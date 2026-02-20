@@ -2,7 +2,7 @@
   <div class="article-manager">
     <!-- 页面标题区域 -->
     <div class="page-header">
-      <h2>农业资讯管理</h2>
+      <h2>资讯管理</h2>
       <el-tag type="info">共 {{ total }} 篇文章</el-tag>
     </div>
 

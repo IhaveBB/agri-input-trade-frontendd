@@ -5,7 +5,7 @@
         <div class="auth-header">
             <div class="logo" @click="goToHome">
                 <i class="el-icon-shopping-cart-2"></i>
-                <span class="brand-name">绿野优品</span>
+                <span class="brand-name">农资采销</span>
             </div>
             <el-button type="success" class="home-btn" @click="goToHome">
                 <i class="el-icon-s-home"></i> 返回首页
@@ -16,19 +16,19 @@
             <div class="auth-card">
                 <div class="brand-tagline">
                     <div class="tagline-content">
-                        <h2>大地馈赠 • 匠心呈现</h2>
+                        <h2>优质农资 • 精心采购</h2>
                         <div class="features">
                             <div class="feature-item">
                                 <i class="el-icon-shopping-cart-2"></i>
-                                <span>甄选之约</span>
+                                <span>品类齐全</span>
                             </div>
                             <div class="feature-item">
                                 <i class="el-icon-box"></i>
-                                <span>原乡直采</span>
+                                <span>品质保障</span>
                             </div>
                             <div class="feature-item">
                                 <i class="el-icon-truck"></i>
-                                <span>鲜达万家</span>
+                                <span>快速配送</span>
                             </div>
                         </div>
                     </div>
@@ -39,7 +39,7 @@
             </div>
         </div>
         <div class="auth-footer">
-            <p>© 2025 绿野仙踪农业平台 - 让自然滋养生活</p>
+            <p>© 2026 农资采销系统</p>
         </div>
     </div>
 </template>

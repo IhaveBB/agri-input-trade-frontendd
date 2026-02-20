@@ -6,7 +6,7 @@ import '../assets/iconfont.css';
     <div>
 
         <!-- <span
-            style="height: 60px;display: flex;flex-direction: row;justify-content: center;align-items: center;text-align: center;font-weight: bolder;color: green;font-size:20px;">农产品销售管理系统</span> -->
+            style="height: 60px;display: flex;flex-direction: row;justify-content: center;align-items: center;text-align: center;font-weight: bolder;color: green;font-size:20px;">农资采销系统</span> -->
         <el-menu
             :default-active="$route.path"
             class="el-menu-vertical"

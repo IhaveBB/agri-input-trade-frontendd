@@ -23,7 +23,7 @@
         
         <front-category></front-category>
 
-        <!-- 推荐商品区域 -->
+        <!-- 推荐产品区域 -->
         <div class="section">
           <div class="section-header">
             <div class="title-wrapper">
@@ -32,7 +32,7 @@
                 <span>为您推荐</span>
               </h2>
               <div class="title-line"></div>
-              <div class="subtitle">精选优质好物，专属于您的推荐</div>
+              <div class="subtitle">精选优质农资，专属于您的推荐</div>
             </div>
             <div class="more-btn" @click="$router.push('/products')">
               <span>查看更多</span>
@@ -55,7 +55,7 @@
                 <span>新品尝鲜</span>
               </h2>
               <div class="title-line"></div>
-              <div class="subtitle">甄选时令新品，新鲜送达您家</div>
+              <div class="subtitle">精选热门产品，快速送达您家</div>
             </div>
             <div class="more-btn" @click="$router.push('/products?type=new')">
               <span>查看更多</span>
@@ -140,7 +140,7 @@ export default {
    
     },
 
-    // 获取推荐商品
+    // 获取推荐产品
     async getRecommendProducts() {
       try {
         this.loading = true; // 开始加载
@@ -188,14 +188,14 @@ export default {
           }
         }
 
-        // 设置推荐商品
+        // 设置推荐产品
         this.recommendProducts = products.map(product => ({
           ...product,
           isFavorite: product.isFavorite || false
         }));
 
       } catch (error) {
-        console.error('获取推荐商品失败:', error);
+        console.error('获取推荐产品失败:', error);
         // 如果获取失败，回退到未登录状态的推荐
         this.isLoggedIn = false;
         this.getRecommendProducts();

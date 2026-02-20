@@ -4,7 +4,7 @@
       <div class="logo-container">
         <i class="el-icon-shopping-cart-2 logo-icon"></i>
         <div class="logo-text-container">
-          <h1 class="logo-text">绿野优品</h1>
+          <h1 class="logo-text">农资采销</h1>
           <div class="logo-subtitle">后台管理系统</div>
         </div>
       </div>

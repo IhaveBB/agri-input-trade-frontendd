@@ -5,7 +5,7 @@
       <!-- 页面标题 -->
       <div class="page-header">
         <h2>{{ categoryName }}</h2>
-        <div class="total-count">共 {{ total }} 件商品</div>
+        <div class="total-count">共 {{ total }} 件产品</div>
       </div>
 
       <!-- 排序和搜索区域 -->
@@ -19,14 +19,14 @@
           </el-radio-group>
         </div>
         <div class="search-box">
-          <el-input v-model="searchKey" placeholder="搜索商品" prefix-icon="el-icon-search" clearable></el-input>
+          <el-input v-model="searchKey" placeholder="搜索产品" prefix-icon="el-icon-search" clearable></el-input>
         </div>
       </div>
 
       <!-- 商品列表 -->
       <div class="products-grid" v-loading="loading">
-        <el-empty v-if="!loading && products.length === 0" description="暂无商品">
-          <el-button type="primary" @click="$router.push('/products')">查看全部商品</el-button>
+        <el-empty v-if="!loading && products.length === 0" description="暂无产品">
+          <el-button type="primary" @click="$router.push('/products')">查看全部产品</el-button>
         </el-empty>
 
         <el-row :gutter="20" v-else>

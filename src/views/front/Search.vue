@@ -5,7 +5,7 @@
       <!-- 页面标题 -->
       <div class="page-header">
         <h2>搜索结果</h2>
-        <div class="total-count">共 {{ total }} 件商品</div>
+        <div class="total-count">共 {{ total }} 件产品</div>
       </div>
 
       <!-- 排序和筛选区域 -->
@@ -19,7 +19,7 @@
           </el-radio-group>
         </div>
         <div class="filter-box">
-          <el-select v-model="categoryId" placeholder="商品分类" clearable @change="handleFilter">
+          <el-select v-model="categoryId" placeholder="产品分类" clearable @change="handleFilter">
             <el-option
               v-for="item in categories"
               :key="item.id"
@@ -36,15 +36,15 @@
         </div>
       </div>
 
-      <!-- 商品列表 -->
+      <!-- 产品列表 -->
       <div class="products-grid" v-loading="loading">
-        <el-empty 
+        <el-empty
           v-if="!loading && products.length === 0"
           :image-size="200"
-          description="暂无相关商品"
+          description="暂无相关产品"
         >
           <template #description>
-            <p class="empty-text">抱歉，没有找到相关商品</p>
+            <p class="empty-text">抱歉，没有找到相关产品</p>
             <p class="empty-tips">您可以：</p>
             <ul class="empty-suggestions">
               <li>检查是否有错别字</li>
@@ -53,7 +53,7 @@
             </ul>
           </template>
           <div class="empty-actions">
-            <el-button type="primary" @click="$router.push('/products')">浏览全部商品</el-button>
+            <el-button type="primary" @click="$router.push('/products')">浏览全部产品</el-button>
             <el-button @click="resetFilters">清除筛选条件</el-button>
           </div>
         </el-empty>
@@ -187,11 +187,11 @@ export default {
         } else {
           this.products = []
           this.total = 0
-          this.$message.error(res.msg || '获取商品列表失败')
+          this.$message.error(res.msg || '获取产品列表失败')
         }
       } catch (error) {
-        console.error('获取商品列表失败:', error)
-        this.$message.error('获取商品列表失败')
+        console.error('获取产品列表失败:', error)
+        this.$message.error('获取产品列表失败')
         this.products = []
         this.total = 0
       } finally {

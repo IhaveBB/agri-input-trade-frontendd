@@ -4,8 +4,8 @@
       <div class="login-icon">
         <i class="el-icon-user-solid"></i>
       </div>
-      <h2 class="login-title">欢迎回到自然之选</h2>
-      <p class="login-subtitle">请用您的身份密钥开启绿色之旅</p>
+      <h2 class="login-title">欢迎使用农资采销系统</h2>
+      <p class="login-subtitle">请用您的账号密码登录系统</p>
     </div>
 
     <el-form ref="loginForm" :model="loginForm" :rules="rules" class="login-form">
@@ -37,7 +37,7 @@
       <el-form-item>
         <el-button type="success" class="login-button" @click="onLogin">
           <i class="el-icon-right"></i>
-          开启田园时光
+          立即登录
         </el-button>
       </el-form-item>
 

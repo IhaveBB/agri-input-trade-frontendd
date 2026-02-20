@@ -4,7 +4,7 @@
     <div class="main-content">
       <!-- 页面标题 -->
       <div class="page-header">
-        <h2>农业资讯</h2>
+        <h2>资讯中心</h2>
         <div class="article-count">共 {{ total }} 篇文章</div>
       </div>
 

@@ -12,7 +12,7 @@
         <el-tooltip content="返回前台" placement="bottom">
           <div class="action-btn" @click="goToFront">
             <i class="el-icon-s-home"></i>
-            <span>商城首页</span>
+            <span>系统首页</span>
           </div>
         </el-tooltip>
         

@@ -3,7 +3,7 @@
     <div class="header-container">
       <div class="logo-area" @click="$router.push('/')">
         <i class="el-icon-shopping-cart-2"></i>
-        <span>绿野优品</span>
+        <span>农资采销</span>
       </div>
 
       <el-menu mode="horizontal" :router="true" :default-active="activePath" class="nav-menu">
@@ -12,7 +12,7 @@
         <el-menu-item index="/cart">购物车</el-menu-item>
         <el-menu-item index="/order">我的订单</el-menu-item>
         <el-menu-item index="/articles" class="nav-item">
-            农业资讯
+            资讯中心
           </el-menu-item>
       </el-menu>
 
@@ -20,7 +20,7 @@
         <div class="search-box">
           <el-input 
             v-model="searchKey" 
-            placeholder="搜索商品..." 
+            placeholder="搜索产品..." 
             @keyup.enter.native="handleSearch"
             class="search-input">
             <i slot="prefix" class="el-icon-search"></i>

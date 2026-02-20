@@ -6,9 +6,9 @@
       <div class="page-header">
         <h2 class="page-title">
           <i class="el-icon-shopping-bag-1"></i>
-          <span>全部商品</span>
+          <span>全部产品</span>
         </h2>
-        <div class="page-subtitle">精选优质农产品，品质保障</div>
+        <div class="page-subtitle">精选优质农资，品质保障</div>
       </div>
 
       <!-- 顶部过滤器 -->
@@ -21,7 +21,7 @@
               <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="">全部商品</el-dropdown-item>
+              <el-dropdown-item command="">全部产品</el-dropdown-item>
               <el-dropdown-item 
                 v-for="category in categories" 
                 :key="category.id"

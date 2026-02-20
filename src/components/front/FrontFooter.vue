@@ -6,11 +6,11 @@
         <div class="footer-section about-section">
           <div class="footer-logo">
             <i class="el-icon-shopping-cart-2"></i>
-            <span class="footer-logo-text">绿野优品</span>
+            <span class="footer-logo-text">农资采销</span>
           </div>
           <div class="footer-info">
             <p class="footer-slogan">
-              撷取自然馈赠 • 臻选品质生活
+              精选优质农资 • 品质保障
             </p>
             <div class="footer-divider">•</div>
             <div class="footer-contact">
@@ -31,7 +31,7 @@
       <!-- 版权信息 -->
       <div class="footer-bottom">
         <div class="copyright">
-          <p>© 2024 绿野优品 版权所有 | 浙ICP备xxxxxxxx号-1</p>
+          <p>© 2025 农资采销系统 版权所有</p>
         </div>
       </div>
     </div>

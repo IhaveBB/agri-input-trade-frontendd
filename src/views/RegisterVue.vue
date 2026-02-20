@@ -1,7 +1,7 @@
 <template>
     <div class="register-container">
-        <h2 class="register-title">成为自然合伙人</h2>
-        <p class="register-subtitle">开启您的有机生活新篇章</p>
+        <h2 class="register-title">加入农资采销系统</h2>
+        <p class="register-subtitle">开启您的采购新体验</p>
 
         <el-form ref="registerForm" :model="registerForm" :rules="rules" class="register-form">
             <div class="form-content">
@@ -85,7 +85,7 @@
                         class="register-button"
                         @click="onRegister">
                         <i class="el-icon-check"></i>
-                        加入绿色联盟
+                        立即注册
                     </el-button>
                 </el-form-item>
 

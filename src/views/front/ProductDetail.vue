@@ -6,7 +6,7 @@
       <div class="breadcrumb">
         <el-breadcrumb separator="/">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item :to="{ path: '/products' }">全部商品</el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: '/products' }">全部产品</el-breadcrumb-item>
           <el-breadcrumb-item>{{ product.name || '加载中...' }}</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
