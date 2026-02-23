@@ -55,12 +55,34 @@ export default {
   methods: {
     async fetchCategories() {
       try {
-        const res = await Request.get('/category/all')
+        // 获取一级分类（顶级分类）
+        const res = await Request.get('/category/top')
         if (res.code === '0') {
           this.categories = res.data.map(item => ({
             ...item,
             icon: item.icon
           }))
+        } else {
+          // 备选：从 all 接口获取并筛选一级分类
+          await this.fetchCategoriesFallback()
+        }
+      } catch (error) {
+        console.error('获取分类数据失败:', error)
+        // 尝试使用备选方案
+        await this.fetchCategoriesFallback()
+      }
+    },
+    async fetchCategoriesFallback() {
+      try {
+        const res = await Request.get('/category/all')
+        if (res.code === '0') {
+          // 只取一级分类（parentId为0或没有parentId的）
+          this.categories = res.data
+            .filter(item => !item.parentId || item.parentId === 0)
+            .map(item => ({
+              ...item,
+              icon: item.icon
+            }))
         }
       } catch (error) {
         console.error('获取分类数据失败:', error)

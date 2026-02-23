@@ -82,6 +82,7 @@ export default {
       this.currentPage = 1
       this.getProducts()
     }, 300)
+    this.getCategoryInfo()
     this.getProducts()
   },
   watch: {
@@ -90,6 +91,19 @@ export default {
     }
   },
   methods: {
+    // 获取分类信息
+    async getCategoryInfo() {
+      const categoryId = this.$route.params.id
+      if (!categoryId) return
+      try {
+        const res = await Request.get(`/category/${categoryId}`)
+        if (res.code === '0' && res.data) {
+          this.categoryName = res.data.name
+        }
+      } catch (error) {
+        console.error('获取分类信息失败:', error)
+      }
+    },
     async getProducts() {
       this.loading = true
       try {

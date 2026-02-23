@@ -17,6 +17,7 @@
                 :class="{ active: !selectedCategory }"
                 @click="handleCategoryChange('')"
               >全部产品</div>
+              <!-- 一级分类 -->
               <div
                 v-for="category in categories"
                 :key="category.id"
@@ -24,6 +25,16 @@
                 :class="{ active: selectedCategory === category.id }"
                 @click="handleCategoryChange(category.id)"
               >{{ category.name }}</div>
+              <!-- 更多分类使用级联选择器 -->
+              <el-cascader
+                v-model="selectedCategory"
+                :options="categoryTree"
+                :props="{ value: 'id', label: 'name', children: 'children', checkStrictly: true, emitPath: false }"
+                placeholder="选择分类"
+                clearable
+                @change="handleCategoryChange(selectedCategory)"
+                class="category-cascader"
+              ></el-cascader>
             </div>
           </div>
           <div class="filter-section">
@@ -169,6 +180,7 @@ export default {
       loading: false,
       products: [],
       categories: [],
+      categoryTree: [],
       selectedCategory: '',
       priceRange: '',
       priceRanges: [
@@ -197,12 +209,42 @@ export default {
     }
   },
   methods: {
+    // 构建树形结构
+    buildTree(flatList) {
+      const map = {}
+      const roots = []
+      flatList.forEach(item => {
+        map[item.id] = { ...item, children: [] }
+      })
+      flatList.forEach(item => {
+        if (item.parentId === 0 || !item.parentId) {
+          roots.push(map[item.id])
+        } else if (map[item.parentId]) {
+          map[item.parentId].children.push(map[item.id])
+        }
+      })
+      return roots
+    },
     // 获取商品分类
     async getCategories() {
       try {
-        const res = await Request.get('/category/all')
-        if (res.code === '0') {
-          this.categories = res.data
+        // 获取一级分类用于筛选
+        const topRes = await Request.get('/category/top')
+        if (topRes.code === '0') {
+          this.categories = topRes.data
+        }
+        // 获取完整分类树用于级联选择器
+        try {
+          const treeRes = await Request.get('/category/tree')
+          if (treeRes.code === '0') {
+            this.categoryTree = treeRes.data
+          }
+        } catch (treeError) {
+          // 备选：从 all 接口构建树
+          const allRes = await Request.get('/category/all')
+          if (allRes.code === '0') {
+            this.categoryTree = this.buildTree(allRes.data)
+          }
         }
       } catch (error) {
         console.error('获取分类失败:', error)

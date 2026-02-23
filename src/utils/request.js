@@ -83,6 +83,28 @@ request.interceptors.response.use(
                 console.error('Response parsing error:', e);
             }
         }
+
+        // 统一处理业务错误
+        if (res.code && res.code !== '0' && res.code !== 0) {
+            // 防止重复显示错误消息
+            if (!messageShown) {
+                messageShown = true;
+                try {
+                    Message.error({
+                        message: res.msg || '操作失败',
+                        duration: 3000,
+                        showClose: true,
+                        onClose: () => {
+                            messageShown = false;
+                        }
+                    });
+                } catch (e) {
+                    messageShown = false;
+                }
+            }
+            return Promise.reject(res);
+        }
+
         return res;
     },
     error => {

@@ -19,14 +19,14 @@
           </el-radio-group>
         </div>
         <div class="filter-box">
-          <el-select v-model="categoryId" placeholder="产品分类" clearable @change="handleFilter">
-            <el-option
-              v-for="item in categories"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
-          </el-select>
+          <el-cascader
+            v-model="categoryId"
+            :options="categoryTree"
+            :props="{ value: 'id', label: 'name', children: 'children', checkStrictly: true, emitPath: false }"
+            placeholder="产品分类"
+            clearable
+            @change="handleFilter"
+          ></el-cascader>
           <el-select v-model="priceRange" placeholder="价格区间" clearable @change="handleFilter">
             <el-option label="0-50元" value="0-50"></el-option>
             <el-option label="50-100元" value="50-100"></el-option>
@@ -106,6 +106,7 @@ export default {
       loading: false,
       products: [],
       categories: [],
+      categoryTree: [],
       total: 0,
       currentPage: 1,
       pageSize: 12,
@@ -142,11 +143,41 @@ export default {
       }
       return true
     },
+    // 构建树形结构
+    buildTree(flatList) {
+      const map = {}
+      const roots = []
+      flatList.forEach(item => {
+        map[item.id] = { ...item, children: [] }
+      })
+      flatList.forEach(item => {
+        if (item.parentId === 0 || !item.parentId) {
+          roots.push(map[item.id])
+        } else if (map[item.parentId]) {
+          map[item.parentId].children.push(map[item.id])
+        }
+      })
+      return roots
+    },
     async getCategories() {
       try {
-        const res = await Request.get('/category/all')
-        if (res.code === '0') {
-          this.categories = res.data
+        // 获取一级分类用于下拉显示
+        const topRes = await Request.get('/category/top')
+        if (topRes.code === '0') {
+          this.categories = topRes.data
+        }
+        // 获取完整分类树用于级联选择器
+        try {
+          const treeRes = await Request.get('/category/tree')
+          if (treeRes.code === '0') {
+            this.categoryTree = treeRes.data
+          }
+        } catch (treeError) {
+          // 备选：从 all 接口构建树
+          const allRes = await Request.get('/category/all')
+          if (allRes.code === '0') {
+            this.categoryTree = this.buildTree(allRes.data)
+          }
         }
       } catch (error) {
         console.error('获取分类列表失败:', error)
@@ -352,6 +383,10 @@ export default {
 /* 筛选框样式 */
 .filter-box :deep(.el-select) {
   width: 160px;
+}
+
+.filter-box :deep(.el-cascader) {
+  width: 180px;
 }
 
 .filter-box :deep(.el-input__inner) {
