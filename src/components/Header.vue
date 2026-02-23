@@ -107,9 +107,9 @@ export default {
   align-items: center;
   justify-content: space-between;
   height: 100%;
-  padding: 0 16px;
-  background: linear-gradient(to right, #ffffff, #f8faf5);
-  border-bottom: 1px solid #ebeef5;
+  padding: 0 20px;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+  border-bottom: none;
   
   .header-left {
     display: flex;
@@ -126,15 +126,16 @@ export default {
       align-items: center;
       gap: 8px;
       color: #606266;
-      font-size: 14px;
-      background: #f5f7fa;
-      padding: 6px 12px;
+      font-size: 13px;
+      background: rgba(64, 158, 255, 0.08);
+      padding: 6px 14px;
       border-radius: 20px;
       white-space: nowrap;
-      
+      border: 1px solid rgba(64, 158, 255, 0.15);
+
       i {
-        color: #67C23A;
-        font-size: 16px;
+        color: #409EFF;
+        font-size: 15px;
       }
     }
     
@@ -151,14 +152,14 @@ export default {
         border-radius: 20px;
         cursor: pointer;
         transition: all 0.3s ease;
-        background: linear-gradient(45deg, #67C23A, #85ce61);
+        background: linear-gradient(45deg, #409EFF, #66B1FF);
         color: white;
         font-size: 14px;
-        box-shadow: 0 2px 6px rgba(103, 194, 58, 0.2);
+        box-shadow: 0 2px 6px rgba(64, 158, 255, 0.2);
         
         &:hover {
           transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
+          box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
         }
         
         i {
@@ -193,7 +194,7 @@ export default {
         
         &:hover {
           background-color: white;
-          color: #67C23A;
+          color: #409EFF;
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
           
           i.el-icon-refresh-right {
@@ -219,8 +220,8 @@ export default {
 }
 
 :deep(.el-badge__content) {
-  background-color: #67C23A;
-  box-shadow: 0 2px 4px rgba(103, 194, 58, 0.2);
+  background-color: #409EFF;
+  box-shadow: 0 2px 4px rgba(64, 158, 255, 0.2);
 }
 
 :deep(.el-tooltip__popper) {

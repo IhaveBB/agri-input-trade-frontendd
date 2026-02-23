@@ -2,80 +2,84 @@
   <div class="products-page">
     <front-header></front-header>
     <div class="main-content">
-      <!-- 页面标题 -->
-      <div class="page-header">
-        <h2 class="page-title">
-          <i class="el-icon-shopping-bag-1"></i>
-          <span>全部产品</span>
-        </h2>
-        <div class="page-subtitle">精选优质农资，品质保障</div>
-      </div>
-
-      <!-- 顶部过滤器 -->
-      <div class="filter-bar">
-        <div class="filter-group">
-          <el-dropdown trigger="click" @command="handleCategoryChange">
-            <span class="filter-label">
-              <i class="el-icon-menu"></i>
-              分类
-              <i class="el-icon-arrow-down el-icon--right"></i>
-            </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="">全部产品</el-dropdown-item>
-              <el-dropdown-item 
-                v-for="category in categories" 
+      <!-- 左侧筛选栏 -->
+      <div class="left-sidebar">
+        <div class="sidebar-header">
+          <i class="el-icon-s-grid"></i>
+          <span>筛选条件</span>
+        </div>
+        <div class="filter-sections">
+          <div class="filter-section">
+            <div class="section-label">产品分类</div>
+            <div class="filter-options">
+              <div
+                class="filter-option"
+                :class="{ active: !selectedCategory }"
+                @click="handleCategoryChange('')"
+              >全部产品</div>
+              <div
+                v-for="category in categories"
                 :key="category.id"
-                :command="category.id"
-              >{{ category.name }}</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-
-          <el-dropdown trigger="click" @command="handlePriceRangeChange">
-            <span class="filter-label">
-              <i class="el-icon-price-tag"></i>
-              价格
-              <i class="el-icon-arrow-down el-icon--right"></i>
-            </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="">全部价格</el-dropdown-item>
-              <el-dropdown-item 
-                v-for="(range, index) in priceRanges" 
+                class="filter-option"
+                :class="{ active: selectedCategory === category.id }"
+                @click="handleCategoryChange(category.id)"
+              >{{ category.name }}</div>
+            </div>
+          </div>
+          <div class="filter-section">
+            <div class="section-label">价格区间</div>
+            <div class="filter-options">
+              <div
+                class="filter-option"
+                :class="{ active: !priceRange }"
+                @click="handlePriceRangeChange('')"
+              >全部价格</div>
+              <div
+                v-for="(range, index) in priceRanges"
                 :key="index"
-                :command="range.value"
-              >{{ range.label }}</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-
-          <el-dropdown trigger="click" @command="handleSortChange">
-            <span class="filter-label">
-              <i class="el-icon-sort"></i>
-              排序
-              <i class="el-icon-arrow-down el-icon--right"></i>
-            </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item 
-                v-for="option in sortOptions" 
+                class="filter-option"
+                :class="{ active: priceRange === range.value }"
+                @click="handlePriceRangeChange(range.value)"
+              >{{ range.label }}</div>
+            </div>
+          </div>
+          <div class="filter-section">
+            <div class="section-label">排序方式</div>
+            <div class="filter-options">
+              <div
+                v-for="option in sortOptions"
                 :key="option.value"
-                :command="option.value"
-              >{{ option.label }}</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </div>
-
-        <div class="search-box">
-          <el-input 
-            v-model="searchKeyword" 
-            placeholder="搜索商品" 
-            prefix-icon="el-icon-search"
-            clearable
-            @clear="handleSearch"
-            @keyup.enter.native="handleSearch"
-          >
-          </el-input>
+                class="filter-option"
+                :class="{ active: sortBy === option.value }"
+                @click="handleSortChange(option.value)"
+              >{{ option.label }}</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- 已选择的过滤条件 -->
+      <!-- 右侧主内容区 -->
+      <div class="right-content">
+        <!-- 页面标题 -->
+        <div class="page-header">
+          <div class="title-section">
+            <h2 class="page-title">全部产品</h2>
+            <div class="page-subtitle">精选优质农资，品质保障</div>
+          </div>
+          <div class="search-box">
+            <el-input
+              v-model="searchKeyword"
+              placeholder="搜索商品"
+              prefix-icon="el-icon-search"
+              clearable
+              @clear="handleSearch"
+              @keyup.enter.native="handleSearch"
+            >
+            </el-input>
+          </div>
+        </div>
+
+        <!-- 已选择的过滤条件 -->
       <div class="selected-filters" v-if="hasFilters">
         <el-tag 
           v-if="selectedCategory" 
@@ -140,6 +144,7 @@
         >
         </el-pagination>
       </div>
+      </div><!-- 闭合 right-content -->
     </div>
     <front-footer></front-footer>
   </div>
@@ -373,34 +378,120 @@ export default {
 
 .main-content {
   flex: 1;
-  max-width: 1400px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 32px 40px;
   width: 100%;
   box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+/* 左侧边栏样式 */
+.left-sidebar {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 84px;
+  height: fit-content;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.sidebar-header i {
+  font-size: 22px;
+  color: #409EFF;
+}
+
+.filter-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #303133;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-option {
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  color: #606266;
+  background: #f5f7fa;
+}
+
+.filter-option:hover {
+  background: rgba(64, 158, 255, 0.1);
+  color: #409EFF;
+}
+
+.filter-option.active {
+  background: linear-gradient(135deg, #409EFF, #66B1FF);
+  color: white;
+  font-weight: 500;
+}
+
+/* 右侧内容区 */
+.right-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 /* 页面标题样式 */
 .page-header {
   margin-bottom: 24px;
   background: white;
-  padding: 20px 24px;
-  border-radius: 12px;
-  border: 1px solid #ebeef5;
-  position: relative;
-  overflow: hidden;
+  padding: 24px 32px;
+  border-radius: 20px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.page-header::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 4px;
-  height: 100%;
-  background: linear-gradient(to bottom, #67C23A, #85ce61);
+.title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.page-header .search-box {
+  width: 280px;
 }
 
 .page-title {
@@ -415,83 +506,28 @@ export default {
 
 .page-title i {
   font-size: 28px;
-  color: #67C23A;
+  color: #409EFF;
 }
 
 .page-subtitle {
-  margin-top: 4px;
   font-size: 14px;
   color: #909399;
-  padding-left: 36px;
 }
 
-/* 过滤器样式 */
-.filter-bar {
-  background: white;
-  border-radius: 12px;
-  padding: 16px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  border: 1px solid #ebeef5;
-}
-
-.filter-group {
-  display: flex;
-  gap: 24px;
-  position: relative;
-}
-
-.filter-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  color: #606266;
-  font-size: 14px;
-  position: relative;
-}
-
-.filter-label:hover {
-  background: rgba(103, 194, 58, 0.05);
-  color: #67C23A;
-}
-
-.filter-label::after {
-  content: '';
-  position: absolute;
-  right: -12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 1px;
-  height: 16px;
-  background: #ebeef5;
-}
-
-.filter-group > :last-child .filter-label::after {
-  display: none;
-}
-
-.search-box {
-  width: 280px;
-}
-
-.search-box :deep(.el-input__inner) {
-  border-radius: 6px;
+/* 搜索框样式 */
+.page-header .search-box :deep(.el-input__inner) {
+  border-radius: 20px;
   border: 1px solid #ebeef5;
   transition: all 0.3s ease;
 }
 
-.search-box :deep(.el-input__inner:hover) {
+.page-header .search-box :deep(.el-input__inner:hover) {
   border-color: #c0c4cc;
 }
 
-.search-box :deep(.el-input__inner:focus) {
-  border-color: #67C23A;
+.page-header .search-box :deep(.el-input__inner:focus) {
+  border-color: #409EFF;
+  box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.1);
 }
 
 /* 已选择的过滤条件 */
@@ -501,8 +537,9 @@ export default {
   gap: 12px;
   margin-bottom: 20px;
   padding: 16px 24px;
-  background: #f8faf5;
+  background: white;
   border-radius: 12px;
+  border: 1px solid #ebeef5;
 }
 
 .selected-filters :deep(.el-tag) {
@@ -543,8 +580,8 @@ export default {
 }
 
 :deep(.el-dropdown-menu__item:hover) {
-  background-color: rgba(103, 194, 58, 0.1);
-  color: #67C23A;
+  background-color: rgba(64, 158, 255, 0.1);
+  color: #409EFF;
 }
 
 :deep(.el-dropdown-menu__item.is-disabled) {
@@ -605,7 +642,7 @@ export default {
 }
 
 :deep(.el-pagination.is-background .el-pager li:not(.disabled).active) {
-  background-color: #67C23A;
+  background-color: #409EFF;
 }
 
 /* 响应式布局优化 */

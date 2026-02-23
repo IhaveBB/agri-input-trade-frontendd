@@ -414,7 +414,7 @@ export default {
   top: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(to bottom, #67C23A, #85ce61);
+  background: linear-gradient(to bottom, #409EFF, #66B1FF);
 }
 
 .page-header h2 {
@@ -450,12 +450,12 @@ export default {
 }
 
 .menu-list .el-menu-item:hover {
-  background: linear-gradient(to right, rgba(103, 194, 58, 0.05), transparent);
+  background: linear-gradient(to right, rgba(64, 158, 255, 0.05), transparent);
 }
 
 .menu-list .el-menu-item.is-active {
-  background: linear-gradient(to right, rgba(103, 194, 58, 0.1), transparent);
-  border-right: 3px solid #67C23A;
+  background: linear-gradient(to right, rgba(64, 158, 255, 0.1), transparent);
+  border-right: 3px solid #409EFF;
 }
 
 .menu-list .el-menu-item i {
@@ -465,7 +465,7 @@ export default {
 }
 
 .menu-list .el-menu-item.is-active i {
-  color: #67C23A;
+  color: #409EFF;
 }
 
 /* 右侧内容区样式 */
@@ -521,7 +521,7 @@ export default {
 
 .address-item:hover {
   transform: translateY(-2px);
-  background: linear-gradient(to right, rgba(103, 194, 58, 0.02), transparent);
+  background: linear-gradient(to right, rgba(64, 158, 255, 0.02), transparent);
 }
 
 .address-item::before {
@@ -531,7 +531,7 @@ export default {
   top: 0;
   width: 3px;
   height: 100%;
-  background: linear-gradient(to bottom, #67C23A, #85ce61);
+  background: linear-gradient(to bottom, #409EFF, #66B1FF);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -580,7 +580,7 @@ export default {
 
 /* 按钮样式 */
 .el-button--primary {
-  background: linear-gradient(135deg, #67c23a, #85ce61);
+  background: linear-gradient(135deg, #67c23a, #66B1FF);
   border: none;
   padding: 10px 20px;
   border-radius: 6px;
@@ -658,7 +658,7 @@ export default {
 }
 
 :deep(.el-empty .el-button--primary) {
-  background: linear-gradient(135deg, #67c23a, #85ce61);
+  background: linear-gradient(135deg, #67c23a, #66B1FF);
   border: none;
   transition: all 0.3s ease;
 }

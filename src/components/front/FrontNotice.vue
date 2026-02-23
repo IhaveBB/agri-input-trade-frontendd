@@ -253,7 +253,7 @@ export default {
 }
 
 .title-wrapper i {
-  color: #67C23A;
+  color: #409EFF;
   font-size: 18px;
 }
 
@@ -276,7 +276,7 @@ export default {
 }
 
 .notice-item:hover {
-  background: rgba(103, 194, 58, 0.05);
+  background: rgba(64, 158, 255, 0.05);
 }
 
 .notice-content {
@@ -351,7 +351,7 @@ export default {
 }
 
 .read-more {
-  color: #67C23A;
+  color: #409EFF;
   font-size: 14px;
   display: flex;
   align-items: center;
@@ -392,7 +392,7 @@ export default {
 }
 
 :deep(.notice-detail-dialog .el-dialog__headerbtn:hover .el-icon-close) {
-  color: #67C23A;
+  color: #409EFF;
 }
 
 :deep(.notice-detail-dialog .el-dialog__body) {
@@ -446,13 +446,13 @@ export default {
 }
 
 .notice-detail-content :deep(a) {
-  color: #67C23A;
+  color: #409EFF;
   text-decoration: none;
   transition: all 0.3s ease;
 }
 
 .notice-detail-content :deep(a:hover) {
-  color: #85ce61;
+  color: #66B1FF;
   text-decoration: underline;
 }
 
@@ -536,7 +536,7 @@ export default {
 }
 
 .more-btn {
-  color: #67C23A;
+  color: #409EFF;
   font-size: 14px;
   display: flex;
   align-items: center;
@@ -567,10 +567,10 @@ export default {
 :deep(.el-carousel__indicator--vertical .el-carousel__button) {
   width: 3px;
   height: 16px;
-  background-color: rgba(103, 194, 58, 0.2);
+  background-color: rgba(64, 158, 255, 0.2);
 }
 
 :deep(.el-carousel__indicator--vertical.is-active .el-carousel__button) {
-  background-color: #67C23A;
+  background-color: #409EFF;
 }
 </style> 

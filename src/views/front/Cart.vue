@@ -369,8 +369,8 @@ export default {
 
 .main-content {
   flex: 1;
-  padding: 32px;
-  max-width: 1200px;
+  padding: 32px 40px;
+  max-width: 1400px;
   margin: 0 auto;
   width: 100%;
   box-sizing: border-box;
@@ -397,7 +397,7 @@ export default {
   top: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(to bottom, #67C23A, #85ce61);
+  background: linear-gradient(to bottom, #409EFF, #66B1FF);
 }
 
 .page-header h2 {
@@ -411,7 +411,7 @@ export default {
   color: #606266;
   font-size: 14px;
   font-weight: 500;
-  background: rgba(103, 194, 58, 0.1);
+  background: rgba(64, 158, 255, 0.1);
   padding: 6px 16px;
   border-radius: 20px;
 }
@@ -430,9 +430,9 @@ export default {
 /* 表头样式 */
 .cart-header {
   display: grid;
-  grid-template-columns: 80px 3fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 60px 2.5fr 1fr 1.2fr 1fr 80px;
   align-items: center;
-  padding: 16px 24px;
+  padding: 16px 32px;
   background: linear-gradient(to right, #f8faf5, #fff);
   border-radius: 12px 12px 0 0;
   font-size: 14px;
@@ -443,16 +443,16 @@ export default {
 /* 商品项样式 */
 .cart-item {
   display: grid;
-  grid-template-columns: 80px 3fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 60px 2.5fr 1fr 1.2fr 1fr 80px;
   align-items: center;
-  padding: 20px 24px;
+  padding: 24px 32px;
   border-bottom: 1px solid #ebeef5;
   transition: all 0.3s ease;
   position: relative;
 }
 
 .cart-item:hover {
-  background: linear-gradient(to right, rgba(103, 194, 58, 0.02), transparent);
+  background: linear-gradient(to right, rgba(64, 158, 255, 0.05), transparent);
 }
 
 /* 商品信息样式 */
@@ -610,7 +610,7 @@ export default {
   padding: 10px 24px;
   font-size: 14px;
   border-radius: 6px;
-  background: linear-gradient(135deg, #67c23a, #85ce61);
+  background: linear-gradient(135deg, #67c23a, #66B1FF);
   border: none;
   transition: all 0.3s ease;
   position: relative;
@@ -624,7 +624,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #85ce61, #67c23a);
+  background: linear-gradient(135deg, #66B1FF, #67c23a);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -652,14 +652,14 @@ export default {
   padding: 12px 30px;
   font-size: 15px;
   border-radius: 24px;
-  background: linear-gradient(135deg, #67c23a, #85ce61);
+  background: linear-gradient(135deg, #67c23a, #66B1FF);
   border: none;
   transition: all 0.3s ease;
 }
 
 :deep(.el-empty .el-button:hover) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
 }
 
 /* 加载状态样式 */

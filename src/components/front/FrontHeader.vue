@@ -160,8 +160,8 @@ export default {
   top: 0;
   z-index: 1000;
   background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  height: 55px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  height: 60px;
   position: relative;
   overflow: hidden;
 }
@@ -187,10 +187,10 @@ export default {
   position: absolute;
   inset: 0;
   background-image: 
-    radial-gradient(circle at 0% 0%, rgba(103, 194, 58, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 100% 0%, rgba(103, 194, 58, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(103, 194, 58, 0.01) 0%, transparent 50%),
-    linear-gradient(90deg, rgba(103, 194, 58, 0.01) 0%, rgba(103, 194, 58, 0.02) 50%, rgba(103, 194, 58, 0.01) 100%);
+    radial-gradient(circle at 0% 0%, rgba(64, 158, 255, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 100% 0%, rgba(64, 158, 255, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(64, 158, 255, 0.01) 0%, transparent 50%),
+    linear-gradient(90deg, rgba(64, 158, 255, 0.01) 0%, rgba(64, 158, 255, 0.02) 50%, rgba(64, 158, 255, 0.01) 100%);
   opacity: 0.8;
   z-index: -1;
 }
@@ -211,16 +211,16 @@ export default {
   align-items: center;
   gap: 10px;
   cursor: pointer;
-  color: #67C23A;
+  color: #409EFF;
   font-size: 18px;
   font-weight: 600;
   padding: 4px 8px;
   border-radius: 6px;
   transition: all 0.3s ease;
   background: linear-gradient(120deg, 
-    rgba(103, 194, 58, 0.05) 0%, 
-    rgba(103, 194, 58, 0.1) 50%, 
-    rgba(103, 194, 58, 0.05) 100%
+    rgba(64, 158, 255, 0.05) 0%, 
+    rgba(64, 158, 255, 0.1) 50%, 
+    rgba(64, 158, 255, 0.05) 100%
   );
   position: relative;
   overflow: hidden;
@@ -240,12 +240,12 @@ export default {
 
 .logo-area:hover {
   background: linear-gradient(120deg, 
-    rgba(103, 194, 58, 0.1) 0%, 
-    rgba(103, 194, 58, 0.15) 50%, 
-    rgba(103, 194, 58, 0.1) 100%
+    rgba(64, 158, 255, 0.1) 0%, 
+    rgba(64, 158, 255, 0.15) 50%, 
+    rgba(64, 158, 255, 0.1) 100%
   );
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(103, 194, 58, 0.1);
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.1);
 }
 
 .logo-area:hover::before {
@@ -254,17 +254,17 @@ export default {
 
 .logo-area i {
   font-size: 22px;
-  background: linear-gradient(45deg, #67C23A, #85ce61);
+  background: linear-gradient(45deg, #409EFF, #66B1FF);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 1px 2px rgba(103, 194, 58, 0.2));
+  filter: drop-shadow(0 1px 2px rgba(64, 158, 255, 0.2));
 }
 
 .nav-menu {
   border: none;
   background: transparent;
-  height: 55px;
-  line-height: 55px;
+  height: 60px;
+  line-height: 60px;
   flex: 1;
   position: relative;
   z-index: 1;
@@ -272,10 +272,10 @@ export default {
 }
 
 :deep(.el-menu--horizontal > .el-menu-item) {
-  height: 55px;
-  line-height: 55px;
-  padding: 0 16px;
-  font-size: 16px;
+  height: 60px;
+  line-height: 60px;
+  padding: 0 20px;
+  font-size: 15px;
   border: none !important;
   position: relative;
   overflow: hidden;
@@ -283,13 +283,13 @@ export default {
 }
 
 :deep(.el-menu--horizontal > .el-menu-item:hover) {
-  background: linear-gradient(to right, transparent, rgba(103, 194, 58, 0.05), transparent);
+  background: linear-gradient(to right, transparent, rgba(64, 158, 255, 0.08), transparent);
 }
 
 :deep(.el-menu--horizontal > .el-menu-item.is-active) {
-  color: #67C23A;
+  color: #409EFF;
   font-weight: 500;
-  background: linear-gradient(to right, transparent, rgba(103, 194, 58, 0.08), transparent);
+  background: linear-gradient(to right, transparent, rgba(64, 158, 255, 0.1), transparent);
 }
 
 .right-section {
@@ -315,8 +315,8 @@ export default {
 
 .search-input :deep(.el-input__inner:focus) {
   background: #fff;
-  border-color: #67C23A;
-  box-shadow: 0 0 0 2px rgba(103, 194, 58, 0.1);
+  border-color: #409EFF;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
 }
 
 .search-input :deep(.el-input__prefix) {
@@ -332,7 +332,7 @@ export default {
 }
 
 .search-input :deep(.el-input__inner:focus + .el-input__prefix i) {
-  color: #67C23A;
+  color: #409EFF;
 }
 
 .user-actions {
@@ -366,12 +366,12 @@ export default {
 }
 
 :deep(.el-dropdown-menu__item:hover) {
-  background-color: rgba(103, 194, 58, 0.1);
-  color: #67C23A;
+  background-color: rgba(64, 158, 255, 0.1);
+  color: #409EFF;
 }
 
 :deep(.el-dropdown-menu__item:hover i) {
-  color: #67C23A;
+  color: #409EFF;
 }
 
 :deep(.el-dropdown-menu__item.is-disabled) {
@@ -402,7 +402,7 @@ export default {
 }
 
 .user-info:hover {
-  background: rgba(103, 194, 58, 0.1);
+  background: rgba(64, 158, 255, 0.1);
 }
 
 .user-info .el-icon-arrow-down {

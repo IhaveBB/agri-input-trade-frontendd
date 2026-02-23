@@ -139,7 +139,7 @@ export default {
   top: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(to bottom, #67C23A, #85ce61);
+  background: linear-gradient(to bottom, #409EFF, #66B1FF);
 }
 
 .article-title {
@@ -354,7 +354,7 @@ export default {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(103, 194, 58, 0.05), transparent);
+  background: linear-gradient(135deg, rgba(64, 158, 255, 0.05), transparent);
 }
 
 .article-summary i {

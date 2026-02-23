@@ -196,9 +196,7 @@ export default {
 
       } catch (error) {
         console.error('获取推荐产品失败:', error);
-        // 如果获取失败，回退到未登录状态的推荐
-        this.isLoggedIn = false;
-        this.getRecommendProducts();
+        this.$message.error('获取推荐产品失败，请稍后重试');
       } finally {
         // 结束加载
         setTimeout(() => {
@@ -262,27 +260,31 @@ export default {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(to bottom, #fff, #f8faf5);
+  background: linear-gradient(to bottom, #fff, #f5f7fa);
 }
 .main-content {
   flex: 1;
-  padding: 20px;
-  max-width: 1400px;
+  padding: 32px 40px;
+  max-width: 1440px;
   margin: 0 auto;
   width: 100%;
   box-sizing: border-box;
 }
 .section {
-  margin: 32px 0;
+  margin: 48px 0;
   position: relative;
+  padding: 32px;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
 }
 .section::before {
   content: '';
   position: absolute;
   inset: -16px;
-  background: 
-    radial-gradient(circle at 0% 0%, rgba(103, 194, 58, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 100% 100%, rgba(103, 194, 58, 0.03) 0%, transparent 50%);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(64, 158, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(64, 158, 255, 0.05) 0%, transparent 50%);
   z-index: -1;
   border-radius: 24px;
 }
@@ -314,7 +316,7 @@ export default {
 }
 
 .section-title i {
-  color: #67C23A;
+  color: #409EFF;
   font-size: 22px;
 }
 
@@ -324,7 +326,7 @@ export default {
   left: 0;
   width: 100%;
   height: 8px;
-  background: rgba(103, 194, 58, 0.2);
+  background: rgba(64, 158, 255, 0.2);
   border-radius: 4px;
   z-index: 0;
 }
@@ -343,8 +345,8 @@ export default {
   padding: 6px 12px;
   border-radius: 20px;
   background: linear-gradient(135deg,
-    rgba(103, 194, 58, 0.1),
-    rgba(103, 194, 58, 0.15)
+    rgba(64, 158, 255, 0.1),
+    rgba(64, 158, 255, 0.15)
   );
   color: #67c23a;
   font-size: 14px;
@@ -363,8 +365,8 @@ export default {
   width: 100%;
   height: 100%;
   background: linear-gradient(135deg,
-    rgba(103, 194, 58, 0.15),
-    rgba(103, 194, 58, 0.2)
+    rgba(64, 158, 255, 0.15),
+    rgba(64, 158, 255, 0.2)
   );
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -442,22 +444,25 @@ export default {
 
 .carousel-notice-section {
   display: flex;
-  gap: 20px;
-  margin: 20px 0;
-  height: 380px;
-  margin-bottom: 50px;
+  gap: 24px;
+  margin: 24px 0;
+  height: 420px;
+  margin-bottom: 48px;
 }
 
 .carousel-wrapper {
-  flex: 2;
+  flex: 3;
   min-width: 0;
   height: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
 .notice-wrapper {
   flex: 1;
-  min-width: 300px;
-  max-width: 400px;
+  min-width: 280px;
+  max-width: 320px;
   height: 100%;
 }
 
@@ -485,7 +490,7 @@ export default {
 
 .loading-spinner {
   font-size: 48px;
-  color: #67C23A;
+  color: #409EFF;
   animation: pulse 1.5s infinite;
 }
 

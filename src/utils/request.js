@@ -52,7 +52,8 @@ window.onerror = function(message, url, lineNumber) {
   
 request.interceptors.request.use(
     config => {
-        const user = localStorage.getItem('backUser');
+        // 优先获取前台用户token，如果没有则获取后台用户token
+        let user = localStorage.getItem('frontUser') || localStorage.getItem('backUser');
         if (user) {
             try {
                 config.headers['token'] = JSON.parse(user).token;

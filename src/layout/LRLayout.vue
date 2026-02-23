@@ -84,10 +84,10 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.92),
-        rgba(235, 245, 235, 0.88),
-        rgba(220, 235, 220, 0.85)
+    background: linear-gradient(135deg,
+        rgba(64, 158, 255, 0.1),
+        rgba(240, 245, 255, 0.9),
+        rgba(230, 240, 250, 0.85)
     );
     z-index: 1;
 }
@@ -98,20 +98,20 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 40px;
+    padding: 24px 48px;  /* 增加内边距 */
     backdrop-filter: blur(10px);
     background: linear-gradient(to right,
-        rgba(255, 255, 255, 0.95),
-        rgba(240, 255, 240, 0.92)
+        rgba(255, 255, 255, 0.98),
+        rgba(240, 247, 255, 0.95)
     );
-    box-shadow: 0 1px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);  /* 更自然的阴影 */
 }
 
 .logo {
     cursor: pointer;
     font-size: 22px;
     font-weight: 600;
-    color: #67C23A;
+    color: #409EFF;
     letter-spacing: 2px;
     position: relative;
     display: flex;
@@ -121,13 +121,13 @@ export default {
 
 .logo i {
     font-size: 24px;
-    color: #67C23A;
+    color: #409EFF;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .logo:hover i {
     transform: rotate(-12deg) scale(1.1);
-    filter: drop-shadow(0 2px 4px rgba(103, 194, 58, 0.2));
+    filter: drop-shadow(0 2px 4px rgba(64, 158, 255, 0.2));
 }
 
 .home-btn {
@@ -135,17 +135,17 @@ export default {
     border-radius: 30px;
     font-weight: 500;
     transition: all 0.3s ease;
-    background: linear-gradient(45deg, #67C23A, #85ce61);
+    background: linear-gradient(45deg, #409EFF, #66B1FF);
     backdrop-filter: blur(10px);
     border: none;
     color: white;
-    box-shadow: 0 2px 8px rgba(103, 194, 58, 0.2);
+    box-shadow: 0 2px 8px rgba(64, 158, 255, 0.2);
 }
 
 .home-btn:hover {
-    background: linear-gradient(45deg, #85ce61, #67C23A);
+    background: linear-gradient(45deg, #66B1FF, #409EFF);
     color: white;
-    box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
+    box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
     transform: translateY(-1px);
 }
 
@@ -167,10 +167,10 @@ export default {
 
 .auth-card {
     display: flex;
-    width: 900px;
-    border-radius: 24px;
+    width: 960px;  /* 增加宽度 */
+    border-radius: 28px;  /* 增大圆角 */
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.12);  /* 调整阴影 */
     background-color: white;
     position: relative;
     transition: all 0.3s ease;
@@ -193,7 +193,7 @@ export default {
 
 .brand-tagline {
     width: 50%;
-    background: linear-gradient(135deg, #4a8c38 0%, #56a032 100%);
+    background: linear-gradient(135deg, #409EFF 0%, #66B1FF 100%);
     color: white;
     display: flex;
     align-items: center;

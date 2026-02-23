@@ -220,7 +220,7 @@ export default {
   top: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(to bottom, #67C23A, #85ce61);
+  background: linear-gradient(to bottom, #409EFF, #66B1FF);
 }
 
 .page-header h2 {
@@ -234,7 +234,7 @@ export default {
   color: #606266;
   font-size: 14px;
   font-weight: 500;
-  background: rgba(103, 194, 58, 0.1);
+  background: rgba(64, 158, 255, 0.1);
   padding: 6px 16px;
   border-radius: 20px;
 }
@@ -288,7 +288,7 @@ export default {
   padding: 10px 24px;
   font-size: 15px;
   border-radius: 6px;
-  background: linear-gradient(135deg, #67c23a, #85ce61);
+  background: linear-gradient(135deg, #67c23a, #66B1FF);
   border: none;
   transition: all 0.3s ease;
 }

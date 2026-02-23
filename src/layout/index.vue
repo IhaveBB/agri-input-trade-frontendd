@@ -69,26 +69,27 @@ export default {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: #f5f7fa;
+  background-color: #f0f2f5;
 
   .side-container {
-    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+    box-shadow: 2px 0 16px rgba(64, 158, 255, 0.12);
     background-color: #fff;
     float: left;
-    width: 220px;
+    width: 240px;
     height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
     // 滚动条宽度
     scrollbar-width: thin;
-    scrollbar-color: #3AB777 #f0f0f0;
-    border-right: 1px solid #f0f0f0;
+    scrollbar-color: #409EFF #f0f0f0;
+    border-right: none;
     position: relative;
     z-index: 2;
+    border-radius: 0 20px 20px 0;
 
     .logo-container {
       height: 64px;
-      background: linear-gradient(to right, #3AB777, #4FC08D);
+      background: linear-gradient(to right, #409EFF, #66B1FF);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -151,20 +152,20 @@ export default {
   }
 
   .main-container {
-    margin-left: 220px;
+    margin-left: 240px;
     min-height: 100vh;
     background-color: #f5f7fa;
-    padding: 16px;
+    padding: 24px;
     position: relative;
     overflow: hidden;
 
     .main-header {
       background: #fff;
-      border-radius: 8px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-      padding: 16px;
-      
+      border-radius: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      padding: 14px 24px;
+
       .el-header {
         padding: 0;
         height: auto;
@@ -173,17 +174,17 @@ export default {
 
     .main-content {
       background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-      min-height: calc(100vh - 140px);
-      
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      min-height: calc(100vh - 148px);
+
       .el-scrollbar {
-        height: calc(100vh - 140px);
-        
+        height: calc(100vh - 148px);
+
         .scrollbar {
           height: 100%;
           overflow-x: hidden;
-          padding: 20px;
+          padding: 24px;
         }
       }
     }

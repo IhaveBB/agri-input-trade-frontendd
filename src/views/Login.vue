@@ -241,7 +241,7 @@ export default {
 
 .login-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
 }
 
 .login-button i {
@@ -276,8 +276,8 @@ export default {
 }
 
 :deep(.el-input__inner:focus) {
-    border-color: #67C23A;
-    box-shadow: 0 0 0 2px rgba(103, 194, 58, 0.2);
+    border-color: #409EFF;
+    box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
 }
 
 :deep(.el-form-item) {
@@ -370,11 +370,11 @@ export default {
 }
 
 :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-  background-color: #67C23A;
-  border-color: #67C23A;
+  background-color: #409EFF;
+  border-color: #409EFF;
 }
 
 :deep(.el-checkbox__input.is-checked + .el-checkbox__label) {
-  color: #67C23A;
+  color: #409EFF;
 }
 </style>

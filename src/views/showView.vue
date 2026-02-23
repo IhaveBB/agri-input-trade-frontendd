@@ -355,7 +355,7 @@ export default {
           }
         ],
         color: [
-          '#409EFF', '#67C23A', '#E6A23C', '#F56C6C',
+          '#409EFF', '#409EFF', '#E6A23C', '#F56C6C',
           '#909399', '#36CBCB', '#FFA2D3', '#9A60B4'
         ]
       }

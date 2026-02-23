@@ -120,39 +120,40 @@ export default {
 <style scoped>
 .el-menu {
     border-right: none;
-    padding: 12px;
+    padding: 16px 12px;
 }
 
 .el-menu-item {
-    height: 50px;
-    line-height: 50px;
-    border-radius: 8px;
-    margin-bottom: 4px;
+    height: 48px;
+    line-height: 48px;
+    border-radius: 10px;
+    margin-bottom: 6px;
     color: #606266;
     font-size: 14px;
-    
+
     &:hover {
-        color: #3AB777;
-        background-color: #F0F9F4 !important;
+        color: #409EFF;
+        background-color: rgba(64, 158, 255, 0.08) !important;
     }
-    
+
     &.is-active {
-        color: #3AB777;
-        background-color: #F0F9F4 !important;
-        font-weight: 600;
+        color: #fff;
+        background: linear-gradient(135deg, #409EFF, #66B1FF) !important;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
     }
 }
 
 .el-submenu ::v-deep .el-submenu__title {
-    height: 50px;
-    line-height: 50px;
-    border-radius: 8px;
+    height: 48px;
+    line-height: 48px;
+    border-radius: 10px;
     color: #606266;
     font-size: 14px;
-    
+
     &:hover {
-        color: #3AB777;
-        background-color: #F0F9F4 !important;
+        color: #409EFF;
+        background-color: rgba(64, 158, 255, 0.08) !important;
     }
 }
 
@@ -166,12 +167,12 @@ export default {
         background-color: transparent;
         
         &:hover {
-            color: #3AB777;
+            color: #409EFF;
             background-color: #F0F9F4 !important;
         }
         
         &.is-active {
-            color: #3AB777;
+            color: #409EFF;
             background-color: #F0F9F4 !important;
             font-weight: 600;
         }
@@ -188,6 +189,6 @@ export default {
 
 .el-menu-item.is-active [class^="el-icon-"],
 .el-submenu.is-active [class^="el-icon-"] {
-    color: #3AB777;
+    color: #409EFF;
 }
 </style>

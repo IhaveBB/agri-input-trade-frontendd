@@ -444,17 +444,19 @@ export default {
 }
 
 .product-main {
-  display: flex;
-  gap: 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
   padding: 24px;
 }
 
 .image-container {
   position: relative;
-  width: 400px;
-  height: 400px;
-  border-radius: 8px;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 16px;
   overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 :deep(.el-image) {
@@ -487,7 +489,7 @@ export default {
 }
 
 .badge.new {
-  background: linear-gradient(135deg, #67C23A, #85ce61);
+  background: linear-gradient(135deg, #409EFF, #66B1FF);
 }
 
 .badge.discount {
@@ -513,8 +515,8 @@ export default {
 .category-tag {
   display: inline-block;
   padding: 4px 12px;
-  background: rgba(103, 194, 58, 0.1);
-  color: #67C23A;
+  background: rgba(64, 158, 255, 0.1);
+  color: #409EFF;
   border-radius: 20px;
   font-size: 14px;
   margin-bottom: 16px;
@@ -605,13 +607,13 @@ export default {
 }
 
 .cart-btn {
-  background: linear-gradient(135deg, #67C23A, #5aad32);
+  background: linear-gradient(135deg, #409EFF, #5aad32);
   border: none;
 }
 
 .cart-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(103, 194, 58, 0.2);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.2);
 }
 
 .buy-btn {
@@ -641,11 +643,11 @@ export default {
 }
 
 :deep(.el-tabs__item.is-active) {
-  color: #67C23A;
+  color: #409EFF;
 }
 
 :deep(.el-tabs__active-bar) {
-  background-color: #67C23A;
+  background-color: #409EFF;
 }
 
 .review-items {

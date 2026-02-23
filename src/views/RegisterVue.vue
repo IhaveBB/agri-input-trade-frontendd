@@ -322,7 +322,7 @@ export default {
 
 .register-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
+    box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
 }
 
 .register-actions {
@@ -362,8 +362,8 @@ export default {
 }
 
 :deep(.el-input__inner:focus) {
-    border-color: #67C23A;
-    box-shadow: 0 0 0 2px rgba(103, 194, 58, 0.2);
+    border-color: #409EFF;
+    box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
 }
 
 :deep(.el-form-item) {

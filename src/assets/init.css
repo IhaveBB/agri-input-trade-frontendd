@@ -41,8 +41,8 @@
 }
 
 .el-message--success {
-  background-color: #f0f9eb !important;
-  border-color: #e1f3d8 !important;
+  background-color: #ecf5ff !important;
+  border-color: #d9ecff !important;
 }
 
 .el-message--warning {

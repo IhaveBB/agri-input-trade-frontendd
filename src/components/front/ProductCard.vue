@@ -380,7 +380,7 @@ export default {
 }
 
 .badge.new {
-  background: rgba(103, 194, 58, 0.9);
+  background: rgba(64, 158, 255, 0.9);
 }
 
 .badge.discount {
@@ -441,7 +441,7 @@ export default {
 }
 
 .stock {
-  color: #67C23A;
+  color: #409EFF;
 }
 
 .stock.low {
@@ -459,7 +459,7 @@ export default {
 
 .origin-info i {
   font-size: 14px;
-  color: #67C23A;
+  color: #409EFF;
 }
 
 .product-footer {
@@ -500,7 +500,7 @@ export default {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background: #67C23A;
+  background: #409EFF;
   color: white;
   padding: 8px;
   border-radius: 6px;
@@ -509,7 +509,7 @@ export default {
 }
 
 .add-to-cart:hover {
-  background: #85ce61;
+  background: #66B1FF;
 }
 
 .add-to-cart i {
