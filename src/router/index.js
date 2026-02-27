@@ -149,6 +149,38 @@ export const setRoutes = () => {
               title: "菜单管理"
             },
           },
+          {
+            path: '/sales-statistics',
+            name: 'SalesStatistics',
+            component: () => import('../views/SalesStatistics.vue'),
+            meta: {
+              title: "销售统计"
+            },
+          },
+          {
+            path: '/recommend-statistics',
+            name: 'RecommendStatistics',
+            component: () => import('../views/RecommendStatistics.vue'),
+            meta: {
+              title: "推荐效果评估"
+            },
+          },
+          {
+            path: '/statistics/recommend',
+            name: 'RecommendStatisticsAlias',
+            component: () => import('../views/RecommendStatistics.vue'),
+            meta: {
+              title: "推荐效果评估"
+            },
+          },
+          {
+            path: '/statistics/sales',
+            name: 'SalesStatisticsAlias',
+            component: () => import('../views/SalesStatistics.vue'),
+            meta: {
+              title: "销售统计"
+            },
+          },
         ]
       }
 
