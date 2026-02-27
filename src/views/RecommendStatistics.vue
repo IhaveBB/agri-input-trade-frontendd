@@ -151,12 +151,12 @@
           </div>
           <ul v-else class="suggestion-list">
             <li v-for="(item, index) in suggestions" :key="index" class="suggestion-item">
-              <span class="suggestion-icon" :class="'suggestion-icon--' + item.priority">
+              <span class="suggestion-icon" :class="'suggestion-icon--' + item.level">
                 <i :class="getSuggestionIcon(item.type)"></i>
               </span>
               <div class="suggestion-content">
-                <div class="suggestion-title">{{ item.title }}</div>
-                <div class="suggestion-desc">{{ item.content }}</div>
+                <div class="suggestion-title">{{ item.message }}</div>
+                <div class="suggestion-desc">{{ item.action }}</div>
               </div>
             </li>
           </ul>
@@ -488,13 +488,20 @@ export default {
     renderAlgorithmChart() {
       if (!this.algorithmChart) return
 
-      const data = this.algorithmData.length > 0
-        ? this.algorithmData.map(item => ({ name: item.name, value: item.value }))
-        : [
-            { name: '协同过滤', value: 45 },
-            { name: '内容推荐', value: 30 },
-            { name: '热门推荐', value: 25 }
-          ]
+      // 从后端composition数据中获取
+      const composition = this.algorithmData.composition || {}
+      const data = Object.keys(composition).length > 0
+        ? Object.entries(composition).map(([name, value]) => ({
+            name,
+            value: parseFloat(value.toString().replace('%', ''))
+          }))
+        : []
+
+      // 如果没有数据，显示提示
+      if (data.length === 0) {
+        this.algorithmChart.clear()
+        return
+      }
 
       const option = {
         tooltip: {
@@ -525,24 +532,30 @@ export default {
     renderCategoryEffectChart() {
       if (!this.categoryEffectChart) return
 
-      const data = this.categoryEffectData.length > 0
-        ? this.categoryEffectData
-        : [
-            { categoryName: '农药', conversionRate: 15.2 },
-            { categoryName: '化肥', conversionRate: 12.8 },
-            { categoryName: '种子', conversionRate: 18.5 },
-            { categoryName: '农具', conversionRate: 10.2 },
-            { categoryName: '其他', conversionRate: 8.5 }
-          ]
+      // 从后端categoryEffect数据中获取
+      const categoryEffectList = this.categoryEffectData.categoryEffect || this.categoryEffectData || []
+      const data = categoryEffectList.length > 0 ? categoryEffectList : []
 
-      const categories = data.map(item => item.categoryName)
-      const rates = data.map(item => item.conversionRate)
+      // 如果没有数据，显示空状态
+      if (data.length === 0) {
+        this.categoryEffectChart.clear()
+        return
+      }
+
+      const categories = data.map(item => item.category_name || item.categoryName)
+      const rates = data.map(item => parseFloat((item.cvr || item.conversionRate || '0').toString().replace('%', '')))
 
       const option = {
         tooltip: {
           trigger: 'axis',
           axisPointer: { type: 'shadow' },
-          formatter: '{b}: {c}%'
+          formatter: (params) => {
+            const item = params[0]
+            const idx = item.dataIndex
+            const d = data[idx]
+            if (!d) return ''
+            return `${item.name}<br/>转化率: ${d.cvr || '0%'}<br/>点击率: ${d.ctr || '0%'}`
+          }
         },
         grid: {
           left: '3%',
@@ -644,61 +657,72 @@ export default {
     renderSimilarityChart() {
       if (!this.similarityChart) return
 
-      // 使用真实API数据，后端返回的是相似度分布数组
-      const similarityList = this.similarityData || []
-      const data = similarityList.map(item => [item.similarity || 0, item.userCount || 0])
+      // 使用新的DTO结构: funnel + depthAnalysis
+      const data = this.similarityData || {}
+      const depthAnalysis = data.depthAnalysis || {}
+      const depthDistribution = depthAnalysis.depthDistribution || {}
 
-      // 如果没有真实数据，显示空状态
-      if (data.length === 0) {
-        data.push([0, 0])
-      }
+      // 转换深度分布为数组
+      const depthData = [
+        { name: '深度4(完整转化)', value: parseFloat(depthDistribution['深度4(完整转化)'] || '0') },
+        { name: '深度3(加购/收藏)', value: parseFloat(depthDistribution['深度3(加购/收藏)'] || '0') },
+        { name: '深度2(点击)', value: parseFloat(depthDistribution['深度2(点击)'] || '0') },
+        { name: '深度1(仅曝光)', value: parseFloat(depthDistribution['深度1(仅曝光)'] || '0') }
+      ]
 
       const option = {
         tooltip: {
-          trigger: 'item',
+          trigger: 'axis',
+          axisPointer: { type: 'shadow' },
           formatter: (params) => {
-            return `相似度: ${params.data[0].toFixed(2)}<br/>用户数: ${params.data[1]}`
+            const item = params[0]
+            return `${item.name}<br/>占比: ${item.value}%`
           }
         },
         grid: {
-          left: '10%',
-          right: '10%',
-          bottom: '15%',
-          top: '10%'
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          top: '10%',
+          containLabel: true
         },
         xAxis: {
-          name: '相似度',
-          nameLocation: 'middle',
-          nameGap: 30,
-          min: 0,
-          max: 1,
+          type: 'category',
+          data: depthData.map(d => d.name),
           axisLine: { lineStyle: { color: '#e5e5e5' } },
-          axisLabel: { color: '#909399' },
-          splitLine: { lineStyle: { color: '#f5f5f5' } }
+          axisLabel: { color: '#909399', interval: 0, rotate: 0 }
         },
         yAxis: {
-          name: '用户数',
+          type: 'value',
+          name: '占比 (%)',
           axisLine: { lineStyle: { color: '#e5e5e5' } },
           axisLabel: { color: '#909399' },
           splitLine: { lineStyle: { color: '#f5f5f5' } }
         },
         series: [{
-          type: 'scatter',
-          symbolSize: 8,
-          data: data,
+          type: 'bar',
+          data: depthData.map(d => d.value),
+          barWidth: '50%',
           itemStyle: {
-            color: new echarts.graphic.RadialGradient(0.4, 0.3, 1, [
-              { offset: 0, color: '#11998e' },
-              { offset: 1, color: '#38ef7d' }
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#83bff6' },
+              { offset: 0.5, color: '#188df0' },
+              { offset: 1, color: '#188df0' }
             ])
           },
           emphasis: {
             itemStyle: {
-              borderColor: '#fff',
-              borderWidth: 2,
-              shadowBlur: 10,
-              shadowColor: 'rgba(0, 0, 0, 0.2)'
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: '#2378f7' },
+                { offset: 0.7, color: '#2378f7' },
+                { offset: 1, color: '#83bff6' }
+              ])
             }
+          },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: '{c}%'
           }
         }]
       }

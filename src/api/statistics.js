@@ -2,14 +2,14 @@ import request from '@/utils/request'
 
 // ==================== 销售统计接口 ====================
 
-// 获取本月订单统计
-export function getMonthlyOrderStatistics() {
-  return request({ url: '/statistics/orders/monthly', method: 'get' })
+// 获取本月订单统计（支持 merchantId，管理员可查看指定商户数据）
+export function getMonthlyOrderStatistics(merchantId) {
+  return request({ url: '/statistics/orders/monthly', method: 'get', params: { merchantId } })
 }
 
-// 获取本月销售额统计
-export function getMonthlySalesStatistics() {
-  return request({ url: '/statistics/sales/monthly', method: 'get' })
+// 获取本月销售额统计（支持 merchantId，管理员可查看指定商户数据）
+export function getMonthlySalesStatistics(merchantId) {
+  return request({ url: '/statistics/sales/monthly', method: 'get', params: { merchantId } })
 }
 
 // 获取用户订单统计
@@ -27,14 +27,36 @@ export function getYearlyUserStatistics() {
   return request({ url: '/statistics/users/yearly', method: 'get' })
 }
 
-// 获取热销商品Top5
-export function getTopSellingProducts() {
-  return request({ url: '/statistics/products/top5', method: 'get' })
+// 获取热销商品 Top5（支持 merchantId，管理员可查看指定商户数据）
+export function getTopSellingProducts(merchantId) {
+  return request({ url: '/statistics/products/top5', method: 'get', params: { merchantId } })
 }
 
-// 获取品类销售占比
-export function getCategorySalesStatistics() {
-  return request({ url: '/statistics/category/sales', method: 'get' })
+// 获取品类销售占比（支持 merchantId，管理员可查看指定商户数据）
+export function getCategorySalesStatistics(merchantId) {
+  return request({ url: '/statistics/category/sales', method: 'get', params: { merchantId } })
+}
+
+// ==================== 新增统计接口 ====================
+
+// 获取销售趋势（支持 merchantId，管理员可查看指定商户数据）
+export function getSalesTrend(days = 30, merchantId) {
+  return request({ url: '/statistics/sales/trend', method: 'get', params: { days, merchantId } })
+}
+
+// 获取季节性销售统计（支持 merchantId，管理员可查看指定商户数据）
+export function getSeasonalStatistics(merchantId) {
+  return request({ url: '/statistics/sales/seasonal', method: 'get', params: { merchantId } })
+}
+
+// 获取地区销售统计（支持 merchantId，管理员可查看指定商户数据）
+export function getRegionStatistics(merchantId) {
+  return request({ url: '/statistics/sales/region', method: 'get', params: { merchantId } })
+}
+
+// 获取商户列表（管理员用）
+export function getMerchantList() {
+  return request({ url: '/statistics/merchants', method: 'get' })
 }
 
 // ==================== 推荐系统效果评估接口 ====================
