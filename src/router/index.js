@@ -181,6 +181,14 @@ export const setRoutes = () => {
               title: "销售统计"
             },
           },
+          {
+            path: '/shop',
+            name: 'Shop',
+            component: () => import('../views/Shop.vue'),
+            meta: {
+              title: "店铺详情"
+            },
+          },
         ]
       }
 

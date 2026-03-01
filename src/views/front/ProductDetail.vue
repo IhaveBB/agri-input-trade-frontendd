@@ -96,9 +96,9 @@
             </div>
             
             <div class="action-buttons">
-              <el-button 
-                type="primary" 
-                size="large" 
+              <el-button
+                type="primary"
+                size="large"
                 @click="handleAddToCart"
                 :disabled="!product.stock"
                 class="cart-btn"
@@ -106,15 +106,39 @@
                 <i class="el-icon-shopping-cart-2"></i>
                 加入购物车
               </el-button>
-              
-              <el-button 
-                type="danger" 
-                size="large" 
+
+              <el-button
+                type="danger"
+                size="large"
                 @click="handleBuyNow"
                 :disabled="!product.stock"
                 class="buy-btn"
               >
                 立即购买
+              </el-button>
+            </div>
+
+            <!-- 店铺信息 -->
+            <div v-if="product.merchant" class="shop-info-card">
+              <div class="shop-info-header">
+                <div class="shop-icon">
+                  <i class="el-icon-shop"></i>
+                </div>
+                <div class="shop-info-detail">
+                  <span class="shop-name">{{ product.merchant.username }}</span>
+                  <span class="shop-location" v-if="product.merchant.location">
+                    <i class="el-icon-location"></i> {{ product.merchant.location }}
+                  </span>
+                </div>
+              </div>
+              <el-button
+                type="primary"
+                size="small"
+                plain
+                class="enter-shop-btn"
+                @click="goToShop(product.merchantId)"
+              >
+                <i class="el-icon-arrow-right"></i> 进入店铺
               </el-button>
             </div>
           </div>
@@ -272,6 +296,9 @@ export default {
   },
   methods: {
     formatTime,
+    goToShop(merchantId) {
+      this.$router.push(`/shop?merchantId=${merchantId}`)
+    },
     async getProductDetail() {
       try {
         this.loading = true
@@ -624,6 +651,59 @@ export default {
 .buy-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(245, 108, 108, 0.2);
+}
+
+.shop-info-card {
+  margin-top: 24px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.shop-info-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.shop-icon {
+  width: 40px;
+  height: 40px;
+  background: #e8f4ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #409EFF;
+  font-size: 20px;
+}
+
+.shop-info-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.shop-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #303133;
+}
+
+.shop-location {
+  font-size: 13px;
+  color: #909399;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.enter-shop-btn {
+  border-radius: 20px;
+  padding: 8px 20px;
 }
 
 .detail-tabs {
