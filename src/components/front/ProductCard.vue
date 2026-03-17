@@ -91,8 +91,7 @@ export default {
   data() {
     return {
       userInfo: JSON.parse(localStorage.getItem('frontUser') || '{}'),
-      loading: true,
-      imageLoaded: false
+      loading: false
     }
   },
   methods: {
@@ -272,17 +271,19 @@ export default {
 <style scoped>
 .product-card {
   background: #fff;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   cursor: pointer;
-  min-height: 350px; /* 设置最小高度以保持一致布局 */
+  min-height: 350px;
+  border: 1px solid #f0f0f0;
 }
 
 .product-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  border-color: #2c9678;
 }
 
 /* 骨架屏样式 */
@@ -305,31 +306,31 @@ export default {
 }
 
 .skeleton-line {
-  height: 16px;
-  margin-bottom: 12px;
+  height: 14px;
+  margin-bottom: 10px;
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .skeleton-title {
-  width: 80%;
-  height: 18px;
+  width: 85%;
+  height: 16px;
 }
 
 .skeleton-price {
-  width: 40%;
+  width: 45%;
 }
 
 .skeleton-info {
-  width: 65%;
+  width: 60%;
 }
 
 .skeleton-actions {
   width: 100%;
-  height: 32px;
-  margin-top: 16px;
+  height: 30px;
+  margin-top: 12px;
 }
 
 @keyframes shimmer {
@@ -346,7 +347,8 @@ export default {
   width: 100%;
   padding-bottom: 100%;
   overflow: hidden;
-  background: #f8f9fa;
+  background: #f8f8f8;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .product-image {
@@ -355,11 +357,11 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  transition: transform 0.4s ease;
+  transition: transform 0.3s ease;
 }
 
 .product-card:hover .product-image {
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
 .product-badges {
@@ -372,19 +374,19 @@ export default {
 }
 
 .badge {
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 3px 8px;
+  border-radius: 3px;
   font-size: 12px;
   font-weight: 500;
   color: white;
 }
 
 .badge.new {
-  background: rgba(64, 158, 255, 0.9);
+  background: #2c9678;
 }
 
 .badge.discount {
-  background: rgba(255, 71, 87, 0.9);
+  background: #e43932;
 }
 
 .product-content {
@@ -395,18 +397,18 @@ export default {
   margin: 0;
   font-size: 14px;
   font-weight: 500;
-  color: #2c3e50;
-  line-height: 1.4;
+  color: #333;
+  line-height: 1.5;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  height: 40px;
+  height: 42px;
 }
 
 .product-info {
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .current-price {
@@ -417,17 +419,17 @@ export default {
 
 .current-price .symbol {
   font-size: 12px;
-  color: #ff4757;
+  color: #e43932;
 }
 
 .current-price .amount {
   font-size: 18px;
   font-weight: 600;
-  color: #ff4757;
+  color: #e43932;
 }
 
 .original-price {
-  color: #909399;
+  color: #999;
   font-size: 12px;
   text-decoration: line-through;
 }
@@ -435,17 +437,17 @@ export default {
 .stock-info {
   display: flex;
   justify-content: space-between;
-  margin-top: 4px;
+  margin-top: 6px;
   font-size: 12px;
-  color: #909399;
+  color: #777;
 }
 
 .stock {
-  color: #409EFF;
+  color: #2c9678;
 }
 
 .stock.low {
-  color: #E6A23C;
+  color: #ff8800;
 }
 
 .origin-info {
@@ -453,19 +455,19 @@ export default {
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  color: #606266;
-  margin-top: 4px;
+  color: #777;
+  margin-top: 6px;
 }
 
 .origin-info i {
   font-size: 14px;
-  color: #409EFF;
+  color: #2c9678;
 }
 
 .product-footer {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid #f0f2f5;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
 }
 
 .action-group {
@@ -479,19 +481,19 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
-  color: #909399;
-  transition: all 0.3s ease;
-  background: #f5f7fa;
+  border-radius: 4px;
+  color: #999;
+  transition: all 0.2s ease;
+  background: #f5f5f5;
 }
 
 .favorite-btn:hover {
-  background: #f0f2f5;
+  background: #f0f0f0;
 }
 
 .favorite-btn.is-favorite {
-  color: #ff4757;
-  background: rgba(255, 71, 87, 0.1);
+  color: #ff8800;
+  background: #fff7e6;
 }
 
 .add-to-cart {
@@ -500,16 +502,16 @@ export default {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background: #409EFF;
+  background: #2c9678;
   color: white;
-  padding: 8px;
-  border-radius: 6px;
+  padding: 7px;
+  border-radius: 4px;
   font-size: 13px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .add-to-cart:hover {
-  background: #66B1FF;
+  background: #36a88a;
 }
 
 .add-to-cart i {

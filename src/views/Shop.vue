@@ -1,98 +1,105 @@
 <template>
   <div class="shop-page">
-    <!-- 店铺头部信息 -->
-    <div class="shop-header">
-      <div class="shop-info">
-        <div class="shop-avatar">
-          <i class="el-icon-shop"></i>
-        </div>
-        <div class="shop-details">
-          <h1 class="shop-name">{{ shopInfo.shopName }}</h1>
-          <p class="shop-location">
-            <i class="el-icon-location"></i> {{ shopInfo.location || '暂无位置信息' }}
-          </p>
-          <div class="shop-rating">
-            <div class="rating-score">
-              <span class="score">{{ shopInfo.rating ? shopInfo.rating.toFixed(1) : '0.0' }}</span>
-              <div class="stars">
-                <i v-for="i in 5" :key="i" class="el-icon-star-on" :class="{ 'active': i <= Math.round(shopInfo.rating) }"></i>
+    <front-header></front-header>
+    <div class="main-wrapper">
+      <!-- 店铺头部信息 -->
+      <div class="shop-header">
+        <div class="shop-info">
+          <div class="shop-avatar">
+            <i class="el-icon-shop"></i>
+          </div>
+          <div class="shop-details">
+            <h1 class="shop-name">{{ shopInfo.shopName }}</h1>
+            <p class="shop-location">
+              <i class="el-icon-location"></i> {{ shopInfo.location || '暂无位置信息' }}
+            </p>
+            <div class="shop-rating">
+              <div class="rating-score">
+                <span class="score">{{ shopInfo.rating ? shopInfo.rating.toFixed(1) : '0.0' }}</span>
+                <div class="stars">
+                  <i v-for="i in 5" :key="i" class="el-icon-star-on" :class="{ 'active': i <= Math.round(shopInfo.rating) }"></i>
+                </div>
               </div>
-            </div>
-            <div class="rating-stats">
-              <span> {{ shopInfo.reviewCount }} 条评价</span>
-              <span> | 好评率 {{ statistics.positiveRate }}</span>
+              <div class="rating-stats">
+                <span> {{ shopInfo.reviewCount }} 条评价</span>
+                <span> | 好评率 {{ statistics.positiveRate }}</span>
+              </div>
             </div>
           </div>
         </div>
+        <div class="shop-stats">
+          <div class="stat-item">
+            <span class="value">{{ shopInfo.productCount }}</span>
+            <span class="label">宝贝数</span>
+          </div>
+          <div class="stat-item">
+            <span class="value">{{ shopInfo.totalSales }}</span>
+            <span class="label">总销量</span>
+          </div>
+          <div class="stat-item" v-if="shopInfo.businessLicense">
+            <el-button type="primary" size="small" @click="showLicense = true">
+              <i class="el-icon-document"></i> 营业执照
+            </el-button>
+          </div>
+        </div>
       </div>
-      <div class="shop-stats">
-        <div class="stat-item">
-          <span class="value">{{ shopInfo.productCount }}</span>
-          <span class="label">宝贝数</span>
-        </div>
-        <div class="stat-item">
-          <span class="value">{{ shopInfo.totalSales }}</span>
-          <span class="label">总销量</span>
-        </div>
-      </div>
-    </div>
 
-    <!-- 营业执照 -->
-    <div v-if="shopInfo.businessLicense" class="business-license-section">
-      <el-card shadow="hover">
-        <div slot="header" class="card-header">
-          <span><i class="el-icon-document"></i> 营业执照</span>
-          <el-button type="text" @click="showLicense = true">查看大图</el-button>
-        </div>
-        <img :src="shopInfo.businessLicense" alt="营业执照" class="license-image" @click="showLicense = true" />
-      </el-card>
-    </div>
-
-    <!-- 主体内容 -->
-    <div class="shop-main">
-      <!-- 左侧：商品列表 -->
-      <div class="main-content">
+      <!-- 营业执照 -->
+      <div v-if="false && shopInfo.businessLicense" class="business-license-section">
         <el-card shadow="hover">
           <div slot="header" class="card-header">
-            <span>店内商品</span>
+            <span><i class="el-icon-document"></i> 营业执照</span>
+            <el-button type="text" @click="showLicense = true">查看大图</el-button>
           </div>
-          <div class="product-list">
-            <div v-loading="productsLoading">
-              <div v-for="product in products" :key="product.id" class="product-item">
-                <div class="product-image">
-                  <img :src="product.imageUrl || '/placeholder.png'" :alt="product.name" @click="goToProduct(product.id)" />
-                </div>
-                <div class="product-info">
-                  <h3 class="product-name" @click="goToProduct(product.id)">{{ product.name }}</h3>
-                  <p class="product-desc">{{ product.description || '暂无描述' }}</p>
-                  <div class="product-meta">
-                    <span>销量：{{ product.salesCount }}</span>
-                    <span>库存：{{ product.stock }}</span>
-                  </div>
-                  <div class="product-price">
-                    <span class="current-price">¥{{ product.price }}</span>
-                    <span v-if="product.isDiscount === 1" class="discount-price">折扣价：¥{{ product.discountPrice }}</span>
-                  </div>
-                  <el-button type="primary" size="small" @click="addToCart(product)">加入购物车</el-button>
-                </div>
-              </div>
-              <div v-if="!productsLoading && products.length === 0" class="empty-state">
-                <i class="el-icon-shopping-bag-2"></i>
-                <p>暂无商品</p>
-              </div>
-            </div>
-          </div>
-          <div class="pagination">
-            <el-pagination
-              background
-              layout="prev, pager, next"
-              :total="productTotal"
-              :page-size="10"
-              @current-change="handleProductPageChange"
-            />
-          </div>
+          <img :src="getImageSrc(shopInfo.businessLicense)" alt="营业执照" class="license-image" @click="showLicense = true" />
         </el-card>
       </div>
+
+      <!-- 主体内容 -->
+      <div class="shop-main">
+        <!-- 左侧：商品列表 -->
+        <div class="main-content">
+          <el-card shadow="hover">
+            <div slot="header" class="card-header">
+              <span>店内商品</span>
+            </div>
+            <div class="product-list">
+              <div v-loading="productsLoading">
+                <div v-for="product in products" :key="product.id" class="product-item">
+                  <div class="product-image">
+                    <img :src="getImageSrc(product.imageUrl)" :alt="product.name" @click="goToProduct(product.id)" />
+                  </div>
+                  <div class="product-info">
+                    <h3 class="product-name" @click="goToProduct(product.id)">{{ product.name }}</h3>
+                    <p class="product-desc">{{ product.description || '暂无描述' }}</p>
+                    <div class="product-meta">
+                      <span>销量：{{ product.salesCount }}</span>
+                      <span>库存：{{ product.stock }}</span>
+                    </div>
+                    <div class="product-price">
+                      <span class="current-price">¥{{ product.price }}</span>
+                      <span v-if="product.isDiscount === 1" class="discount-price">折扣价：¥{{ product.discountPrice }}</span>
+                    </div>
+                    <el-button type="primary" size="small" @click="addToCart(product)">加入购物车</el-button>
+                  </div>
+                </div>
+                <div v-if="!productsLoading && products.length === 0" class="empty-state">
+                  <i class="el-icon-shopping-bag-2"></i>
+                  <p>暂无商品</p>
+                </div>
+              </div>
+            </div>
+            <div class="pagination">
+              <el-pagination
+                background
+                layout="prev, pager, next"
+                :total="productTotal"
+                :page-size="10"
+                @current-change="handleProductPageChange"
+              />
+            </div>
+          </el-card>
+        </div>
 
       <!-- 右侧：店铺评价 -->
       <div class="sidebar">
@@ -110,7 +117,7 @@
                   </div>
                 </div>
                 <p class="review-product">购买：{{ review.productName }}</p>
-                <p class="review-content">{{ review.content }}</p>
+                <div class="review-content" v-html="renderHtmlContent(review.content)"></div>
                 <p class="review-date">{{ review.createdAt }}</p>
               </div>
               <div v-if="!reviewsLoading && reviews.length === 0" class="empty-state">
@@ -131,20 +138,28 @@
         </el-card>
       </div>
     </div>
+    </div>
 
     <!-- 营业执照大图预览 -->
     <el-dialog :visible.sync="showLicense" title="营业执照" width="600px">
-      <img :src="shopInfo.businessLicense" alt="营业执照" class="license-large" />
+      <img :src="getImageSrc(shopInfo.businessLicense)" alt="营业执照" class="license-large" />
     </el-dialog>
+    <front-footer></front-footer>
   </div>
 </template>
 
 <script>
+import FrontHeader from '@/components/front/FrontHeader.vue'
+import FrontFooter from '@/components/front/FrontFooter.vue'
 import { getShopInfo, getShopProducts, getShopReviews, getShopStatistics } from '@/api/shop'
 import Request from '@/utils/request'
 
 export default {
   name: 'ShopPage',
+  components: {
+    FrontHeader,
+    FrontFooter
+  },
   data() {
     return {
       merchantId: null,
@@ -219,11 +234,18 @@ export default {
       this.$router.push(`/product/${productId}`)
     },
     async addToCart(product) {
+      // 检查用户是否登录
+      const userId = this.getUserId()
+      if (!userId) {
+        this.$message.error('请先登录')
+        this.$router.push('/login')
+        return
+      }
       try {
         const cartItem = {
-          userId: this.getUserId(),
+          userId: userId,
           productId: product.id,
-          count: 1
+          quantity: 1
         }
         const res = await Request.post('/cart', cartItem)
         if (res.code === '0') {
@@ -250,6 +272,18 @@ export default {
     handleReviewPageChange(page) {
       this.reviewPage = page
       this.loadReviews()
+    },
+    renderHtmlContent(content) {
+      if (!content) return ''
+      // 移除 <p> 标签，保留内部内容
+      return content.replace(/<p[^>]*>/g, '').replace(/<\/p>/g, '<br/>')
+    },
+    // 处理图片 src，如果是 base64 则直接使用，否则添加 api 前缀
+    getImageSrc(url) {
+      if (!url) return '/placeholder.png'
+      if (url.startsWith('data:image')) return url
+      if (url.startsWith('http')) return url
+      return 'api' + url
     }
   }
 }
@@ -257,20 +291,30 @@ export default {
 
 <style lang="scss" scoped>
 .shop-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f5f5;
+}
+
+.main-wrapper {
+  flex: 1;
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  width: 100%;
 }
 
 .shop-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 30px;
-  border-radius: 12px;
+  background: #fff;
+  padding: 24px 30px;
+  border-radius: 8px;
   margin-bottom: 20px;
-  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-bottom: 3px solid #2c9678;
 
   .shop-info {
     display: flex;
@@ -280,23 +324,25 @@ export default {
     .shop-avatar {
       width: 80px;
       height: 80px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
+      background: #e8f5e9;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 40px;
+      color: #2c9678;
     }
 
     .shop-details {
       .shop-name {
         font-size: 24px;
         margin: 0 0 8px 0;
+        color: #333;
       }
 
       .shop-location {
         margin: 0 0 10px 0;
-        opacity: 0.9;
+        color: #666;
       }
 
       .shop-rating {
@@ -312,15 +358,16 @@ export default {
           .score {
             font-size: 28px;
             font-weight: bold;
+            color: #ff6b00;
           }
 
           .stars {
             .el-icon-star-on {
-              color: rgba(255, 255, 255, 0.3);
+              color: #ddd;
               font-size: 18px;
 
               &.active {
-                color: #ffd700;
+                color: #ff6b00;
               }
             }
           }
@@ -328,7 +375,7 @@ export default {
 
         .rating-stats {
           font-size: 14px;
-          opacity: 0.9;
+          color: #666;
         }
       }
     }
@@ -337,6 +384,7 @@ export default {
   .shop-stats {
     display: flex;
     gap: 30px;
+    align-items: center;
 
     .stat-item {
       text-align: center;
@@ -345,11 +393,12 @@ export default {
         display: block;
         font-size: 28px;
         font-weight: bold;
+        color: #333;
       }
 
       .label {
         font-size: 14px;
-        opacity: 0.8;
+        color: #666;
       }
     }
   }
@@ -357,6 +406,8 @@ export default {
 
 .business-license-section {
   margin-bottom: 20px;
+  width: 100%;
+  box-sizing: border-box;
 
   .card-header {
     display: flex;
@@ -374,22 +425,35 @@ export default {
 }
 
 .shop-main {
-  display: grid;
-  grid-template-columns: 1fr 350px;
-  gap: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
 }
 
 .main-content {
+  flex: 1;
+  min-width: 0;
+
   .card-header {
-    font-weight: 500;
+    font-weight: 600;
+    color: #333;
+    border-left: 4px solid #2c9678;
+    padding-left: 12px;
   }
 
   .product-list {
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 8px;
+
     .product-item {
       display: flex;
       gap: 15px;
-      padding: 15px 0;
-      border-bottom: 1px solid #eee;
+      padding: 16px;
+      margin-bottom: 12px;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 
       &:last-child {
         border-bottom: none;
@@ -404,13 +468,14 @@ export default {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          border-radius: 8px;
+          border-radius: 6px;
           cursor: pointer;
         }
       }
 
       .product-info {
         flex: 1;
+        min-width: 0;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -420,9 +485,14 @@ export default {
           margin: 0 0 8px 0;
           cursor: pointer;
           color: #333;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
 
           &:hover {
-            color: #667eea;
+            color: #2c9678;
           }
         }
 
@@ -430,6 +500,12 @@ export default {
           font-size: 14px;
           color: #666;
           margin: 0 0 8px 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          max-width: 100%;
         }
 
         .product-meta {
@@ -446,13 +522,13 @@ export default {
 
           .current-price {
             font-size: 20px;
-            color: #ff4400;
+            color: #e43932;
             font-weight: bold;
           }
 
           .discount-price {
             font-size: 14px;
-            color: #ff6b6b;
+            color: #e43932;
           }
         }
       }
@@ -460,8 +536,10 @@ export default {
 
     .empty-state {
       text-align: center;
-      padding: 40px;
+      padding: 60px 20px;
       color: #999;
+      background: #fff;
+      border-radius: 6px;
 
       i {
         font-size: 48px;
@@ -478,17 +556,27 @@ export default {
 }
 
 .sidebar {
+  width: 320px;
+  flex-shrink: 0;
+
   .card-header {
-    font-weight: 500;
+    font-weight: 600;
+    color: #333;
+    border-left: 4px solid #2c9678;
+    padding-left: 12px;
   }
 
   .review-list {
     max-height: 600px;
     overflow-y: auto;
+    padding: 8px;
 
     .review-item {
-      padding: 15px 0;
-      border-bottom: 1px solid #eee;
+      padding: 16px;
+      margin-bottom: 12px;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 
       &:last-child {
         border-bottom: none;
@@ -503,6 +591,7 @@ export default {
         .user-name {
           font-size: 14px;
           color: #666;
+          font-weight: 500;
         }
 
         .review-rating {
@@ -527,6 +616,12 @@ export default {
         font-size: 14px;
         color: #333;
         margin: 0 0 8px 0;
+        line-height: 1.6;
+        word-wrap: break-word;
+
+        p {
+          margin: 0;
+        }
       }
 
       .review-date {
@@ -562,7 +657,11 @@ export default {
 
 @media (max-width: 768px) {
   .shop-main {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
   }
 
   .shop-header {

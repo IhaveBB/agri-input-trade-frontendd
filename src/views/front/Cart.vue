@@ -183,7 +183,7 @@ export default {
   },
   methods: {
     formatAddress(addr) {
-      return `${addr.receiver} ${addr.phone}`
+      return `${addr.phone} ${addr.address}`
     },
     async getCartList() {
       try {
@@ -205,10 +205,14 @@ export default {
     },
     async getAddresses() {
       try {
-        const userId = this.userInfo.id
+        const userId = this.userInfo?.id
+        if (!userId) {
+          console.error('用户未登录，无法获取地址')
+          return
+        }
         const res = await Request.get(`/address/user/${userId}`)
         if (res.code === '0') {
-          this.addresses = res.data
+          this.addresses = res.data || []
           if (this.addresses.length > 0) {
             this.selectedAddressId = this.addresses[0].id
           }
@@ -294,20 +298,22 @@ export default {
         return
       }
 
-      const selectedAddress = this.addresses.find(addr => addr.id === this.selectedAddressId)
       const orderData = {
         userId: this.userInfo.id,
         addressId: this.selectedAddressId,
         items: selectedItems.map(item => ({
           productId: item.productId,
           quantity: item.quantity,
-          price: item.product.isDiscount ? item.product.discountPrice : item.product.price
+          price: item.product.isDiscount === 1 ? item.product.discountPrice : item.product.price
         }))
       }
 
       try {
         const res = await Request.post('/order/batch', orderData)
         if (res.code === '0') {
+          // 下单成功后删除已购买的商品
+          const selectedIds = selectedItems.map(item => item.id)
+          await Request.delete(`/cart/batch?ids=${selectedIds.join(',')}`)
           this.$message.success('下单成功')
           this.getCartList()
           this.$router.push('/order')
@@ -335,12 +341,12 @@ export default {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f5f7fa;
+  background: #f8f8f8;
 }
 
 .main-content {
   flex: 1;
-  padding: 24px;
+  padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
@@ -350,38 +356,44 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #2c9678;
 }
 
 .page-header h2 {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
-  color: #303133;
+  color: #333;
   margin: 0;
 }
 
 .cart-count {
-  color: #909399;
+  color: #777;
   font-size: 14px;
 }
 
 .cart-content {
   background: white;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  margin-top: 16px;
 }
 
 /* 商家分组样式 */
 .merchant-groups {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
 .merchant-group {
-  border: 1px solid #ebeef5;
-  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
   overflow: hidden;
 }
 
@@ -389,9 +401,9 @@ export default {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 20px;
-  background: #fafafa;
-  border-bottom: 1px solid #ebeef5;
+  padding: 14px 16px;
+  background: #f8f8f8;
+  border-bottom: 1px solid #e8e8e8;
 }
 
 .merchant-info {
@@ -399,17 +411,18 @@ export default {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  color: #303133;
+  color: #333;
   font-size: 15px;
   font-weight: 500;
 }
 
 .merchant-info:hover {
-  color: #409EFF;
+  color: #2c9678;
 }
 
 .merchant-info i {
   font-size: 18px;
+  color: #2c9678;
 }
 
 .merchant-items {
@@ -422,7 +435,7 @@ export default {
   grid-template-columns: 40px 380px 120px 120px 120px auto;
   align-items: center;
   gap: 16px;
-  padding: 20px;
+  padding: 16px;
   border-bottom: 1px solid #f0f0f0;
   transition: background 0.2s;
 }
@@ -459,7 +472,7 @@ export default {
 
 .product-name {
   font-size: 14px;
-  color: #303133;
+  color: #333;
   margin-bottom: 8px;
   cursor: pointer;
   display: -webkit-box;
@@ -469,7 +482,7 @@ export default {
 }
 
 .product-name:hover {
-  color: #409EFF;
+  color: #2c9678;
 }
 
 .product-stock {
@@ -486,13 +499,13 @@ export default {
 
 .current-price {
   font-size: 18px;
-  color: #ff4757;
+  color: #e43932;
   font-weight: 600;
 }
 
 .original-price {
   font-size: 13px;
-  color: #909399;
+  color: #999;
   text-decoration: line-through;
 }
 
@@ -504,7 +517,7 @@ export default {
 .product-subtotal {
   text-align: center;
   font-size: 18px;
-  color: #ff4757;
+  color: #e43932;
   font-weight: 600;
 }
 
@@ -514,27 +527,29 @@ export default {
 }
 
 .delete-btn {
-  color: #909399;
+  color: #999;
   font-size: 14px;
 }
 
 .delete-btn:hover {
-  color: #ff4757;
+  color: #e43932;
 }
 
 /* 收货地址区域 */
 .address-section {
-  margin-top: 24px;
-  padding: 20px;
-  background: #fafafa;
-  border-radius: 8px;
+  margin-top: 20px;
+  padding: 16px;
+  background: #f8f8f8;
+  border-radius: 6px;
 }
 
 .section-title {
   font-size: 15px;
   font-weight: 500;
-  color: #303133;
-  margin-bottom: 16px;
+  color: #333;
+  margin-bottom: 12px;
+  padding-left: 10px;
+  border-left: 3px solid #2c9678;
 }
 
 .address-content {
@@ -549,9 +564,9 @@ export default {
 
 /* 购物车底部 */
 .cart-footer {
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 2px solid #f0f0f0;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid #e8e8e8;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -564,47 +579,53 @@ export default {
 }
 
 .delete-btn {
-  color: #909399;
+  color: #777;
 }
 
 .delete-btn:hover {
-  color: #ff4757;
+  color: #e43932;
 }
 
 .footer-right {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
 }
 
 .total-info {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   text-align: right;
 }
 
 .total-info span:first-child {
   font-size: 14px;
-  color: #606266;
+  color: #666;
 }
 
 .total-price {
   font-size: 16px;
-  color: #303133;
+  color: #333;
 }
 
 .total-price em {
-  font-size: 24px;
-  color: #ff4757;
+  font-size: 22px;
+  color: #e43932;
   font-weight: 600;
   font-style: normal;
 }
 
 :deep(.el-button--medium) {
-  height: 44px;
-  padding: 0 32px;
-  font-size: 16px;
+  height: 42px;
+  padding: 0 28px;
+  font-size: 15px;
+  background: #2c9678;
+  border: none;
+}
+
+:deep(.el-button--medium:hover) {
+  background: #36a88a;
 }
 
 :deep(.el-checkbox) {

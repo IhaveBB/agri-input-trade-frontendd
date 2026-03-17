@@ -120,60 +120,60 @@ export default {
 <style scoped>
 .el-menu {
     border-right: none;
-    padding: 16px 12px;
+    padding: 12px 8px;
+    background-color: #fafafa;
 }
 
 .el-menu-item {
-    height: 48px;
-    line-height: 48px;
-    border-radius: 10px;
-    margin-bottom: 6px;
+    height: 45px;
+    line-height: 45px;
+    border-radius: 6px;
+    margin-bottom: 4px;
     color: #606266;
     font-size: 14px;
 
     &:hover {
-        color: #409EFF;
-        background-color: rgba(64, 158, 255, 0.08) !important;
+        color: #2c9678;
+        background-color: rgba(44, 150, 120, 0.08) !important;
     }
 
     &.is-active {
         color: #fff;
-        background: linear-gradient(135deg, #409EFF, #66B1FF) !important;
+        background: #2c9678 !important;
         font-weight: 500;
-        box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
     }
 }
 
 .el-submenu ::v-deep .el-submenu__title {
-    height: 48px;
-    line-height: 48px;
-    border-radius: 10px;
+    height: 45px;
+    line-height: 45px;
+    border-radius: 6px;
     color: #606266;
     font-size: 14px;
 
     &:hover {
-        color: #409EFF;
-        background-color: rgba(64, 158, 255, 0.08) !important;
+        color: #2c9678;
+        background-color: rgba(44, 150, 120, 0.08) !important;
     }
 }
 
 .el-submenu ::v-deep .el-menu--inline {
     padding-left: 0;
-    
+
     .el-menu-item {
-        height: 45px;
-        line-height: 45px;
-        padding-left: 48px !important;
+        height: 42px;
+        line-height: 42px;
+        padding-left: 44px !important;
         background-color: transparent;
-        
+
         &:hover {
-            color: #409EFF;
-            background-color: #F0F9F4 !important;
+            color: #2c9678;
+            background-color: rgba(44, 150, 120, 0.06) !important;
         }
-        
+
         &.is-active {
-            color: #409EFF;
-            background-color: #F0F9F4 !important;
+            color: #2c9678;
+            background-color: rgba(44, 150, 120, 0.08) !important;
             font-weight: 600;
         }
     }
@@ -189,6 +189,6 @@ export default {
 
 .el-menu-item.is-active [class^="el-icon-"],
 .el-submenu.is-active [class^="el-icon-"] {
-    color: #409EFF;
+    color: #fff;
 }
 </style>

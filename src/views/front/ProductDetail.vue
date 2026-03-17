@@ -246,15 +246,6 @@
         </el-button>
       </div>
     </el-dialog>
-
-    <!-- 全局加载遮罩 -->
-    <el-loading 
-      :visible.sync="submitLoading" 
-      fullscreen 
-      element-loading-text="处理中..." 
-      element-loading-spinner="el-icon-loading"
-      element-loading-background="rgba(0, 0, 0, 0.7)">
-    </el-loading>
   </div>
 </template>
 
@@ -263,7 +254,10 @@ import Request from '@/utils/request'
 import { formatTime } from '@/utils/time'
 import FrontHeader from '@/components/front/FrontHeader.vue'
 import FrontFooter from '@/components/front/FrontFooter.vue'
+import { Loading } from 'element-ui'
 import DOMPurify from 'dompurify'
+
+let loadingInstance = null
 
 export default {
   name: 'ProductDetail',
@@ -283,8 +277,7 @@ export default {
       activeTab: 'detail',
       loading: true,
       reviewsLoading: true,
-      addressesLoading: false,
-      submitLoading: false
+      addressesLoading: false
     }
   },
   created() {
@@ -342,7 +335,13 @@ export default {
       try {
         this.isLogin()
 
-        this.submitLoading = true
+        loadingInstance = Loading.service({
+          lock: true,
+          text: '正在添加...',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        })
+
         const userId = this.userInfo.id
 
         const data = {
@@ -359,7 +358,9 @@ export default {
         console.error('添加到购物车失败:', error)
         this.$message.error('添加失败')
       } finally {
-        this.submitLoading = false
+        if (loadingInstance) {
+          loadingInstance.close()
+        }
       }
     },
     async handleBuyNow() {
@@ -405,7 +406,13 @@ export default {
           return
         }
 
-        this.submitLoading = true
+        loadingInstance = Loading.service({
+          lock: true,
+          text: '正在提交...',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        })
+
         const selectedAddress = this.addresses.find(addr => addr.id === this.selectedAddressId)
         const orderData = {
           userId: this.userInfo.id,
@@ -428,7 +435,9 @@ export default {
         console.error('创建订单失败:', error)
         this.$message.error('下单失败')
       } finally {
-        this.submitLoading = false
+        if (loadingInstance) {
+          loadingInstance.close()
+        }
       }
     }
   },

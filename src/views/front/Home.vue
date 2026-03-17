@@ -13,11 +13,11 @@
       <!-- 轮播图和公告区域 -->
       <div v-else>
         <div class="carousel-notice-section">
-          <div class="notice-wrapper">
-            <front-notice></front-notice>
-          </div>
           <div class="carousel-wrapper">
             <front-carousel></front-carousel>
+          </div>
+          <div class="notice-wrapper">
+            <front-notice></front-notice>
           </div>
         </div>
         
@@ -150,25 +150,38 @@ export default {
         let products = [];
         
         if (!this.isLoggedIn) {
-          // 未登录状态 - 获取随机排序的前8条商品
-          const res = await Request.get('/product/page?status=1&size=8');
+          // 未登录状态 - 获取热销商品（冷启动降级策略）
+          const res = await Request.get('/product/page?status=1&sort=salesCount,desc&size=8');
           if (res.code === '0') {
             products = res.data.records || res.data;
-            // 随机排序
-            products = products.sort(() => Math.random() - 0.5);
           }
         } else {
-          // 登录状态 - 获取个性化推荐
+          // 登录状态 - 获取个性化推荐（使用融合推荐算法）
           const userStr = localStorage.getItem('frontUser');
           if (!userStr) {
             throw new Error('User info not found');
           }
-          const userId = JSON.parse(userStr).id;
-          const res = await Request.get(`/recommend/user/${userId}`);
+          const user = JSON.parse(userStr);
+          const userId = user.id;
+
+          const res = await Request.get('/api/recommendation/personalized');
           if (res.code === '0') {
-            products = res.data.records || res.data;
+            // 融合推荐接口返回的数据结构需要转换
+            const recommendData = res.data.records || res.data;
+            products = recommendData.map(item => ({
+              id: item.productId,
+              name: item.productName,
+              price: item.price,
+              imageUrl: item.imageUrl,
+              categoryId: item.categoryId,
+              categoryName: item.categoryName,
+              // 保留推荐相关的额外信息
+              recommendScore: item.score,
+              recommendReason: item.reason,
+              matchTags: item.matchTags
+            }));
           }
-          
+
           // 获取收藏状态
           try {
             const favRes = await Request.get(`/favorite/user/${userId}`);
@@ -264,132 +277,109 @@ export default {
 }
 .main-content {
   flex: 1;
-  padding: 32px 40px;
-  max-width: 1440px;
+  padding: 20px;
+  max-width: 1400px;
   margin: 0 auto;
   width: 100%;
   box-sizing: border-box;
+  background-color: #f8f8f8;
 }
 .section {
-  margin: 48px 0;
+  margin: 24px 0;
   position: relative;
-  padding: 32px;
+  padding: 24px;
   background: #ffffff;
-  border-radius: 24px;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 .section::before {
   content: '';
   position: absolute;
-  inset: -16px;
+  inset: -12px;
   background:
-    radial-gradient(circle at 0% 0%, rgba(64, 158, 255, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 100% 100%, rgba(64, 158, 255, 0.05) 0%, transparent 50%);
+    radial-gradient(circle at 0% 0%, rgba(44, 150, 120, 0.04) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(44, 150, 120, 0.04) 0%, transparent 50%);
   z-index: -1;
-  border-radius: 24px;
+  border-radius: 8px;
 }
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
 }
 
 .title-wrapper {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .section-title {
   margin: 0;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
   color: #333;
   position: relative;
   z-index: 1;
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-right: 16px;
+  gap: 8px;
+  margin-right: 12px;
 }
 
 .section-title i {
-  color: #409EFF;
-  font-size: 22px;
+  color: #2c9678;
+  font-size: 20px;
 }
 
 .title-line {
   position: absolute;
   bottom: -4px;
   left: 0;
-  width: 100%;
-  height: 8px;
-  background: rgba(64, 158, 255, 0.2);
-  border-radius: 4px;
+  width: 80px;
+  height: 3px;
+  background: #2c9678;
+  border-radius: 2px;
   z-index: 0;
 }
 
 .subtitle {
-  font-size: 14px;
-  color: #909399;
+  font-size: 13px;
+  color: #999;
   position: relative;
   top: 2px;
+  margin-left: 8px;
 }
 
 .more-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  background: linear-gradient(135deg,
-    rgba(64, 158, 255, 0.1),
-    rgba(64, 158, 255, 0.15)
-  );
-  color: #67c23a;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 4px;
+  background: #f5f5f5;
+  color: #333;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.more-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg,
-    rgba(64, 158, 255, 0.15),
-    rgba(64, 158, 255, 0.2)
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: all 0.2s ease;
+  border: 1px solid #e0e0e0;
 }
 
 .more-btn:hover {
-  transform: translateX(4px);
-}
-
-.more-btn:hover::before {
-  opacity: 1;
+  background: #2c9678;
+  color: #fff;
+  border-color: #2c9678;
+  transform: translateX(2px);
 }
 
 .more-btn i {
   font-size: 14px;
-  transition: transform 0.3s ease;
-  position: relative;
-  z-index: 1;
-}
-
-.more-btn span {
-  position: relative;
-  z-index: 1;
+  transition: transform 0.2s ease;
 }
 
 .more-btn:hover i {
@@ -407,62 +397,60 @@ export default {
 
 @media (max-width: 1200px) {
   .main-content {
-    padding: 16px;
+    padding: 12px;
   }
-  
+
   .section-title {
-    font-size: 20px;
+    font-size: 18px;
   }
-  
+
   .section-title i {
-    font-size: 20px;
+    font-size: 18px;
   }
 }
 
 @media (max-width: 768px) {
   .section {
-    margin: 24px 0;
+    margin: 16px 0;
   }
-  
+
   .section-title {
-    font-size: 18px;
+    font-size: 16px;
   }
-  
+
   .section-title i {
-    font-size: 18px;
+    font-size: 16px;
   }
-  
+
   .title-wrapper {
-    gap: 12px;
+    gap: 8px;
   }
-  
+
   .subtitle {
-    font-size: 13px;
+    font-size: 12px;
     display: none;
   }
 }
 
 .carousel-notice-section {
   display: flex;
-  gap: 24px;
-  margin: 24px 0;
-  height: 420px;
-  margin-bottom: 48px;
+  gap: 16px;
+  margin: 16px 0;
+  height: 380px;
+  margin-bottom: 32px;
 }
 
 .carousel-wrapper {
-  flex: 3;
+  flex: 1;
   min-width: 0;
   height: 100%;
-  border-radius: 20px;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
 
 .notice-wrapper {
-  flex: 1;
-  min-width: 280px;
-  max-width: 320px;
+  flex: 0 0 280px;
   height: 100%;
 }
 
@@ -472,10 +460,10 @@ export default {
     gap: 16px;
     height: auto;
   }
-  
+
   .notice-wrapper {
     max-width: none;
-    height: 300px;
+    height: 280px;
   }
 }
 

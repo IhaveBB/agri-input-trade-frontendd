@@ -69,80 +69,58 @@ export default {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: #f0f2f5;
+  background-color: #f5f5f5;
 
   .side-container {
-    box-shadow: 2px 0 16px rgba(64, 158, 255, 0.12);
-    background-color: #fff;
+    box-shadow: 1px 0 8px rgba(0, 0, 0, 0.06);
+    background-color: #fafafa;
     float: left;
-    width: 240px;
+    width: 230px;
     height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
-    // 滚动条宽度
     scrollbar-width: thin;
-    scrollbar-color: #409EFF #f0f0f0;
-    border-right: none;
+    scrollbar-color: #2c9678 #f0f0f0;
+    border-right: 1px solid #e8e8e8;
     position: relative;
     z-index: 2;
-    border-radius: 0 20px 20px 0;
+    border-radius: 0;
 
     .logo-container {
-      height: 64px;
-      background: linear-gradient(to right, #409EFF, #66B1FF);
+      height: 60px;
+      background: #2c9678;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0 24px;
-      gap: 12px;
-      position: relative;
-      overflow: hidden;
-      
-      &:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(to right, 
-          rgba(255,255,255,0.1),
-          rgba(255,255,255,0.3),
-          rgba(255,255,255,0.1)
-        );
-      }
-      
+      padding: 0 20px;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
       .logo-icon {
-        font-size: 28px;
+        font-size: 26px;
         color: #fff;
-        position: relative;
-        z-index: 1;
-    
         margin-right: 0;
       }
-      
+
       .logo-text-container {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
       }
-      
+
       .logo-text {
         margin: 0;
-        font-size: 20px;
+        font-size: 18px;
         color: #fff;
         font-weight: 600;
         letter-spacing: 1px;
         white-space: nowrap;
-        position: relative;
-        z-index: 1;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         line-height: 1.2;
       }
-      
+
       .logo-subtitle {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.85);
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.8);
         font-weight: 400;
         letter-spacing: 0.5px;
         white-space: nowrap;
@@ -152,19 +130,19 @@ export default {
   }
 
   .main-container {
-    margin-left: 240px;
+    margin-left: 230px;
     min-height: 100vh;
-    background-color: #f5f7fa;
-    padding: 24px;
+    background-color: #f5f5f5;
+    padding: 16px;
     position: relative;
     overflow: hidden;
 
     .main-header {
       background: #fff;
-      border-radius: 16px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-      padding: 14px 24px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      padding: 12px 20px;
 
       .el-header {
         padding: 0;
@@ -174,32 +152,20 @@ export default {
 
     .main-content {
       background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-      min-height: calc(100vh - 148px);
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      min-height: calc(100vh - 124px);
 
       .el-scrollbar {
-        height: calc(100vh - 148px);
+        height: calc(100vh - 124px);
 
         .scrollbar {
           height: 100%;
           overflow-x: hidden;
-          padding: 24px;
+          padding: 20px;
         }
       }
     }
-  }
-}
-
-@keyframes logoFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-/* 响应式调整 */
-@media (max-width: 768px) {
-  .logo-subtitle {
-    display: none; /* 在小屏幕上隐藏副标题 */
   }
 }
 </style>

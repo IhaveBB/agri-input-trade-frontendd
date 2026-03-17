@@ -110,9 +110,26 @@ const routes = [
     meta: {
       title: '搜索结果'
     }
+    },
+  {
+    path: '/shop',
+    name: 'Shop',
+    component: () => import('@/views/Shop.vue'),
+    meta: {
+      title: '店铺详情'
+    }
+  },
+  {
+    path: '/user-profile',
+    name: 'UserProfile',
+    component: () => import('@/views/front/UserProfile.vue'),
+    meta: {
+      title: '我的画像',
+      requiresAuth: true
+    }
   }
-  
-  
+
+
 ];
 
 
@@ -182,11 +199,19 @@ export const setRoutes = () => {
             },
           },
           {
-            path: '/shop',
-            name: 'Shop',
-            component: () => import('../views/Shop.vue'),
+            path: '/region-sales',
+            name: 'RegionSalesAnalysis',
+            component: () => import('../views/RegionSalesAnalysis.vue'),
             meta: {
-              title: "店铺详情"
+              title: "地域销售分析"
+            },
+          },
+          {
+            path: '/stock-warning',
+            name: 'StockWarning',
+            component: () => import('../views/StockWarning.vue'),
+            meta: {
+              title: "库存预警"
             },
           },
         ]

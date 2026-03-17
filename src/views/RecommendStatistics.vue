@@ -787,16 +787,6 @@ export default {
 
       this.predictionChart.setOption(option)
     },
-    generateMockDates(days) {
-      const dates = []
-      const now = new Date()
-      for (let i = days - 1; i >= 0; i--) {
-        const date = new Date(now)
-        date.setDate(date.getDate() - i)
-        dates.push(`${date.getMonth() + 1}/${date.getDate()}`)
-      }
-      return dates
-    },
     getSuggestionIcon(type) {
       const icons = {
         optimize: 'el-icon-setting',

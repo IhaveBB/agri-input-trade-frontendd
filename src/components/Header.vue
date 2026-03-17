@@ -108,60 +108,58 @@ export default {
   justify-content: space-between;
   height: 100%;
   padding: 0 20px;
-  background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
-  border-bottom: none;
-  
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+
   .header-left {
     display: flex;
     align-items: center;
   }
-  
+
   .header-right {
     display: flex;
     align-items: center;
     gap: 16px;
-    
+
     .current-time {
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #606266;
+      color: #666;
       font-size: 13px;
-      background: rgba(64, 158, 255, 0.08);
-      padding: 6px 14px;
-      border-radius: 20px;
+      background: #f5f5f5;
+      padding: 6px 12px;
+      border-radius: 4px;
       white-space: nowrap;
-      border: 1px solid rgba(64, 158, 255, 0.15);
+      border: 1px solid #e8e8e8;
 
       i {
-        color: #409EFF;
+        color: #2c9678;
         font-size: 15px;
       }
     }
-    
+
     .header-actions {
       display: flex;
       align-items: center;
       gap: 12px;
-      
+
       .action-btn {
         display: flex;
         align-items: center;
         gap: 6px;
-        padding: 8px 16px;
-        border-radius: 20px;
+        padding: 7px 14px;
+        border-radius: 4px;
         cursor: pointer;
-        transition: all 0.3s ease;
-        background: linear-gradient(45deg, #409EFF, #66B1FF);
+        transition: all 0.2s ease;
+        background: #2c9678;
         color: white;
         font-size: 14px;
-        box-shadow: 0 2px 6px rgba(64, 158, 255, 0.2);
-        
+
         &:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+          background: #36a88a;
         }
-        
+
         i {
           font-size: 16px;
         }
@@ -170,72 +168,47 @@ export default {
       .action-group {
         display: flex;
         align-items: center;
-        gap: 8px;
-        background: #f5f7fa;
-        padding: 4px;
-        border-radius: 16px;
+        gap: 6px;
+        background: #f5f5f5;
+        padding: 3px;
+        border-radius: 4px;
+        border: 1px solid #e8e8e8;
       }
-      
+
       .action-icon-btn {
-        width: 32px;
-        height: 32px;
+        width: 30px;
+        height: 30px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 50%;
+        border-radius: 4px;
         cursor: pointer;
-        transition: all 0.3s ease;
-        color: #606266;
-        
+        transition: all 0.2s ease;
+        color: #666;
+
         i {
-          font-size: 18px;
-          transition: all 0.3s ease;
+          font-size: 16px;
+          transition: all 0.2s ease;
         }
-        
+
         &:hover {
-          background-color: white;
-          color: #409EFF;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-          
+          background-color: #fff;
+          color: #2c9678;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
           i.el-icon-refresh-right {
             transform: rotate(180deg);
           }
         }
       }
-      
+
       .divider {
         width: 1px;
-        height: 24px;
-        background: linear-gradient(to bottom, transparent, #e4e7ed, transparent);
+        height: 20px;
+        background: #e8e8e8;
         margin: 0 8px;
       }
     }
-  }
-}
-
-:deep(.el-badge__content.is-fixed) {
-  top: 8px;
-  right: 8px;
-  border: 2px solid white;
-}
-
-:deep(.el-badge__content) {
-  background-color: #409EFF;
-  box-shadow: 0 2px 4px rgba(64, 158, 255, 0.2);
-}
-
-:deep(.el-tooltip__popper) {
-  font-size: 13px;
-}
-
-/* 响应式调整 */
-@media (max-width: 992px) {
-  .current-time span {
-    display: none;
-  }
-  
-  .current-time {
-    padding: 6px !important;
   }
 }
 </style>

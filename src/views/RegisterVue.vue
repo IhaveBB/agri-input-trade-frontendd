@@ -56,14 +56,27 @@
                 </el-form-item>
 
                 <el-form-item prop="role">
-                    <el-select 
-                        v-model="registerForm.role" 
+                    <el-select
+                        v-model="registerForm.role"
                         placeholder="请选择用户角色"
                         class="role-select">
                         <el-option label="普通用户" value="USER"></el-option>
                         <el-option label="商户" value="MERCHANT"></el-option>
                         <el-option label="管理员" value="ADMIN"></el-option>
                     </el-select>
+                </el-form-item>
+
+                <!-- 普通用户显示感兴趣作物选择 -->
+                <el-form-item v-if="registerForm.role === 'USER'" label="感兴趣作物">
+                    <el-cascader
+                        v-model="registerForm.interestedCropIds"
+                        :options="cropTree"
+                        :props="{ value: 'id', label: 'name', children: 'children', multiple: true, emitPath: false }"
+                        placeholder="请选择您种植或感兴趣的作物（可选）"
+                        clearable
+                        style="width: 100%">
+                    </el-cascader>
+                    <div class="form-tip">选择作物可帮助我们为您推荐更精准的农资商品</div>
                 </el-form-item>
 
                 <el-form-item prop="invitationCode" v-if="registerForm.role === 'ADMIN'">
@@ -134,8 +147,10 @@ export default {
                 code: '',
                 role: 'USER',
                 status: 1,
-                invitationCode: '' // 添加邀请码字段
+                invitationCode: '', // 添加邀请码字段
+                interestedCropIds: [] // 感兴趣作物ID列表
             },
+            cropTree: [], // 作物分类树
             rules: {
                 username: [
                     { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -164,7 +179,26 @@ export default {
             }
         };
     },
+    created() {
+        this.loadCropTree();
+    },
     methods: {
+        // 加载作物分类树（种子分类下的四级分类）
+        async loadCropTree() {
+            try {
+                // 获取分类树，然后提取种子分类（id=1）下的子分类
+                const res = await request.get('/category/tree');
+                if (res.code === '0' && res.data) {
+                    const seedCategory = res.data.find(c => c.id === 1);
+                    if (seedCategory && seedCategory.children) {
+                        // 只取种子分类下的子分类作为作物选项
+                        this.cropTree = seedCategory.children;
+                    }
+                }
+            } catch (error) {
+                console.error('加载作物分类失败:', error);
+            }
+        },
         sendVerificationCode() {
             if (this.disabled) return;
             
@@ -231,7 +265,14 @@ export default {
                         return;
                     }
 
-                    request.post("/user/add", this.registerForm).then(res => {
+                    // 构建提交数据，转换感兴趣作物为逗号分隔字符串
+                    const submitData = { ...this.registerForm };
+                    if (submitData.interestedCropIds && submitData.interestedCropIds.length > 0) {
+                        submitData.interestedCrops = submitData.interestedCropIds.join(',');
+                    }
+                    delete submitData.interestedCropIds; // 删除临时字段
+
+                    request.post("/user/add", submitData).then(res => {
                         if (res.code === '0') {
                             this.$message({
                                 type: 'success',
@@ -284,6 +325,13 @@ export default {
 .form-content {
     width: 85%;
     margin: 0 auto;
+}
+
+.form-tip {
+    font-size: 12px;
+    color: #909399;
+    margin-top: 5px;
+    line-height: 1.4;
 }
 
 .validate-container {

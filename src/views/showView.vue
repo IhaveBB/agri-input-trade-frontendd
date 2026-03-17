@@ -270,19 +270,11 @@ export default {
           type: 'bar',
           data: this.topProducts.map(item => item.salesCount).reverse(),
           itemStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-              { offset: 0, color: '#83bff6' },
-              { offset: 0.5, color: '#188df0' },
-              { offset: 1, color: '#188df0' }
-            ])
+            color: '#2c9678'
           },
           emphasis: {
             itemStyle: {
-              color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-                { offset: 0, color: '#2378f7' },
-                { offset: 0.7, color: '#2378f7' },
-                { offset: 1, color: '#83bff6' }
-              ])
+              color: '#36a88a'
             }
           }
         }]
@@ -355,7 +347,7 @@ export default {
           }
         ],
         color: [
-          '#409EFF', '#409EFF', '#E6A23C', '#F56C6C',
+          '#2c9678', '#36a88a', '#E6A23C', '#F56C6C',
           '#909399', '#36CBCB', '#FFA2D3', '#9A60B4'
         ]
       }
@@ -392,45 +384,45 @@ export default {
 
 <style lang="less" scoped>
 .dashboard-wrapper {
-  padding: 20px;
+  padding: 16px;
 }
 
 .stat-cards {
   display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .stat-card {
   flex: 1;
-  min-width: 240px;
+  min-width: 220px;
 
   .stat-header {
     display: flex;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
   .stat-icon {
     font-size: 24px;
     margin-right: 12px;
-    color: #409eff;
+    color: #2c9678;
   }
 
   .stat-title {
-    font-size: 16px;
+    font-size: 15px;
     color: #606266;
   }
 
   .stat-value {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: bold;
     color: #303133;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
   .stat-footer {
-    font-size: 14px;
+    font-size: 13px;
     color: #909399;
 
     .up {
@@ -445,17 +437,17 @@ export default {
 
 .content-wrapper {
   display: flex;
-  gap: 20px;
-  margin-top: 20px;
+  gap: 16px;
+  margin-top: 16px;
 
   .chart-card {
     flex: 1;
-    min-width: 400px;
+    min-width: 380px;
   }
 
   .notice-card {
     flex: 1;
-    min-width: 400px;
+    min-width: 380px;
   }
 }
 
@@ -463,12 +455,15 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 12px;
 }
 
 .chart-content {
-  height: 400px;
+  height: 380px;
   .chart {
     width: 100%;
     height: 100%;
@@ -479,12 +474,15 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 12px;
 }
 
 .notice-content {
-  max-height: 600px;
+  max-height: 550px;
   overflow-y: auto;
 }
 
@@ -493,18 +491,20 @@ export default {
 
   h4 {
     margin: 0 0 8px;
-    color: #303133;
+    color: #333;
+    font-size: 15px;
   }
 
   .notice-text {
-    color: #606266;
+    color: #666;
     margin: 0;
     line-height: 1.6;
+    font-size: 14px;
   }
 }
 
 :deep(.el-timeline-item__node--primary) {
-  background-color: #409eff;
+  background-color: #2c9678;
 }
 
 :deep(.el-timeline-item__node--success) {
