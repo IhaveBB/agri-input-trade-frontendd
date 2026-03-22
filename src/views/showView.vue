@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-wrapper">
     <!-- 数据概览卡片 -->
-    <div class="stat-cards">
+    <div class="stat-cards" v-loading="statsLoading">
       <el-card class="stat-card" shadow="hover">
         <div class="stat-header">
           <i class="el-icon-shopping-cart-full stat-icon"></i>
@@ -55,6 +55,23 @@
           </span>
         </div>
       </el-card>
+
+      <el-card class="stat-card" shadow="hover">
+        <div class="stat-header">
+          <i class="el-icon-warning-outline stat-icon stat-icon--warning"></i>
+          <div class="stat-title">库存预警</div>
+        </div>
+        <div class="stat-value">
+          <count-to :startVal="0" :endVal="stockWarningCount" :duration="2000">
+          </count-to>
+        </div>
+        <div class="stat-footer">
+          <span :class="stockWarningCount > 0 ? 'down' : 'up'">
+            <i :class="stockWarningCount > 0 ? 'el-icon-warning' : 'el-icon-check'"></i>
+            {{ stockWarningCount > 0 ? '需关注' : '库存正常' }}
+          </span>
+        </div>
+      </el-card>
     </div>
 
     <div class="content-wrapper">
@@ -88,8 +105,12 @@
           <span>通知公告</span>
           <el-button type="text" @click="fetchData">刷新</el-button>
         </div>
-        <div class="notice-content">
-          <el-timeline>
+        <div class="notice-content" v-loading="noticeLoading">
+          <div v-if="!noticeLoading && announcements.length === 0" class="empty-notice">
+            <i class="el-icon-bell"></i>
+            <p>暂无通知公告</p>
+          </div>
+          <el-timeline v-else>
             <el-timeline-item v-for="(notice, index) in announcements" :key="index" :timestamp="notice.time" :type="getNoticeType(notice.type)">
               <el-card class="notice-item" shadow="never">
                 <h4>{{ notice.title }}</h4>
@@ -122,6 +143,8 @@ export default {
     return {
       noticeLimit: 10,
       announcements: [],
+      statsLoading: false,
+      noticeLoading: false,
       // 统计数据
       orderStats: {
         currentMonthOrders: 0,
@@ -138,6 +161,7 @@ export default {
         lastYearUsers: 0,
         growthRate: '0.00%'
       },
+      stockWarningCount: 0,
       // 热销商品数据
       topProductsChart: null,
       topProducts: [],
@@ -160,15 +184,14 @@ export default {
       return parseFloat(this.userStats.growthRate)
     }
   },
-  created() {
+  mounted() {
+    this.initTopProductsChart()
+    this.initCategoryChart()
     this.fetchData()
     this.fetchStatistics()
     this.fetchTopProducts()
     this.fetchCategoryStats()
-  },
-  mounted() {
-    this.initTopProductsChart()
-    this.initCategoryChart()
+    this.fetchStockWarningCount()
     window.addEventListener('resize', this.resizeCharts)
   },
   beforeDestroy() {
@@ -183,38 +206,47 @@ export default {
   methods: {
     // 获取通知数据
     fetchData() {
+      this.noticeLoading = true
       Request.get("/notice/limit", {
-        params: {
-          count: this.noticeLimit
-        }
+        params: { count: this.noticeLimit }
       }).then(response => {
         if (response.code === '0') {
-          this.announcements = response.data
+          this.announcements = response.data || []
         }
+      }).catch(() => {
+        this.announcements = []
+      }).finally(() => {
+        this.noticeLoading = false
       })
     },
     // 获取统计数据
-    fetchStatistics() {
-      // 获取订单统计
-      Request.get("/statistics/orders/monthly").then(response => {
-        if (response.code === '0') {
-          this.orderStats = response.data
+    async fetchStatistics() {
+      this.statsLoading = true
+      try {
+        const [orderRes, salesRes, userRes] = await Promise.all([
+          Request.get("/statistics/orders/monthly"),
+          Request.get("/statistics/sales/monthly"),
+          Request.get("/statistics/users/yearly")
+        ])
+        if (orderRes.code === '0') this.orderStats = orderRes.data
+        if (salesRes.code === '0') this.salesStats = salesRes.data
+        if (userRes.code === '0') this.userStats = userRes.data
+      } catch (e) {
+        console.error('获取统计数据失败:', e)
+      } finally {
+        this.statsLoading = false
+      }
+    },
+    // 获取库存预警数量
+    async fetchStockWarningCount() {
+      try {
+        const res = await Request.get('/stock-warning/count')
+        if (res.code === '0') {
+          this.stockWarningCount = res.data || 0
         }
-      })
-
-      // 获取销售额统计
-      Request.get("/statistics/sales/monthly").then(response => {
-        if (response.code === '0') {
-          this.salesStats = response.data
-        }
-      })
-
-      // 获取用户统计
-      Request.get("/statistics/users/yearly").then(response => {
-        if (response.code === '0') {
-          this.userStats = response.data
-        }
-      })
+      } catch (e) {
+        this.stockWarningCount = 0
+      }
     },
     getNoticeType(type) {
       const types = {
@@ -233,6 +265,7 @@ export default {
 
     // 更新图表数据
     updateTopProductsChart() {
+      if (!this.topProductsChart) return
       const option = {
         tooltip: {
           trigger: 'axis',
@@ -305,6 +338,7 @@ export default {
 
     // 更新品类图表数据
     updateCategoryChart() {
+      if (!this.categoryChart) return
       const option = {
         tooltip: {
           trigger: 'item',
@@ -407,6 +441,10 @@ export default {
     font-size: 24px;
     margin-right: 12px;
     color: #2c9678;
+
+    &--warning {
+      color: #e6a23c;
+    }
   }
 
   .stat-title {
@@ -484,6 +522,25 @@ export default {
 .notice-content {
   max-height: 550px;
   overflow-y: auto;
+}
+
+.empty-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  color: #c0c4cc;
+
+  i {
+    font-size: 36px;
+    margin-bottom: 12px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
 }
 
 .notice-item {

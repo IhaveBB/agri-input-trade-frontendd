@@ -125,10 +125,10 @@
         </div>
       </div>
 
-      <!-- 用户相似度分布 -->
+      <!-- 用户行为漏斗 -->
       <div class="chart-panel">
         <div class="chart-panel__header">
-          <h3 class="chart-panel__title">用户相似度分布</h3>
+          <h3 class="chart-panel__title">用户行为漏斗</h3>
         </div>
         <div class="chart-panel__body">
           <div ref="similarityChartRef" class="chart"></div>
@@ -145,9 +145,17 @@
           <h3>智能优化建议</h3>
         </div>
         <div class="panel-suggestions__content">
-          <div v-if="suggestions.length === 0" class="empty-tip">
+          <div v-if="suggestionsLoading" class="empty-tip">
             <i class="el-icon-loading"></i>
             正在分析推荐系统...
+          </div>
+          <div v-else-if="suggestionsError" class="empty-tip empty-tip--error">
+            <i class="el-icon-warning-outline"></i>
+            分析数据加载失败，请刷新重试
+          </div>
+          <div v-else-if="suggestions.length === 0" class="empty-tip">
+            <i class="el-icon-check"></i>
+            推荐系统运行正常，暂无优化建议
           </div>
           <ul v-else class="suggestion-list">
             <li v-for="(item, index) in suggestions" :key="index" class="suggestion-item">
@@ -229,6 +237,8 @@ export default {
       diversityData: {},
       similarityData: [],
       suggestions: [],
+      suggestionsLoading: false,
+      suggestionsError: false,
       predictionData: {},
       // 图表实例
       trendChart: null,
@@ -324,10 +334,10 @@ export default {
           this.fetchAlgorithm(),
           this.fetchDiversity(),
           this.fetchSimilarity(),
-          this.fetchSuggestions(),
           this.fetchPrediction()
         ])
-        this.renderAllCharts()
+        // suggestions 单独请求，失败不影响其他图表
+        this.fetchSuggestions()
       } catch (error) {
         console.error('加载数据失败:', error)
       } finally {
@@ -385,9 +395,20 @@ export default {
       }
     },
     async fetchSuggestions() {
-      const res = await getOptimizationSuggestions()
-      if (res.code === '0' && res.data) {
-        this.suggestions = res.data.suggestions || res.data || []
+      this.suggestionsLoading = true
+      this.suggestionsError = false
+      try {
+        const res = await getOptimizationSuggestions()
+        if (res.code === '0' && res.data) {
+          this.suggestions = res.data.suggestions || res.data || []
+        } else {
+          this.suggestions = []
+        }
+      } catch (e) {
+        this.suggestionsError = true
+        this.suggestions = []
+      } finally {
+        this.suggestionsLoading = false
       }
     },
     async fetchPrediction() {
@@ -596,7 +617,8 @@ export default {
     renderGaugeChart() {
       if (!this.gaugeChart) return
 
-      const value = parseFloat(this.diversityData.normalizedDiversity) / 100 || 0.75
+      const raw = parseFloat(this.diversityData.normalizedDiversity)
+      const value = isNaN(raw) ? 0 : raw / 100
 
       const option = {
         series: [{
@@ -1087,6 +1109,10 @@ export default {
     display: block;
     font-size: 24px;
     margin-bottom: 10px;
+  }
+
+  &--error {
+    color: #f56c6c;
   }
 }
 

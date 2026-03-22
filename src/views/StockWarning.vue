@@ -11,6 +11,12 @@
         </p>
       </div>
       <div class="header-right">
+        <el-button v-if="isMerchant" type="primary" size="small" icon="el-icon-setting" @click="openConfigDialog">
+          预警配置
+        </el-button>
+        <el-button v-if="isAdmin" type="info" size="small" icon="el-icon-message" @click="goEmailRecord">
+          邮件记录
+        </el-button>
         <el-button icon="el-icon-refresh" circle @click="refreshData" :loading="loading"></el-button>
       </div>
     </div>
@@ -51,7 +57,7 @@
 
       <div class="stat-card stat-card--success">
         <div class="stat-card__icon">
-          <i class="el-icon-success"></i>
+          <i class="el-icon-circle-check"></i>
         </div>
         <div class="stat-card__content">
           <div class="stat-card__label">库存正常</div>
@@ -67,16 +73,16 @@
 
       <div class="stat-card stat-card--info">
         <div class="stat-card__icon">
-          <i class="el-icon-s-goods"></i>
+          <i class="el-icon-box"></i>
         </div>
         <div class="stat-card__content">
-          <div class="stat-card__label">商品总数</div>
+          <div class="stat-card__label">库存积压</div>
           <div class="stat-card__value">
-            <count-to :start-val="0" :end-val="overview.totalProducts" :duration="1500" />
+            <count-to :start-val="0" :end-val="overview.highStockCount" :duration="1500" />
           </div>
           <div class="stat-card__trend trend-neutral">
-            <i class="el-icon-s-data"></i>
-            全部商品
+            <i class="el-icon-sell"></i>
+            建议促销
           </div>
         </div>
       </div>
@@ -121,7 +127,8 @@
       <div class="chart-panel__body">
         <el-table :data="filteredWarnings" stripe style="width: 100%" v-loading="loading">
           <el-table-column prop="productId" label="商品ID" width="80" />
-          <el-table-column prop="productName" label="商品名称" min-width="200" show-overflow-tooltip />
+          <el-table-column prop="productName" label="商品名称" min-width="180" show-overflow-tooltip />
+          <el-table-column v-if="isAdmin" prop="merchantName" label="所属商户" width="120" show-overflow-tooltip />
           <el-table-column prop="currentStock" label="当前库存" width="100" align="center">
             <template slot-scope="scope">
               <el-tag :type="getStockTagType(scope.row.warningType)" size="small">
@@ -152,6 +159,120 @@
         </div>
       </div>
     </div>
+
+    <!-- 预警配置弹窗 -->
+    <el-dialog title="库存预警配置" :visible.sync="configDialogVisible" width="900px" top="5vh">
+      <el-tabs v-model="configActiveTab">
+        <!-- 全局配置 -->
+        <el-tab-pane label="全局配置" name="global">
+          <div class="config-form">
+            <el-form :model="globalConfig" label-width="140px" size="small">
+              <el-form-item label="启用全局预警">
+                <el-switch v-model="globalConfig.enabled"></el-switch>
+              </el-form-item>
+              <el-form-item label="预警规则">
+                <el-select v-model="globalConfig.ruleType" placeholder="选择预警规则" style="width: 100%">
+                  <el-option label="库存低于阈值" value="THRESHOLD"></el-option>
+                  <el-option label="库存小于昨日销量" value="SALES_RATIO"></el-option>
+                  <el-option label="库存为0（缺货）" value="OUT_OF_STOCK"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item v-if="globalConfig.ruleType === 'THRESHOLD'" label="库存阈值">
+                <el-input-number v-model="globalConfig.thresholdValue" :min="1" :max="9999"></el-input-number>
+                <span class="form-tip">当库存低于此值时触发预警</span>
+              </el-form-item>
+              <el-form-item label="预警间隔">
+                <el-input-number v-model="globalConfig.alertIntervalHours" :min="1" :max="168"></el-input-number>
+                <span class="form-tip">小时（同一商品两次预警的最小间隔）</span>
+              </el-form-item>
+              <el-form-item label="重复提醒">
+                <el-switch v-model="globalConfig.repeatAlertEnabled"></el-switch>
+                <span class="form-tip">库存未恢复时按预警间隔持续发送提醒</span>
+              </el-form-item>
+            </el-form>
+            <div class="config-actions">
+              <el-button type="primary" @click="saveGlobalConfig" :loading="savingConfig">保存全局配置</el-button>
+            </div>
+          </div>
+        </el-tab-pane>
+
+        <!-- 商品配置 -->
+        <el-tab-pane label="商品配置" name="products">
+          <div class="product-config">
+            <!-- 搜索和批量操作 -->
+            <div class="config-toolbar">
+              <el-input v-model="productSearchKey" placeholder="搜索商品名称" size="small" style="width: 250px" clearable @clear="searchProducts" @keyup.enter.native="searchProducts">
+                <el-button slot="append" icon="el-icon-search" @click="searchProducts"></el-button>
+              </el-input>
+              <div class="batch-actions">
+                <el-button size="small" :disabled="selectedProducts.length === 0" @click="batchEnableAlert(true)">
+                  批量启用
+                </el-button>
+                <el-button size="small" :disabled="selectedProducts.length === 0" @click="batchEnableAlert(false)">
+                  批量禁用
+                </el-button>
+              </div>
+            </div>
+
+            <!-- 商品列表 -->
+            <el-table :data="productConfigList" stripe size="small" v-loading="loadingProducts" @selection-change="handleSelectionChange" max-height="400">
+              <el-table-column type="selection" width="50"></el-table-column>
+              <el-table-column prop="productName" label="商品名称" min-width="180" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="currentStock" label="当前库存" width="100" align="center">
+                <template slot-scope="scope">
+                  <span :class="{'stock-warning': scope.row.currentStock < (scope.row.thresholdValue || 10)}">{{ scope.row.currentStock }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="enabled" label="启用预警" width="100" align="center">
+                <template slot-scope="scope">
+                  <el-switch v-model="scope.row.enabled" @change="toggleProductAlert(scope.row)"></el-switch>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" width="100" align="center">
+                <template slot-scope="scope">
+                  <el-button type="text" size="small" @click="openProductConfig(scope.row)">配置</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+
+            <!-- 分页 -->
+            <el-pagination
+              class="config-pagination"
+              @size-change="handleProductPageSizeChange"
+              @current-change="handleProductPageChange"
+              :current-page="productPageNum"
+              :page-sizes="[10, 20, 50]"
+              :page-size="productPageSize"
+              layout="total, sizes, prev, pager, next"
+              :total="productTotal">
+            </el-pagination>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
+    </el-dialog>
+
+    <!-- 单品配置弹窗 -->
+    <el-dialog :title="'配置「' + (currentProduct.productName || '') + '」的预警设置'" :visible.sync="productConfigDialogVisible" width="500px">
+      <el-form :model="currentProduct" label-width="120px" size="small">
+        <el-form-item label="启用预警">
+          <el-switch v-model="currentProduct.enabled"></el-switch>
+        </el-form-item>
+        <el-form-item label="预警规则">
+          <el-select v-model="currentProduct.ruleType" placeholder="选择预警规则" style="width: 100%">
+            <el-option label="库存低于阈值" value="THRESHOLD"></el-option>
+            <el-option label="库存小于昨日销量" value="SALES_RATIO"></el-option>
+            <el-option label="库存为0（缺货）" value="OUT_OF_STOCK"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="currentProduct.ruleType === 'THRESHOLD'" label="库存阈值">
+          <el-input-number v-model="currentProduct.thresholdValue" :min="1" :max="9999"></el-input-number>
+        </el-form-item>
+      </el-form>
+      <span slot="footer">
+        <el-button @click="productConfigDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="saveProductConfig" :loading="savingProductConfig">确定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -161,7 +282,13 @@ import * as echarts from 'echarts'
 import {
   getStockOverview,
   getAllStockWarnings,
-  getMerchantStockWarnings
+  getMerchantStockWarnings,
+  getGlobalConfig,
+  updateGlobalConfig,
+  getProductConfigList,
+  toggleProductAlert,
+  updateProductConfig,
+  batchToggleProductAlert
 } from '@/api/stockWarning'
 
 export default {
@@ -185,7 +312,30 @@ export default {
       },
       warnings: [],
       pieChart: null,
-      barChart: null
+      barChart: null,
+      // 预警配置相关
+      configDialogVisible: false,
+      configActiveTab: 'global',
+      savingConfig: false,
+      globalConfig: {
+        enabled: true,
+        ruleType: 'THRESHOLD',
+        thresholdValue: 10,
+        alertIntervalHours: 24,
+        repeatAlertEnabled: true
+      },
+      // 商品配置相关
+      loadingProducts: false,
+      productSearchKey: '',
+      productConfigList: [],
+      selectedProducts: [],
+      productPageNum: 1,
+      productPageSize: 10,
+      productTotal: 0,
+      // 单品配置
+      productConfigDialogVisible: false,
+      savingProductConfig: false,
+      currentProduct: {}
     }
   },
   computed: {
@@ -448,6 +598,163 @@ export default {
     // 查看商品
     viewProduct(productId) {
       this.$router.push(`/product/${productId}`)
+    },
+    // 打开预警配置弹窗
+    openConfigDialog() {
+      this.configDialogVisible = true
+      this.loadGlobalConfig()
+      this.loadProductConfigs()
+    },
+    // 加载全局配置
+    async loadGlobalConfig() {
+      try {
+        const res = await getGlobalConfig()
+        if (res.code === '0' && res.data) {
+          this.globalConfig = {
+            ...this.globalConfig,
+            ...res.data,
+            ruleType: this.parseRuleType(res.data.ruleConfig)
+          }
+        }
+      } catch (error) {
+        console.error('加载全局配置失败:', error)
+      }
+    },
+    // 解析规则类型
+    parseRuleType(ruleConfig) {
+      if (!ruleConfig) return 'THRESHOLD'
+      try {
+        const config = JSON.parse(ruleConfig)
+        return config.ruleType || 'THRESHOLD'
+      } catch {
+        return 'THRESHOLD'
+      }
+    },
+    // 保存全局配置
+    async saveGlobalConfig() {
+      this.savingConfig = true
+      try {
+        const ruleConfig = JSON.stringify({
+          ruleType: this.globalConfig.ruleType,
+          thresholdValue: this.globalConfig.thresholdValue || 10
+        })
+        const data = {
+          enabled: this.globalConfig.enabled,
+          ruleConfig: ruleConfig,
+          alertIntervalHours: this.globalConfig.alertIntervalHours,
+          repeatAlertEnabled: this.globalConfig.repeatAlertEnabled
+        }
+        const res = await updateGlobalConfig(data)
+        if (res.code === '0') {
+          this.$message.success('全局配置保存成功')
+        } else {
+          this.$message.error(res.msg || '保存失败')
+        }
+      } catch (error) {
+        this.$message.error('保存失败')
+      } finally {
+        this.savingConfig = false
+      }
+    },
+    // 加载商品配置列表
+    async loadProductConfigs() {
+      this.loadingProducts = true
+      try {
+        const res = await getProductConfigList({
+          productName: this.productSearchKey,
+          pageNum: this.productPageNum,
+          pageSize: this.productPageSize
+        })
+        if (res.code === '0' && res.data) {
+          this.productConfigList = res.data.records.map(item => {
+            let parsed = {}
+            try { parsed = JSON.parse(item.ruleConfig || '{}') } catch (e) {}
+            return {
+              ...item,
+              ruleType: parsed.ruleType || 'THRESHOLD',
+              thresholdValue: parsed.thresholdValue || 10
+            }
+          })
+          this.productTotal = res.data.total
+        }
+      } catch (error) {
+        console.error('加载商品配置失败:', error)
+      } finally {
+        this.loadingProducts = false
+      }
+    },
+    // 搜索商品
+    searchProducts() {
+      this.productPageNum = 1
+      this.loadProductConfigs()
+    },
+    // 切换商品预警
+    async toggleProductAlert(row) {
+      try {
+        await updateProductConfig(row.productId, {
+          enabled: row.enabled
+        })
+        this.$message.success(row.enabled ? '已启用预警' : '已禁用预警')
+      } catch (error) {
+        row.enabled = !row.enabled
+        this.$message.error('操作失败')
+      }
+    },
+    // 选择变化
+    handleSelectionChange(selection) {
+      this.selectedProducts = selection
+    },
+    // 批量启用/禁用预警
+    async batchEnableAlert(enabled) {
+      if (this.selectedProducts.length === 0) return
+      try {
+        const productIds = this.selectedProducts.map(p => p.productId)
+        await batchToggleProductAlert(productIds, enabled)
+        this.$message.success(enabled ? '批量启用成功' : '批量禁用成功')
+        this.loadProductConfigs()
+      } catch (error) {
+        this.$message.error('操作失败')
+      }
+    },
+    // 打开单品配置
+    openProductConfig(row) {
+      this.currentProduct = { ...row }
+      this.productConfigDialogVisible = true
+    },
+    // 保存单品配置
+    async saveProductConfig() {
+      this.savingProductConfig = true
+      try {
+        const ruleConfig = JSON.stringify({
+          ruleType: this.currentProduct.ruleType,
+          thresholdValue: this.currentProduct.thresholdValue || 10
+        })
+        await updateProductConfig(this.currentProduct.productId, {
+          enabled: this.currentProduct.enabled,
+          ruleConfig: ruleConfig
+        })
+        this.$message.success('配置保存成功')
+        this.productConfigDialogVisible = false
+        this.loadProductConfigs()
+      } catch (error) {
+        this.$message.error('保存失败')
+      } finally {
+        this.savingProductConfig = false
+      }
+    },
+    // 分页变化
+    handleProductPageChange(page) {
+      this.productPageNum = page
+      this.loadProductConfigs()
+    },
+    handleProductPageSizeChange(size) {
+      this.productPageSize = size
+      this.productPageNum = 1
+      this.loadProductConfigs()
+    },
+    // 跳转邮件记录页面
+    goEmailRecord() {
+      this.$router.push('/email-record')
     }
   }
 }
@@ -653,5 +960,52 @@ export default {
   .stat-cards {
     grid-template-columns: 1fr;
   }
+}
+
+/* 预警配置相关样式 */
+.config-form {
+  padding: 20px;
+}
+
+.form-tip {
+  margin-left: 10px;
+  color: #909399;
+  font-size: 12px;
+}
+
+.config-actions {
+  margin-top: 20px;
+  text-align: right;
+}
+
+.product-config {
+  padding: 0 20px;
+}
+
+.config-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.batch-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.config-pagination {
+  margin-top: 16px;
+  text-align: right;
+}
+
+.stock-warning {
+  color: #e6a23c;
+  font-weight: 600;
+}
+
+.stock-danger {
+  color: #f56c6c;
+  font-weight: 600;
 }
 </style>
