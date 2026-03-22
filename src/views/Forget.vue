@@ -68,7 +68,6 @@ export default {
             countdown: 0,
             disabled: false,
             timer: null,
-            emailCode: '',
             buttonContent: '发送验证码',
             resetForm: {
                 email: '',
@@ -92,64 +91,58 @@ export default {
     },
     methods: {
         sendVerificationCode() {
-            // 发送重置密码请求到后端
-            if (this.disabled) return; // 如果按钮已禁用，则不执行发送逻辑
+            if (this.disabled) return;
 
-            // 发送验证码的逻辑...
-            console.log('验证码发送逻辑');
-      request.get(`/email/findByEmail/${this.resetForm.email}`)
-            .then(res => {
-                if (res.code == '0') {
-                    this.$message({
-                        type: 'success',
-                        message: "验证码已发送到您的邮箱,请查收"
-                    })
-                    this.emailCode = res.data;
-                } else {
-                    this.$message({
-                        type: 'error',
-                        message: res.msg
-                    })
-                    return
-                }
-            })
-            this.countdown = 60; // 设置倒计时为60秒
-            this.disabled = true; // 禁用按钮
-            this.buttonContent = `${this.countdown}秒后可重发`; // 更新按钮文本为倒计时
+            if (!this.resetForm.email) {
+                this.$message.error('请先输入邮箱地址');
+                return;
+            }
+
+            request.get(`/email/findByEmail/${this.resetForm.email}`)
+                .then(res => {
+                    if (res.code === '0') {
+                        this.$message({
+                            type: 'success',
+                            message: "验证码已发送到您的邮箱,请查收"
+                        });
+                        this.startCountdown();
+                    } else {
+                        this.$message({
+                            type: 'error',
+                            message: res.msg
+                        });
+                    }
+                });
+        },
+
+        startCountdown() {
+            this.countdown = 60;
+            this.disabled = true;
+            this.buttonContent = `${this.countdown}秒后可重发`;
 
             this.timer = setInterval(() => {
                 if (this.countdown > 0) {
-                    this.countdown--; // 每秒减少1秒
-                    this.buttonContent = `${this.countdown}秒后可重发`; // 更新按钮文本
+                    this.countdown--;
+                    this.buttonContent = `${this.countdown}秒后可重发`;
                 } else {
-                    clearInterval(this.timer); // 清除定时器
-                    this.countdown = 0; // 重置倒计时
-                    this.disabled = false; // 启用按钮
-                    this.buttonContent = '发送验证码'; // 重置按钮文本
+                    clearInterval(this.timer);
+                    this.disabled = false;
+                    this.buttonContent = '发送验证码';
                 }
             }, 1000);
-
-        
-    },
+        },
     onResetPassword() {
         this.$refs.resetForm.validate((valid) => {
             if (valid) {
-                if (this.resetForm.code != this.emailCode) {
-                    this.$message({
-                        type: 'error',
-                        message: '验证码不正确'
-                    });
-                    return;
-                }
-                // 发送重置密码请求到后端
-                request.get("/user/forget", {
+                // 发送重置密码请求到后端，后端会验证验证码
+                request.post("/user/forget", null, {
                     params: {
                         email: this.resetForm.email,
+                        code: this.resetForm.code,
                         newPassword: this.resetForm.newPassword,
-
                     },
                 }).then(res => {
-                    if (res.code == '0') {
+                    if (res.code === '0') {
                         this.$message({
                             type: 'success',
                             message: "密码重置成功"
@@ -163,7 +156,6 @@ export default {
                     }
                 });
             } else {
-                console.error('重置密码失败: 表单校验失败');
                 return false;
             }
         });

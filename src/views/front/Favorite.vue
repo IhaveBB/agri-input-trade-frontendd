@@ -98,7 +98,8 @@ export default {
           }))
           this.total = res.data.total
         }
-      }} catch (error) {
+      }
+    } catch (error) {
         console.error('获取收藏列表失败:', error)
         this.$message({
           type: 'error',
@@ -114,11 +115,8 @@ export default {
         await this.$confirm('确定要取消收藏该商品吗？', '提示', {
           type: 'warning'
         })
-        const userId = this.userInfo.id
         const data = {
-          userId: userId,
-          productId: item.id,
-          status: item.status  // 直接使用原有状态
+          productId: item.id
         }
         const res = await Request.post('/favorite', data)
         if (res.code === '0') {

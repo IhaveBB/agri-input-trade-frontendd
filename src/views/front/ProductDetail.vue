@@ -342,10 +342,7 @@ export default {
           background: 'rgba(0, 0, 0, 0.7)'
         })
 
-        const userId = this.userInfo.id
-
         const data = {
-          userId,
           productId: this.product.id,
           quantity: this.quantity
         }
@@ -415,11 +412,9 @@ export default {
 
         const selectedAddress = this.addresses.find(addr => addr.id === this.selectedAddressId)
         const orderData = {
-          userId: this.userInfo.id,
           productId: this.product.id,
           quantity: this.quantity,
           price: this.product.isDiscount ? this.product.discountPrice : this.product.price,
-          totalPrice: (this.product.isDiscount ? this.product.discountPrice : this.product.price) * this.quantity,
           recvAddress: selectedAddress.address,
           recvPhone: selectedAddress.phone,
           recvName: selectedAddress.receiver

@@ -188,8 +188,7 @@ export default {
     async getCartList() {
       try {
         this.loading = true
-        const userId = this.userInfo.id
-        const res = await Request.get(`/cart/user/${userId}`)
+        const res = await Request.get('/cart/my')
         if (res.code === '0') {
           this.cartItems = res.data.map(item => ({
             ...item,
@@ -197,8 +196,8 @@ export default {
           }))
         }
       } catch (error) {
+        // 错误已在 request 拦截器中统一处理，这里不再重复提示
         console.error('获取购物车列表失败:', error)
-        this.$message.error('获取购物车列表失败')
       } finally {
         this.loading = false
       }
@@ -241,7 +240,7 @@ export default {
     },
     async updateCartItem(id, data) {
       try {
-        const res = await Request.put(`/cart/${id}`, data)
+        const res = await Request.put(`/cart/${id}?quantity=${data.quantity}`)
         if (res.code === '0') {
           this.getCartList()
         } else {
@@ -299,7 +298,6 @@ export default {
       }
 
       const orderData = {
-        userId: this.userInfo.id,
         addressId: this.selectedAddressId,
         items: selectedItems.map(item => ({
           productId: item.productId,

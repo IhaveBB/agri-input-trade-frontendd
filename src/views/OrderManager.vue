@@ -740,10 +740,10 @@ export default {
           
           let logisticsRes
           
-          if (checkRes.code === '0') {
+          if (checkRes.code === '0' && checkRes.data) {
             // 已存在物流信息，更新物流状态和信息
             logisticsRes = await Request.put(`/logistics/${checkRes.data.id}/status?status=1`)
-            
+
             // 更新物流信息
             await Request.put(`/logistics/${checkRes.data.id}`, {
               id: checkRes.data.id,

@@ -66,6 +66,20 @@
                     </el-select>
                 </el-form-item>
 
+                <!-- 普通用户/商户显示地理位置选择 -->
+                <el-form-item v-if="registerForm.role === 'USER' || registerForm.role === 'MERCHANT'" label="所在省份">
+                    <el-select
+                        v-model="registerForm.province"
+                        placeholder="请选择所在省份（可选）"
+                        clearable
+                        style="width: 100%">
+                        <el-option-group v-for="group in provinceGroups" :key="group.region" :label="group.region">
+                            <el-option v-for="p in group.provinces" :key="p" :label="p" :value="p"></el-option>
+                        </el-option-group>
+                    </el-select>
+                    <div class="form-tip">填写省份可帮助系统为您推荐当地适用的农资商品</div>
+                </el-form-item>
+
                 <!-- 普通用户显示感兴趣作物选择 -->
                 <el-form-item v-if="registerForm.role === 'USER'" label="感兴趣作物">
                     <el-cascader
@@ -137,7 +151,6 @@ export default {
             countdown: 0,
             disabled: false,
             timer: null,
-            emailCode: '',
             buttonContent: '发送验证码',
             registerForm: {
                 username: '',
@@ -148,9 +161,19 @@ export default {
                 role: 'USER',
                 status: 1,
                 invitationCode: '', // 添加邀请码字段
-                interestedCropIds: [] // 感兴趣作物ID列表
+                interestedCropIds: [], // 感兴趣作物ID列表
+                province: '' // 所在省份
             },
             cropTree: [], // 作物分类树
+            provinceGroups: [
+                { region: '华北', provinces: ['北京', '天津', '河北', '山西', '内蒙古'] },
+                { region: '东北', provinces: ['辽宁', '吉林', '黑龙江'] },
+                { region: '华东', provinces: ['上海', '江苏', '浙江', '安徽', '福建', '江西', '山东'] },
+                { region: '华中', provinces: ['河南', '湖北', '湖南'] },
+                { region: '华南', provinces: ['广东', '广西', '海南'] },
+                { region: '西南', provinces: ['重庆', '四川', '贵州', '云南', '西藏'] },
+                { region: '西北', provinces: ['陕西', '甘肃', '青海', '宁夏', '新疆'] }
+            ],
             rules: {
                 username: [
                     { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -201,7 +224,7 @@ export default {
         },
         sendVerificationCode() {
             if (this.disabled) return;
-            
+
             if (!this.registerForm.email) {
                 this.$message.error('请先输入邮箱地址');
                 return;
@@ -213,8 +236,6 @@ export default {
                         type: 'success',
                         message: "验证码已发送到您的邮箱,请查收"
                     });
-                    console.log(res.data);
-                    this.emailCode = res.data;
                     this.startCountdown();
                 } else {
                     this.$message({
@@ -245,18 +266,8 @@ export default {
         onRegister() {
             this.$refs.registerForm.validate((valid) => {
                 if (valid) {
-                    // 将验证码转换为字符串后再比较
-                    if (String(this.registerForm.code) !== String(this.emailCode)) {
-                        console.log('Input code:', this.registerForm.code, 'Expected code:', this.emailCode);
-                        this.$message({
-                            type: 'error',
-                            message: '验证码不正确'
-                        });
-                        return;
-                    }
-
                     // 如果是管理员注册，验证邀请码
-                    if (this.registerForm.role === 'ADMIN' && 
+                    if (this.registerForm.role === 'ADMIN' &&
                         this.registerForm.invitationCode !== 'ADMIN666') {
                         this.$message({
                             type: 'error',
@@ -271,8 +282,16 @@ export default {
                         submitData.interestedCrops = submitData.interestedCropIds.join(',');
                     }
                     delete submitData.interestedCropIds; // 删除临时字段
+                    // 将省份转换为 location 字段格式（省份-省会城市）
+                    if (submitData.province) {
+                        submitData.location = submitData.province;
+                    }
+                    delete submitData.province; // 删除临时字段
 
-                    request.post("/user/add", submitData).then(res => {
+                    // 注册请求，传递验证码参数
+                    request.post("/user/add", submitData, {
+                        params: { code: this.registerForm.code }
+                    }).then(res => {
                         if (res.code === '0') {
                             this.$message({
                                 type: 'success',

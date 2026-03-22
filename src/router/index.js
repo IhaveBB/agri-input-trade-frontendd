@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
+import ElementUI from 'element-ui'
 import home from '../layout/index.vue';
 
 

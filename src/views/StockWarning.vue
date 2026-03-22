@@ -212,7 +212,7 @@ export default {
       const userStr = localStorage.getItem('backUser')
       if (userStr) {
         const user = JSON.parse(userStr)
-        this.isAdmin = user.role === 'ADMIN'
+        this.isAdmin = user.role === 'ADMIN' || user.role === 'SUPER_ADMIN'
         this.isMerchant = user.role === 'MERCHANT'
       }
     },

@@ -857,12 +857,10 @@ export default {
         }
 
         // 更新订单收货信息
-        const orderRes = await Request.put(`/order/${this.currentEditOrder.id}/address`, null, {
-          params: {
-            name: receiver,
-            address,
-            phone
-          }
+        const orderRes = await Request.put(`/order/${this.currentEditOrder.id}/address`, {
+          recvName: receiver,
+          recvPhone: phone,
+          recvAddress: address
         })
 
         if (orderRes.code === '0') {
@@ -925,8 +923,6 @@ export default {
           if (res.code === '0') {
             this.$message.success('评价成功')
             this.reviewDialogVisible = false
-            // 更新订单状态为已评价
-            await Request.put(`/order/${this.currentOrder.id}/status?status=3`)
             this.getOrders()
           }
         } catch (error) {

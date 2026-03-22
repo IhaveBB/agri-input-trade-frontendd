@@ -141,6 +141,7 @@ export default {
           this.total = res.data.total
         }
       } catch (error) {
+        // 错误已在 request 拦截器中统一处理，这里不再重复提示
         console.error('获取购物车列表失败:', error)
       }
     },

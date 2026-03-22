@@ -151,7 +151,7 @@
           </div>
           <ul v-else class="suggestion-list">
             <li v-for="(item, index) in suggestions" :key="index" class="suggestion-item">
-              <span class="suggestion-icon" :class="'suggestion-icon--' + item.level">
+              <span class="suggestion-icon" :class="getLevelClass(item.level)">
                 <i :class="getSuggestionIcon(item.type)"></i>
               </span>
               <div class="suggestion-content">
@@ -351,7 +351,7 @@ export default {
     async fetchTrend() {
       const res = await getRecommendTrend(this.activeTrendTab)
       if (res.code === '0' && res.data) {
-        // 后端返回的是 trend 数组，每个元素包含 date, exposure_count, click_count, buy_count
+        // 后端返回的是 trend 数组，每个元素包含 date, exposureCount, clickCount, buyCount
         this.trendData = res.data.trend || []
         this.renderTrendChart()
       }
@@ -359,7 +359,7 @@ export default {
     async fetchCategoryEffect() {
       const res = await getCategoryEffect()
       if (res.code === '0' && res.data) {
-        this.categoryEffectData = res.data
+        this.categoryEffectData = res.data.categoryEffect || []
         this.renderCategoryEffectChart()
       }
     },
@@ -412,8 +412,8 @@ export default {
       // 使用真实API数据
       const trendList = this.trendData || []
       const dates = trendList.map(item => item.date || '')
-      const clicks = trendList.map(item => item.click_count || 0)
-      const conversions = trendList.map(item => item.buy_count || 0)
+      const clicks = trendList.map(item => item.clickCount || 0)
+      const conversions = trendList.map(item => item.buyCount || 0)
 
       const option = {
         tooltip: {
@@ -542,7 +542,7 @@ export default {
         return
       }
 
-      const categories = data.map(item => item.category_name || item.categoryName)
+      const categories = data.map(item => item.categoryName)
       const rates = data.map(item => parseFloat((item.cvr || item.conversionRate || '0').toString().replace('%', '')))
 
       const option = {
@@ -596,7 +596,7 @@ export default {
     renderGaugeChart() {
       if (!this.gaugeChart) return
 
-      const value = parseFloat(this.diversityData.entropy) || 0.75
+      const value = parseFloat(this.diversityData.normalizedDiversity) / 100 || 0.75
 
       const option = {
         series: [{
@@ -737,7 +737,7 @@ export default {
       const currentCVR = parseFloat(this.formatRate(this.overviewData.cvr)) || 0
       // 从 predictionData 获取预测值
       const predictedCVR = parseFloat(this.formatPredictionRate(this.predictionData.predictedCVR)) || 0
-      const diversity = parseFloat(this.diversityData.entropy) * 100 || 0
+      const diversity = parseFloat(this.diversityData.normalizedDiversity) || 0
 
       const option = {
         tooltip: {
@@ -795,6 +795,10 @@ export default {
         info: 'el-icon-info'
       }
       return icons[type] || icons.suggest
+    },
+    getLevelClass(level) {
+      const map = { '高': 'high', '中': 'medium', '低': 'low' }
+      return 'suggestion-icon--' + (map[level] || 'low')
     }
   }
 }

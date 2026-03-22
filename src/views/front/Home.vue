@@ -151,9 +151,9 @@ export default {
         
         if (!this.isLoggedIn) {
           // 未登录状态 - 获取热销商品（冷启动降级策略）
-          const res = await Request.get('/product/page?status=1&sort=salesCount,desc&size=8');
+          const res = await Request.get('/product/page?status=1&sortField=sales&sortOrder=desc&size=8');
           if (res.code === '0') {
-            products = res.data.records || res.data;
+            products = (res.data && (res.data.records || res.data)) || [];
           }
         } else {
           // 登录状态 - 获取个性化推荐（使用融合推荐算法）
@@ -167,7 +167,7 @@ export default {
           const res = await Request.get('/api/recommendation/personalized');
           if (res.code === '0') {
             // 融合推荐接口返回的数据结构需要转换
-            const recommendData = res.data.records || res.data;
+            const recommendData = (res.data && (res.data.records || res.data)) || [];
             products = recommendData.map(item => ({
               id: item.productId,
               name: item.productName,
@@ -220,9 +220,9 @@ export default {
     // 获取新品
     async getNewProducts() {
       try {
-        const res = await Request.get('/product/page?status=1&sort=updatedAt,desc&size=4')
+        const res = await Request.get('/product/page?status=1&sortField=updatedAt&sortOrder=desc&size=4')
         if (res.code === '0') {
-          this.newProducts = res.data.records.map(product => ({
+          this.newProducts = (res.data && res.data.records || []).map(product => ({
             ...product,
             isFavorite: false
           }))
