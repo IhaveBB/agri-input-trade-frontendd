@@ -132,14 +132,26 @@
         <!-- 左侧基本信息 -->
         <div class="form-left">
           <el-form-item label="商品分类" prop="categoryId">
-            <el-cascader
-              v-model="form.categoryId"
-              :options="categoryTree"
-              :props="{ value: 'id', label: 'name', children: 'children', checkStrictly: true, emitPath: false }"
-              placeholder="请选择分类"
-              style="width: 100%;"
-              @change="handleCategoryChangeForForm"
-            ></el-cascader>
+            <div class="category-select-wrapper">
+              <el-cascader
+                v-model="form.categoryId"
+                :options="categoryTree"
+                :props="{ value: 'id', label: 'name', children: 'children', checkStrictly: true, emitPath: false }"
+                placeholder="请选择分类"
+                style="flex: 1;"
+                @change="handleCategoryChangeForForm"
+              ></el-cascader>
+              <el-button
+                v-if="userInfo.role === 'MERCHANT'"
+                type="text"
+                icon="el-icon-plus"
+                @click="showCategoryApplyDialog"
+                style="margin-left: 10px; white-space: nowrap;"
+              >申请新分类</el-button>
+            </div>
+            <div class="category-tips" v-if="userInfo.role === 'MERCHANT'">
+              <i class="el-icon-info"></i> 找不到合适的分类？点击右侧"申请新分类"提交申请，审核通过后即可使用
+            </div>
           </el-form-item>
           <el-form-item label="商品名称" prop="name">
             <el-input v-model="form.name" placeholder="请输入商品名称"></el-input>
@@ -410,6 +422,41 @@
         <el-button type="primary" @click="handleCropUpload">确 定</el-button>
       </div>
     </el-dialog>
+
+    <!-- 申请新分类对话框 -->
+    <el-dialog title="申请自定义分类" :visible.sync="categoryApplyDialogVisible" width="500px" append-to-body>
+      <el-alert
+        type="info"
+        description="提交申请后需管理员审核，审核通过后分类将显示在下拉列表中"
+        :closable="false"
+        style="margin-bottom: 20px;"
+      />
+      <el-form :model="categoryApplyForm" :rules="categoryApplyRules" ref="categoryApplyForm" label-width="100px">
+        <el-form-item label="父分类" prop="parentId">
+          <el-cascader
+            v-model="categoryApplyForm.parentId"
+            :options="categoryTree"
+            :props="{ value: 'id', label: 'name', children: 'children', checkStrictly: true, emitPath: false }"
+            placeholder="请选择父分类（必选）"
+            style="width: 100%;"
+          ></el-cascader>
+          <div class="form-tip">自定义分类必须选择父级分类，最多支持三级</div>
+        </el-form-item>
+        <el-form-item label="分类名称" prop="name">
+          <el-input v-model="categoryApplyForm.name" placeholder="请输入分类名称"></el-input>
+        </el-form-item>
+        <el-form-item label="排序" prop="sortOrder">
+          <el-input-number v-model="categoryApplyForm.sortOrder" :min="0" :max="9999" style="width: 100%;"></el-input-number>
+        </el-form-item>
+        <el-form-item label="描述" prop="description">
+          <el-input type="textarea" v-model="categoryApplyForm.description" :rows="3" placeholder="请输入分类描述（可选）"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="categoryApplyDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitCategoryApply" :loading="categoryApplyLoading">提 交 申 请</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -583,7 +630,21 @@ export default {
             }
           }
         }
-      }
+      },
+      // 分类申请对话框
+      categoryApplyDialogVisible: false,
+      categoryApplyForm: {
+        name: '',
+        parentId: null,
+        icon: '',
+        sortOrder: 0,
+        description: ''
+      },
+      categoryApplyRules: {
+        parentId: [{ required: true, message: '请选择父分类', trigger: 'change' }],
+        name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }]
+      },
+      categoryApplyLoading: false
     }
   },
   created() {
@@ -1070,6 +1131,37 @@ export default {
     },
     handleChange(editor) {
       this.form.description = editor.getHtml()
+    },
+    // 显示分类申请对话框
+    showCategoryApplyDialog() {
+      this.categoryApplyForm = {
+        name: '',
+        parentId: null,
+        icon: '',
+        sortOrder: 0,
+        description: ''
+      }
+      this.categoryApplyDialogVisible = true
+    },
+    // 提交分类申请
+    submitCategoryApply() {
+      this.$refs.categoryApplyForm.validate(async valid => {
+        if (!valid) return
+        this.categoryApplyLoading = true
+        try {
+          const res = await Request.post('/category/custom', this.categoryApplyForm)
+          if (res.code === '0') {
+            this.$message.success('申请提交成功，请等待管理员审核')
+            this.categoryApplyDialogVisible = false
+          } else {
+            this.$message.error(res.msg || '提交失败')
+          }
+        } catch (error) {
+          this.$message.error('提交申请失败')
+        } finally {
+          this.categoryApplyLoading = false
+        }
+      })
     }
   },
   computed: {
@@ -1578,5 +1670,27 @@ export default {
   font-size: 12px;
   color: #909399;
   margin-top: 8px;
+}
+
+/* 分类选择器样式 */
+.category-select-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.category-tips {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 8px;
+}
+
+.category-tips i {
+  color: #409eff;
+}
+
+.form-tip {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 5px;
 }
 </style> 

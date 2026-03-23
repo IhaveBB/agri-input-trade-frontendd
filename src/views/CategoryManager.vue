@@ -32,6 +32,13 @@
             <el-option label="禁用" :value="0"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="审核状态" v-if="isAdmin">
+          <el-select v-model="searchForm.auditStatus" placeholder="全部" clearable @change="handleSearch">
+            <el-option label="待审核" :value="0"></el-option>
+            <el-option label="已通过" :value="1"></el-option>
+            <el-option label="已拒绝" :value="2"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button size="medium" plain type="primary" @click="handleSearch">查询</el-button>
           <el-button size="medium" plain @click="resetSearch">重置</el-button>
@@ -48,11 +55,6 @@
     <!-- 分类列表 -->
     <el-card class="table-card" shadow="hover">
       <el-table :data="categories" border style="width: 100%">
-        <el-table-column label="层级" width="80">
-          <template slot-scope="scope">
-            <el-tag size="medium" :type="getLevelType(scope.row.level)">L{{ scope.row.level }}</el-tag>
-          </template>
-        </el-table-column>
         <el-table-column prop="name" label="分类名称"></el-table-column>
         <el-table-column prop="parentId" label="父分类" width="120">
           <template slot-scope="scope">
@@ -81,10 +83,22 @@
         </el-table-column>
         <el-table-column prop="description" label="描述" show-overflow-tooltip></el-table-column>
         <el-table-column prop="createdAt" label="创建时间" width="180"></el-table-column>
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column prop="auditStatus" label="审核状态" width="100" v-if="isAdmin">
+          <template slot-scope="scope">
+            <el-tag :type="getAuditStatusType(scope.row.auditStatus)" size="small" v-if="scope.row.isCustom === 1">
+              {{ getAuditStatusText(scope.row.auditStatus) }}
+            </el-tag>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="180" fixed="right">
           <template slot-scope="scope">
             <el-button type="text" size="small" icon="el-icon-edit" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button type="text" size="small" icon="el-icon-delete" class="delete-btn" @click="handleDelete(scope.row)">删除</el-button>
+            <template v-if="isAdmin && scope.row.isCustom === 1 && scope.row.auditStatus === 0">
+              <el-button type="text" size="small" icon="el-icon-check" class="success-btn" @click="handleApprove(scope.row)">通过</el-button>
+              <el-button type="text" size="small" icon="el-icon-close" class="danger-btn" @click="handleReject(scope.row)">拒绝</el-button>
+            </template>
           </template>
         </el-table-column>
       </el-table>
@@ -127,6 +141,20 @@
         <el-button type="primary" @click="submitForm">确 定</el-button>
       </div>
     </el-dialog>
+
+    <!-- 审核拒绝对话框 -->
+    <el-dialog title="拒绝原因" :visible.sync="auditDialogVisible" width="400px">
+      <el-input
+        type="textarea"
+        v-model="auditForm.auditRemark"
+        :rows="4"
+        placeholder="请填写拒绝原因（必填）"
+      ></el-input>
+      <div slot="footer">
+        <el-button @click="auditDialogVisible = false">取 消</el-button>
+        <el-button type="danger" @click="confirmReject" :loading="auditLoading" :disabled="!auditForm.auditRemark.trim()">确 认 拒 绝</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -146,7 +174,8 @@ export default {
         name: '',
         parentId: '',
         level: '',
-        status: ''
+        status: '',
+        auditStatus: ''
       },
       // 父分类列表（用于下拉选择）
       parentCategories: [],
@@ -180,10 +209,21 @@ export default {
         name: [
           { required: true, message: '请输入分类名称', trigger: 'blur' }
         ]
-      }
+      },
+      // 当前用户是否是管理员
+      isAdmin: false,
+      // 审核对话框
+      auditDialogVisible: false,
+      auditForm: {
+        categoryId: null,
+        auditStatus: 1,
+        auditRemark: ''
+      },
+      auditLoading: false
     }
   },
   created() {
+    this.checkUserRole()
     this.getList()
     this.loadCategoryTree()
     this.loadParentCategories()
@@ -320,16 +360,17 @@ export default {
         const params = {
           ...this.queryParams,
           name: this.searchForm.name || undefined,
-          status: this.searchForm.status || undefined
+          status: this.searchForm.status !== '' ? this.searchForm.status : undefined
         }
 
-        // 同时支持父分类和层级的组合查询
-        // 例如：父分类=种子，层级=2 → 查询种子下的二级分类
-        if (this.searchForm.parentId) {
+        if (this.searchForm.parentId !== '') {
           params.parentId = this.searchForm.parentId
         }
-        if (this.searchForm.level) {
+        if (this.searchForm.level !== '') {
           params.level = this.searchForm.level
+        }
+        if (this.searchForm.auditStatus !== '') {
+          params.auditStatus = this.searchForm.auditStatus
         }
 
         const res = await Request.get('/category/page', { params })
@@ -360,7 +401,11 @@ export default {
     // 重置搜索
     resetSearch() {
       this.searchForm = {
-        name: ''
+        name: '',
+        parentId: '',
+        level: '',
+        status: '',
+        auditStatus: ''
       }
       this.handleSearch()
     },
@@ -443,6 +488,72 @@ export default {
           }
         }
       })
+    },
+    // 判断用户角色
+    checkUserRole() {
+      const userInfo = JSON.parse(localStorage.getItem('backUser') || '{}')
+      this.isAdmin = ['ADMIN', 'SUPER_ADMIN'].includes(userInfo.role)
+    },
+    // 获取审核状态类型
+    getAuditStatusType(status) {
+      const map = { 0: 'warning', 1: 'success', 2: 'danger' }
+      return map[status] || 'info'
+    },
+    // 获取审核状态文本
+    getAuditStatusText(status) {
+      const map = { 0: '待审核', 1: '已通过', 2: '已拒绝' }
+      return map[status] || '-'
+    },
+    // 通过审核
+    async handleApprove(row) {
+      try {
+        await this.$confirm(`确认通过分类「${row.name}」的申请？`, '提示', { type: 'warning' })
+        const res = await Request.put(`/category/${row.id}/audit`, { auditStatus: 1 })
+        if (res.code === '0') {
+          this.$message.success('审核通过')
+          this.getList()
+        } else {
+          this.$message.error(res.msg || '操作失败')
+        }
+      } catch (error) {
+        if (error !== 'cancel') {
+          this.$message.error('操作失败')
+        }
+      }
+    },
+    // 显示拒绝对话框
+    handleReject(row) {
+      this.auditForm = {
+        categoryId: row.id,
+        auditStatus: 2,
+        auditRemark: ''
+      }
+      this.auditDialogVisible = true
+    },
+    // 确认拒绝
+    async confirmReject() {
+      if (!this.auditForm.auditRemark.trim()) {
+        this.$message.warning('请填写拒绝原因')
+        return
+      }
+      this.auditLoading = true
+      try {
+        const res = await Request.put(`/category/${this.auditForm.categoryId}/audit`, {
+          auditStatus: 2,
+          auditRemark: this.auditForm.auditRemark.trim()
+        })
+        if (res.code === '0') {
+          this.$message.success('已拒绝')
+          this.auditDialogVisible = false
+          this.getList()
+        } else {
+          this.$message.error(res.msg || '操作失败')
+        }
+      } catch (error) {
+        this.$message.error('操作失败')
+      } finally {
+        this.auditLoading = false
+      }
     }
   }
 }
