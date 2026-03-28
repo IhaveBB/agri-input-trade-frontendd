@@ -548,8 +548,10 @@ export default {
         try {
           console.log('发起支付请求，订单ID:', order.id);
           
-          // 打开支付页面
-           window.open('http://localhost:1234/api/alipay/pay/' + order.id, '_blank');
+          // 打开支付页面（通过URL传递token进行身份验证）
+          const user = JSON.parse(localStorage.getItem('frontUser') || '{}')
+          const token = user.token || ''
+          window.open('http://localhost:8081/api/alipay/pay/' + order.id + '?token=' + token, '_blank')
           this.paymentDialogVisible = false;
           
           // 显示支付状态检查对话框

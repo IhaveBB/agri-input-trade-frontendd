@@ -15,6 +15,10 @@
               <i class="el-icon-user"></i>
               <span>个人信息</span>
             </el-menu-item>
+            <el-menu-item index="balance">
+              <i class="el-icon-wallet"></i>
+              <span>我的余额</span>
+            </el-menu-item>
             <el-menu-item index="address">
               <i class="el-icon-location"></i>
               <span>收货地址</span>
@@ -48,6 +52,126 @@
                 <el-button type="primary" @click="updateUserInfo">保存修改</el-button>
               </el-form-item>
             </el-form>
+          </div>
+
+          <!-- 我的余额 -->
+          <div v-if="activeMenu === 'balance'" class="balance-section">
+            <div class="section-header">
+              <div class="header-left">
+                <h3>我的余额</h3>
+                <p class="section-desc">查看您的账户余额和交易记录</p>
+              </div>
+              <el-button type="primary" icon="el-icon-wallet" @click="showRechargeDialog">
+                立即充值
+              </el-button>
+            </div>
+
+            <!-- 余额卡片 -->
+            <div class="balance-card">
+              <div class="balance-info">
+                <div class="balance-label">当前余额</div>
+                <div class="balance-amount">¥ {{ formatBalance(balance) }}</div>
+              </div>
+            </div>
+
+            <!-- 充值记录表格 -->
+            <div class="recharge-records">
+              <h4 class="records-title">充值记录</h4>
+              <el-table :data="rechargeRecords" stripe style="width: 100%" v-loading="rechargeLoading">
+                <el-table-column prop="createdAt" label="创建时间" width="180">
+                  <template slot-scope="scope">
+                    {{ formatDate(scope.row.createdAt) }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="rechargeNo" label="充值单号" width="220">
+                  <template slot-scope="scope">
+                    <span class="recharge-no">{{ scope.row.rechargeNo }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="amount" label="充值金额" width="120">
+                  <template slot-scope="scope">
+                    <span class="amount-positive">¥ {{ formatBalance(scope.row.amount) }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="status" label="状态" width="100">
+                  <template slot-scope="scope">
+                    <el-tag :type="getRechargeStatusType(scope.row.status)">
+                      {{ getRechargeStatusText(scope.row.status) }}
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="paidAt" label="支付时间" width="180">
+                  <template slot-scope="scope">
+                    {{ scope.row.paidAt ? formatDate(scope.row.paidAt) : '-' }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作" width="120">
+                  <template slot-scope="scope">
+                    <el-button
+                      v-if="scope.row.status === 0"
+                      type="text"
+                      size="small"
+                      @click="continueRecharge(scope.row)">
+                      继续支付
+                    </el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+
+              <!-- 分页 -->
+              <div class="pagination-wrapper">
+                <el-pagination
+                  @current-change="handleRechargePageChange"
+                  :current-page="rechargePage"
+                  :page-size="5"
+                  layout="prev, pager, next"
+                  :total="rechargeTotal">
+                </el-pagination>
+              </div>
+            </div>
+
+            <!-- 余额记录表格 -->
+            <div class="balance-records">
+              <h4 class="records-title">余额变动记录</h4>
+              <el-table :data="balanceRecords" stripe style="width: 100%" v-loading="balanceLoading">
+                <el-table-column prop="createdAt" label="时间" width="180">
+                  <template slot-scope="scope">
+                    {{ formatDate(scope.row.createdAt) }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="type" label="类型" width="120">
+                  <template slot-scope="scope">
+                    <el-tag :type="getBalanceTypeType(scope.row.type)">
+                      {{ getBalanceTypeText(scope.row.type) }}
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="amount" label="金额" width="150">
+                  <template slot-scope="scope">
+                    <span :class="scope.row.amount > 0 ? 'amount-positive' : 'amount-negative'">
+                      {{ scope.row.amount > 0 ? '+' : '' }}¥ {{ formatBalance(scope.row.amount) }}
+                    </span>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="balanceAfter" label="余额" width="150">
+                  <template slot-scope="scope">
+                    ¥ {{ formatBalance(scope.row.balanceAfter) }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="remark" label="备注"></el-table-column>
+              </el-table>
+
+              <!-- 分页 -->
+              <div class="pagination-wrapper">
+                <el-pagination
+                  @current-change="handleBalancePageChange"
+                  :current-page="balancePage"
+                  :page-size="10"
+                  layout="prev, pager, next"
+                  :total="balanceTotal">
+                </el-pagination>
+              </div>
+            </div>
           </div>
 
           <!-- 收货地址 -->
@@ -144,6 +268,35 @@
       </div>
     </el-dialog>
 
+    <!-- 充值对话框 -->
+    <el-dialog title="余额充值" :visible.sync="rechargeDialogVisible" width="400px" :close-on-click-modal="false">
+      <el-form :model="rechargeForm" :rules="rechargeRules" ref="rechargeForm" label-width="100px">
+        <el-form-item label="充值金额" prop="amount">
+          <el-input-number
+            v-model="rechargeForm.amount"
+            :min="0.01"
+            :max="10000"
+            :precision="2"
+            :step="10"
+            controls-position="right"
+            style="width: 100%">
+          </el-input-number>
+        </el-form-item>
+        <el-form-item>
+          <div class="recharge-tips">
+            <p>提示：充值金额范围 0.01 ~ 10000 元</p>
+            <p>充值成功后金额将立即到账</p>
+          </div>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button @click="rechargeDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="createRecharge" :loading="rechargeSubmitting">
+          立即支付
+        </el-button>
+      </div>
+    </el-dialog>
+
     <front-footer></front-footer>
   </div>
 </template>
@@ -207,16 +360,38 @@ export default {
         ],
         confirmPassword: [
           { required: true, message: '请再次输入新密码', trigger: 'blur' },
-          { 
+          {
             validator: (rule, value, callback) => {
               if (value !== this.passwordForm.newPassword) {
                 callback(new Error('两次输入的密码不一致'));
               } else {
                 callback();
               }
-            }, 
-            trigger: 'blur' 
+            },
+            trigger: 'blur'
           }
+        ]
+      },
+      // 余额相关数据
+      balance: 0,
+      balanceRecords: [],
+      balancePage: 1,
+      balanceTotal: 0,
+      balanceLoading: false,
+      // 充值相关数据
+      rechargeRecords: [],
+      rechargePage: 1,
+      rechargeTotal: 0,
+      rechargeLoading: false,
+      rechargeDialogVisible: false,
+      rechargeSubmitting: false,
+      rechargeForm: {
+        amount: 100
+      },
+      rechargeRules: {
+        amount: [
+          { required: true, message: '请输入充值金额', trigger: 'blur' },
+          { type: 'number', min: 0.01, message: '充值金额必须大于0', trigger: 'blur' }
         ]
       }
     }
@@ -237,6 +412,11 @@ export default {
   methods: {
     handleMenuSelect(index) {
       this.activeMenu = index;
+      if (index === 'balance') {
+        this.getBalance()
+        this.getBalanceRecords()
+        this.getRechargeRecords()
+      }
     },
     async getUserInfo() {
       try {
@@ -352,7 +532,7 @@ export default {
           if (valid) {
             const userId = this.currentUser.id
             const params = {
-        
+
               newPassword: this.passwordForm.newPassword,
               oldPassword: this.passwordForm.oldPassword
             }
@@ -374,6 +554,159 @@ export default {
         console.error('修改密码失败:', error)
         this.$message.error('修改密码失败')
       }
+    },
+
+    // 余额相关方法
+    async getBalance() {
+      try {
+        const res = await Request.get('/balance/my')
+        if (res.code === '0') {
+          this.balance = res.data
+        }
+      } catch (error) {
+        console.error('获取余额失败:', error)
+      }
+    },
+
+    async getBalanceRecords() {
+      this.balanceLoading = true
+      try {
+        const res = await Request.get('/balance/my/records', {
+          params: {
+            currentPage: this.balancePage,
+            size: 10
+          }
+        })
+        if (res.code === '0') {
+          this.balanceRecords = res.data.records
+          this.balanceTotal = res.data.total
+        }
+      } catch (error) {
+        console.error('获取余额记录失败:', error)
+        this.$message.error('获取余额记录失败')
+      } finally {
+        this.balanceLoading = false
+      }
+    },
+
+    handleBalancePageChange(page) {
+      this.balancePage = page
+      this.getBalanceRecords()
+    },
+
+    formatBalance(value) {
+      if (value === null || value === undefined) return '0.00'
+      return parseFloat(value).toFixed(2)
+    },
+
+    formatDate(dateStr) {
+      if (!dateStr) return ''
+      const date = new Date(dateStr)
+      return date.toLocaleString('zh-CN')
+    },
+
+    getBalanceTypeText(type) {
+      const typeMap = {
+        1: '充值',
+        2: '消费',
+        3: '退款'
+      }
+      return typeMap[type] || '其他'
+    },
+
+    getBalanceTypeType(type) {
+      const typeColorMap = {
+        1: 'success',
+        2: 'danger',
+        3: 'warning'
+      }
+      return typeColorMap[type] || 'info'
+    },
+
+    // 充值相关方法
+    showRechargeDialog() {
+      this.rechargeDialogVisible = true
+      this.rechargeForm.amount = 100
+    },
+
+    async createRecharge() {
+      try {
+        await this.$refs.rechargeForm.validate()
+        this.rechargeSubmitting = true
+
+        const res = await Request.post('/balance/recharge/create', null, {
+          params: {
+            amount: this.rechargeForm.amount
+          }
+        })
+
+        if (res.code === '0') {
+          this.rechargeDialogVisible = false
+          this.$message.success('充值订单创建成功，正在跳转到支付页面...')
+          // 跳转到支付宝支付页面，携带 token
+          const token = JSON.parse(localStorage.getItem('frontUser') || '{}').token
+          window.open(`/api/alipay/recharge/pay/${res.data.id}?token=${token}`, '_blank')
+          // 刷新充值记录
+          setTimeout(() => {
+            this.getRechargeRecords()
+          }, 1000)
+        }
+      } catch (error) {
+        console.error('创建充值订单失败:', error)
+        this.$message.error('创建充值订单失败')
+      } finally {
+        this.rechargeSubmitting = false
+      }
+    },
+
+    async getRechargeRecords() {
+      this.rechargeLoading = true
+      try {
+        const res = await Request.get('/balance/my/recharges', {
+          params: {
+            currentPage: this.rechargePage,
+            size: 5
+          }
+        })
+        if (res.code === '0') {
+          this.rechargeRecords = res.data.records
+          this.rechargeTotal = res.data.total
+        }
+      } catch (error) {
+        console.error('获取充值记录失败:', error)
+        this.$message.error('获取充值记录失败')
+      } finally {
+        this.rechargeLoading = false
+      }
+    },
+
+    handleRechargePageChange(page) {
+      this.rechargePage = page
+      this.getRechargeRecords()
+    },
+
+    continueRecharge(rechargeRecord) {
+      // 继续支付，携带 token
+      const token = JSON.parse(localStorage.getItem('frontUser') || '{}').token
+      window.open(`/api/alipay/recharge/pay/${rechargeRecord.id}?token=${token}`, '_blank')
+    },
+
+    getRechargeStatusText(status) {
+      const statusMap = {
+        0: '待支付',
+        1: '已支付',
+        2: '已取消'
+      }
+      return statusMap[status] || '未知'
+    },
+
+    getRechargeStatusType(status) {
+      const typeMap = {
+        0: 'warning',
+        1: 'success',
+        2: 'info'
+      }
+      return typeMap[status] || 'info'
     }
   }
 }
@@ -670,5 +1003,83 @@ export default {
 /* 密码表单样式 */
 .password-section {
   width: 100%;
+}
+
+/* 余额部分样式 */
+.balance-section {
+  width: 100%;
+}
+
+.balance-card {
+  background: linear-gradient(135deg, #409EFF 0%, #66B1FF 100%);
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 32px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+}
+
+.balance-info {
+  text-align: center;
+}
+
+.balance-label {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 12px;
+}
+
+.balance-amount {
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.balance-records {
+  margin-top: 24px;
+}
+
+.records-title {
+  font-size: 18px;
+  color: #2c3e50;
+  margin: 0 0 20px 0;
+  font-weight: 500;
+}
+
+.amount-positive {
+  color: #67C23A;
+  font-weight: 500;
+}
+
+.amount-negative {
+  color: #F56C6C;
+  font-weight: 500;
+}
+
+.pagination-wrapper {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+/* 充值记录样式 */
+.recharge-records {
+  margin-bottom: 32px;
+}
+
+.recharge-no {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: #606266;
+}
+
+.recharge-tips {
+  color: #909399;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.recharge-tips p {
+  margin: 4px 0;
 }
 </style> 

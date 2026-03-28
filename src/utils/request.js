@@ -61,6 +61,15 @@ request.interceptors.request.use(
                 console.error('Token parsing error:', e);
             }
         }
+
+        // 禁用浏览器缓存 - 为 GET 请求添加时间戳
+        if (config.method === 'get') {
+            config.params = {
+                ...config.params,
+                _t: Date.now()
+            }
+        }
+
         return config;
     },
     error => {
