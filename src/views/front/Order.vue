@@ -1085,7 +1085,7 @@ export default {
   top: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(to bottom, #409EFF, #66B1FF);
+  background: linear-gradient(to bottom, #2c9678, #36a88a);
 }
 
 .page-header h2 {
@@ -1099,7 +1099,7 @@ export default {
   color: #606266;
   font-size: 14px;
   font-weight: 500;
-  background: rgba(64, 158, 255, 0.1);
+  background: rgba(44, 150, 120, 0.1);
   padding: 6px 16px;
   border-radius: 20px;
 }
@@ -1127,7 +1127,7 @@ export default {
   top: 0;
   width: 3px;
   height: 100%;
-  background: linear-gradient(to bottom, #409EFF, #66B1FF);
+  background: linear-gradient(to bottom, #2c9678, #36a88a);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -1185,17 +1185,17 @@ export default {
 
 .order-status.paid {
   color: #409eff;
-  background: rgba(64, 158, 255, 0.1);
+  background: rgba(44, 150, 120, 0.1);
 }
 
 .order-status.shipped {
   color: #67c23a;
-  background: rgba(64, 158, 255, 0.1);
+  background: rgba(44, 150, 120, 0.1);
 }
 
 .order-status.completed {
   color: #67c23a;
-  background: rgba(64, 158, 255, 0.1);
+  background: rgba(44, 150, 120, 0.1);
 }
 
 .order-status.cancelled {
@@ -1373,7 +1373,7 @@ export default {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(64, 158, 255, 0.05), transparent);
+  background: linear-gradient(135deg, rgba(44, 150, 120, 0.05), transparent);
 }
 
 .info-item {
@@ -1585,7 +1585,7 @@ export default {
 :deep(.el-input__inner:focus),
 :deep(.el-textarea__inner:focus) {
   border-color: #67c23a;
-  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+  box-shadow: 0 0 0 2px rgba(44, 150, 120, 0.1);
 }
 
 :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
@@ -1701,7 +1701,7 @@ export default {
 
 .address-radio-item:hover {
   border-color: #67c23a;
-  box-shadow: 0 2px 12px rgba(64, 158, 255, 0.1);
+  box-shadow: 0 2px 12px rgba(44, 150, 120, 0.1);
 }
 
 .address-radio-item.is-checked {
@@ -1789,7 +1789,7 @@ export default {
 :deep(.el-input__inner:focus),
 :deep(.el-textarea__inner:focus) {
   border-color: #67c23a;
-  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+  box-shadow: 0 0 0 2px rgba(44, 150, 120, 0.1);
 }
 
 :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
@@ -1929,7 +1929,7 @@ export default {
 
 .loading-status i {
   font-size: 48px;
-  color: #409EFF;
+  color: #2c9678;
   margin-bottom: 20px;
 }
 
@@ -1941,7 +1941,7 @@ export default {
 
 .payment-counter {
   background: #f0f9eb;
-  color: #409EFF;
+  color: #2c9678;
   padding: 4px 12px;
   border-radius: 12px;
   font-size: 12px;
@@ -1987,7 +1987,7 @@ export default {
   content: "•";
   position: absolute;
   left: 0;
-  color: #409EFF;
+  color: #2c9678;
   font-size: 18px;
   line-height: 14px;
 }

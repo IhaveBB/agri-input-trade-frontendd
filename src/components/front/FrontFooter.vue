@@ -58,8 +58,8 @@ export default {
   position: absolute;
   inset: 0;
   background-image: 
-    radial-gradient(circle at 0% 0%, rgba(64, 158, 255, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 100% 0%, rgba(64, 158, 255, 0.03) 0%, transparent 50%);
+    radial-gradient(circle at 0% 0%, rgba(44, 150, 120,0.03) 0%, transparent 50%),
+    radial-gradient(circle at 100% 0%, rgba(44, 150, 120,0.03) 0%, transparent 50%);
   opacity: 0.8;
   z-index: 0;
 }
@@ -93,14 +93,14 @@ export default {
 
 .footer-logo i {
   font-size: 28px;
-  color: #409EFF;
+  color: #2c9678;
   margin-right: 8px;
 }
 
 .footer-logo-text {
   font-size: 18px;
   font-weight: 600;
-  color: #409EFF;
+  color: #2c9678;
   letter-spacing: 1px;
 }
 
@@ -146,11 +146,11 @@ export default {
 }
 
 .contact-item:hover {
-  color: #409EFF;
+  color: #2c9678;
 }
 
 .contact-item i {
-  color: #409EFF;
+  color: #2c9678;
   margin-right: 6px;
   font-size: 14px;
 }
@@ -162,7 +162,7 @@ export default {
   font-size: 12px;
   opacity: 0.8;
   padding-top: 16px;
-  border-top: 1px solid rgba(64, 158, 255, 0.1);
+  border-top: 1px solid rgba(44, 150, 120,0.1);
 }
 
 .copyright p {

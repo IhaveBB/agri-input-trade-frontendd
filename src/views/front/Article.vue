@@ -192,7 +192,7 @@ export default {
   top: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(to bottom, #409EFF, #66B1FF);
+  background: linear-gradient(to bottom, #2c9678, #36a88a);
 }
 
 .page-header h2 {
@@ -206,7 +206,7 @@ export default {
   color: #606266;
   font-size: 14px;
   font-weight: 500;
-  background: rgba(64, 158, 255, 0.1);
+  background: rgba(44, 150, 120, 0.1);
   padding: 6px 16px;
   border-radius: 20px;
 }
@@ -230,7 +230,7 @@ export default {
 
 .article-item:hover {
   transform: translateY(-2px);
-  background: linear-gradient(to right, rgba(64, 158, 255, 0.02), transparent);
+  background: linear-gradient(to right, rgba(44, 150, 120, 0.02), transparent);
 }
 
 .article-item::before {
@@ -240,7 +240,7 @@ export default {
   top: 0;
   width: 3px;
   height: 100%;
-  background: linear-gradient(to bottom, #409EFF, #66B1FF);
+  background: linear-gradient(to bottom, #2c9678, #36a88a);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -276,7 +276,7 @@ export default {
 }
 
 .article-item:hover .article-title {
-  color: #409EFF;
+  color: #2c9678;
 }
 
 .article-summary {

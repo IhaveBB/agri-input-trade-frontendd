@@ -120,40 +120,44 @@ export default {
 <style scoped>
 .el-menu {
     border-right: none;
-    padding: 12px 8px;
-    background-color: #fafafa;
+    padding: 18px 8px 12px;
+    background-color: #fff;
 }
 
 .el-menu-item {
-    height: 45px;
-    line-height: 45px;
-    border-radius: 6px;
-    margin-bottom: 4px;
+    height: 42px;
+    line-height: 42px;
+    border-radius: 8px;
+    margin-bottom: 2px;
     color: #606266;
     font-size: 14px;
+    padding-left: 20px !important;
+    transition: all 0.2s ease;
 
     &:hover {
         color: #2c9678;
-        background-color: rgba(44, 150, 120, 0.08) !important;
+        background-color: #f0faf6 !important;
     }
 
     &.is-active {
         color: #fff;
-        background: #2c9678 !important;
+        background: linear-gradient(135deg, #2c9678, #35b08e) !important;
         font-weight: 500;
+        box-shadow: 0 2px 8px rgba(44, 150, 120, 0.25);
     }
 }
 
 .el-submenu ::v-deep .el-submenu__title {
-    height: 45px;
-    line-height: 45px;
-    border-radius: 6px;
+    height: 42px;
+    line-height: 42px;
+    border-radius: 8px;
     color: #606266;
     font-size: 14px;
+    padding-left: 20px !important;
 
     &:hover {
         color: #2c9678;
-        background-color: rgba(44, 150, 120, 0.08) !important;
+        background-color: #f0faf6 !important;
     }
 }
 
@@ -161,34 +165,40 @@ export default {
     padding-left: 0;
 
     .el-menu-item {
-        height: 42px;
-        line-height: 42px;
-        padding-left: 44px !important;
+        height: 40px;
+        line-height: 40px;
+        padding-left: 40px !important;
         background-color: transparent;
+        border-radius: 6px;
+        font-size: 13px;
 
         &:hover {
             color: #2c9678;
-            background-color: rgba(44, 150, 120, 0.06) !important;
+            background-color: #f0faf6 !important;
         }
 
         &.is-active {
             color: #2c9678;
-            background-color: rgba(44, 150, 120, 0.08) !important;
+            background-color: #f0faf6 !important;
             font-weight: 600;
+            box-shadow: none;
         }
     }
 }
 
-/* 图标样式 */
 .el-menu-item [class^="el-icon-"],
 .el-submenu [class^="el-icon-"] {
-    font-size: 18px;
-    margin-right: 12px;
+    font-size: 17px;
+    margin-right: 10px;
     color: #909399;
 }
 
 .el-menu-item.is-active [class^="el-icon-"],
 .el-submenu.is-active [class^="el-icon-"] {
     color: #fff;
+}
+
+.el-submenu .el-menu-item.is-active [class^="el-icon-"] {
+    color: #2c9678;
 }
 </style>

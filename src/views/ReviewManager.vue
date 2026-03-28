@@ -301,11 +301,11 @@ export default {
 
 /* 文本按钮样式 */
 .success-text {
-  color: #409EFF;
+  color: #2c9678;
 }
 
 .success-text:hover {
-  color: #66B1FF;
+  color: #36a88a;
 }
 
 .danger-text {

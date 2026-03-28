@@ -160,39 +160,8 @@ export default {
   top: 0;
   z-index: 1000;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   height: 60px;
-  position: relative;
-  overflow: hidden;
-}
-
-.front-header::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(to bottom, 
-    rgba(255, 255, 255, 0.98),
-    #fff
-  );
-  backdrop-filter: blur(10px);
-  z-index: -1;
-}
-
-/* 添加背景装饰 */
-.front-header::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: 
-    radial-gradient(circle at 0% 0%, rgba(64, 158, 255, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 100% 0%, rgba(64, 158, 255, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(64, 158, 255, 0.01) 0%, transparent 50%),
-    linear-gradient(90deg, rgba(64, 158, 255, 0.01) 0%, rgba(64, 158, 255, 0.02) 50%, rgba(64, 158, 255, 0.01) 100%);
-  opacity: 0.8;
-  z-index: -1;
 }
 
 .header-container {
@@ -203,61 +172,29 @@ export default {
   display: flex;
   align-items: center;
   gap: 24px;
-  position: relative;
 }
 
 .logo-area {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   cursor: pointer;
-  color: #409EFF;
+  color: #2c9678;
   font-size: 18px;
   font-weight: 600;
   padding: 4px 8px;
   border-radius: 6px;
-  transition: all 0.3s ease;
-  background: linear-gradient(120deg, 
-    rgba(64, 158, 255, 0.05) 0%, 
-    rgba(64, 158, 255, 0.1) 50%, 
-    rgba(64, 158, 255, 0.05) 100%
-  );
-  position: relative;
-  overflow: hidden;
-}
-
-.logo-area::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
 }
 
 .logo-area:hover {
-  background: linear-gradient(120deg, 
-    rgba(64, 158, 255, 0.1) 0%, 
-    rgba(64, 158, 255, 0.15) 50%, 
-    rgba(64, 158, 255, 0.1) 100%
-  );
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.1);
-}
-
-.logo-area:hover::before {
-  opacity: 1;
+  opacity: 0.8;
 }
 
 .logo-area i {
   font-size: 22px;
-  background: linear-gradient(45deg, #409EFF, #66B1FF);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 1px 2px rgba(64, 158, 255, 0.2));
+  color: #2c9678;
 }
 
 .nav-menu {
@@ -266,9 +203,6 @@ export default {
   height: 60px;
   line-height: 60px;
   flex: 1;
-  position: relative;
-  z-index: 1;
-  backdrop-filter: blur(4px);
 }
 
 :deep(.el-menu--horizontal > .el-menu-item) {
@@ -277,19 +211,18 @@ export default {
   padding: 0 20px;
   font-size: 15px;
   border: none !important;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 :deep(.el-menu--horizontal > .el-menu-item:hover) {
-  background: linear-gradient(to right, transparent, rgba(64, 158, 255, 0.08), transparent);
+  color: #2c9678;
+  background: transparent;
 }
 
 :deep(.el-menu--horizontal > .el-menu-item.is-active) {
-  color: #409EFF;
+  color: #2c9678;
   font-weight: 500;
-  background: linear-gradient(to right, transparent, rgba(64, 158, 255, 0.1), transparent);
+  border-bottom: 2px solid #2c9678 !important;
 }
 
 .right-section {
@@ -315,8 +248,8 @@ export default {
 
 .search-input :deep(.el-input__inner:focus) {
   background: #fff;
-  border-color: #409EFF;
-  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+  border-color: #2c9678;
+  box-shadow: 0 0 0 2px rgba(44, 150, 120, 0.1);
 }
 
 .search-input :deep(.el-input__prefix) {
@@ -332,7 +265,7 @@ export default {
 }
 
 .search-input :deep(.el-input__inner:focus + .el-input__prefix i) {
-  color: #409EFF;
+  color: #2c9678;
 }
 
 .user-actions {
@@ -341,7 +274,6 @@ export default {
   gap: 8px;
 }
 
-/* 下拉菜单样式优化 */
 :deep(.el-dropdown-menu) {
   padding: 6px;
   border-radius: 8px;
@@ -366,12 +298,12 @@ export default {
 }
 
 :deep(.el-dropdown-menu__item:hover) {
-  background-color: rgba(64, 158, 255, 0.1);
-  color: #409EFF;
+  background-color: rgba(44, 150, 120, 0.08);
+  color: #2c9678;
 }
 
 :deep(.el-dropdown-menu__item:hover i) {
-  color: #409EFF;
+  color: #2c9678;
 }
 
 :deep(.el-dropdown-menu__item.is-disabled) {
@@ -398,11 +330,11 @@ export default {
   padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.2s ease;
 }
 
 .user-info:hover {
-  background: rgba(64, 158, 255, 0.1);
+  background: rgba(44, 150, 120, 0.06);
 }
 
 .user-info .el-icon-arrow-down {
@@ -421,15 +353,14 @@ export default {
 }
 
 .admin-btn {
-  color: #409EFF;
+  color: #2c9678;
 }
 
 .admin-btn:hover {
-  color: #409EFF;
-  background: rgba(64, 158, 255, 0.1);
+  color: #2c9678;
+  background: rgba(44, 150, 120, 0.08);
 }
 
-/* 响应式布局 */
 @media (max-width: 1200px) {
   .header-container {
     padding: 0 16px;

@@ -456,7 +456,7 @@ export default {
 
 .sidebar-header i {
   font-size: 22px;
-  color: #409EFF;
+  color: #2c9678;
 }
 
 .filter-sections {
@@ -497,12 +497,12 @@ export default {
 }
 
 .filter-option:hover {
-  background: rgba(64, 158, 255, 0.1);
-  color: #409EFF;
+  background: rgba(44, 150, 120, 0.1);
+  color: #2c9678;
 }
 
 .filter-option.active {
-  background: linear-gradient(135deg, #409EFF, #66B1FF);
+  background: linear-gradient(135deg, #2c9678, #36a88a);
   color: white;
   font-weight: 500;
 }
@@ -548,7 +548,7 @@ export default {
 
 .page-title i {
   font-size: 28px;
-  color: #409EFF;
+  color: #2c9678;
 }
 
 .page-subtitle {
@@ -568,8 +568,8 @@ export default {
 }
 
 .page-header .search-box :deep(.el-input__inner:focus) {
-  border-color: #409EFF;
-  box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.1);
+  border-color: #2c9678;
+  box-shadow: 0 0 0 3px rgba(44, 150, 120, 0.1);
 }
 
 /* 已选择的过滤条件 */
@@ -622,8 +622,8 @@ export default {
 }
 
 :deep(.el-dropdown-menu__item:hover) {
-  background-color: rgba(64, 158, 255, 0.1);
-  color: #409EFF;
+  background-color: rgba(44, 150, 120, 0.1);
+  color: #2c9678;
 }
 
 :deep(.el-dropdown-menu__item.is-disabled) {
@@ -684,7 +684,7 @@ export default {
 }
 
 :deep(.el-pagination.is-background .el-pager li:not(.disabled).active) {
-  background-color: #409EFF;
+  background-color: #2c9678;
 }
 
 /* 响应式布局优化 */

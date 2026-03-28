@@ -74,7 +74,7 @@ export default {
     background-size: cover;
     background-position: center;
     filter: blur(8px);
-    transform: scale(1.1); /* 避免模糊边缘 */
+    transform: scale(1.1);
     z-index: 0;
 }
 
@@ -85,9 +85,9 @@ export default {
     right: 0;
     bottom: 0;
     background: linear-gradient(135deg,
-        rgba(64, 158, 255, 0.1),
-        rgba(240, 245, 255, 0.9),
-        rgba(230, 240, 250, 0.85)
+        rgba(74, 140, 56, 0.06),
+        rgba(248, 251, 240, 0.92),
+        rgba(240, 248, 230, 0.88)
     );
     z-index: 1;
 }
@@ -98,54 +98,49 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 24px 48px;  /* 增加内边距 */
-    backdrop-filter: blur(10px);
-    background: linear-gradient(to right,
-        rgba(255, 255, 255, 0.98),
-        rgba(240, 247, 255, 0.95)
-    );
-    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);  /* 更自然的阴影 */
+    padding: 20px 48px;
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.85);
+    border-bottom: 1px solid rgba(74, 140, 56, 0.08);
 }
 
 .logo {
     cursor: pointer;
     font-size: 22px;
-    font-weight: 600;
-    color: #409EFF;
+    font-weight: 700;
+    color: #3a7029;
     letter-spacing: 2px;
-    position: relative;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .logo i {
-    font-size: 24px;
-    color: #409EFF;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 26px;
+    color: #4a8c38;
+    transition: all 0.3s ease;
 }
 
 .logo:hover i {
-    transform: rotate(-12deg) scale(1.1);
-    filter: drop-shadow(0 2px 4px rgba(64, 158, 255, 0.2));
+    transform: scale(1.1);
+    filter: drop-shadow(0 2px 6px rgba(74, 140, 56, 0.25));
 }
 
 .home-btn {
-    padding: 10px 16px;
-    border-radius: 30px;
+    padding: 10px 20px;
+    border-radius: 24px;
     font-weight: 500;
     transition: all 0.3s ease;
-    background: linear-gradient(45deg, #409EFF, #66B1FF);
-    backdrop-filter: blur(10px);
+    background: #4a8c38;
     border: none;
     color: white;
-    box-shadow: 0 2px 8px rgba(64, 158, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(74, 140, 56, 0.2);
 }
 
 .home-btn:hover {
-    background: linear-gradient(45deg, #66B1FF, #409EFF);
+    background: #3a7029;
     color: white;
-    box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+    box-shadow: 0 4px 14px rgba(74, 140, 56, 0.35);
     transform: translateY(-1px);
 }
 
@@ -162,24 +157,16 @@ export default {
     padding: 48px 24px;
     position: relative;
     z-index: 2;
-    transition: all 0.8s ease;
 }
 
 .auth-card {
     display: flex;
-    width: 960px;  /* 增加宽度 */
-    border-radius: 28px;  /* 增大圆角 */
+    width: 920px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.12);  /* 调整阴影 */
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
     background-color: white;
     position: relative;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(20px);
-}
-
-.auth-card:hover {
-    /* transform: translateY(-5px); */
-    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
 }
 
 .auth-card-content {
@@ -193,7 +180,7 @@ export default {
 
 .brand-tagline {
     width: 50%;
-    background: linear-gradient(135deg, #409EFF 0%, #66B1FF 100%);
+    background: linear-gradient(160deg, #2d6e1e 0%, #4a8c38 50%, #5da842 100%);
     color: white;
     display: flex;
     align-items: center;
@@ -209,11 +196,16 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: 
-        radial-gradient(circle at 10px 10px, rgba(255, 255, 255, 0.05) 2px, transparent 0),
-        radial-gradient(circle at 25px 25px, rgba(255, 255, 255, 0.05) 2px, transparent 0);
-    background-size: 30px 30px;
-    opacity: 1;
+    background-image:
+        repeating-linear-gradient(
+            120deg,
+            transparent,
+            transparent 30px,
+            rgba(255, 255, 255, 0.015) 30px,
+            rgba(255, 255, 255, 0.015) 60px
+        ),
+        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.06), transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.04), transparent 50%);
     z-index: 0;
 }
 
@@ -221,10 +213,10 @@ export default {
     content: '\e790';
     font-family: element-icons !important;
     position: absolute;
-    bottom: -60px;
-    right: -60px;
-    font-size: 200px;
-    opacity: 0.05;
+    bottom: -50px;
+    right: -50px;
+    font-size: 180px;
+    opacity: 0.04;
     transform: rotate(-15deg);
     z-index: 0;
 }
@@ -237,10 +229,10 @@ export default {
 }
 
 .tagline-content h2 {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 600;
-    margin-bottom: 40px;
-    letter-spacing: 1px;
+    margin-bottom: 36px;
+    letter-spacing: 2px;
     position: relative;
     display: inline-block;
 }
@@ -248,20 +240,20 @@ export default {
 .tagline-content h2::after {
     content: '';
     position: absolute;
-    bottom: -10px;
+    bottom: -12px;
     left: 50%;
     transform: translateX(-50%);
-    width: 50px;
+    width: 40px;
     height: 3px;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.4);
     border-radius: 3px;
 }
 
 .features {
     display: flex;
     justify-content: center;
-    gap: 30px;
-    margin-top: 40px;
+    gap: 28px;
+    margin-top: 36px;
 }
 
 .feature-item {
@@ -272,11 +264,11 @@ export default {
 }
 
 .feature-item i {
-    font-size: 32px;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
+    font-size: 28px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    width: 56px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -284,28 +276,26 @@ export default {
 }
 
 .feature-item:hover i {
-    background: rgba(255, 255, 255, 0.25);
-    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.22);
+    transform: translateY(-3px);
 }
 
 .feature-item span {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 500;
+    letter-spacing: 1px;
 }
 
 .auth-footer {
     position: relative;
     z-index: 2;
-    padding: 20px 0;
+    padding: 18px 0;
     text-align: center;
-    color: #2d5a1d;
-    font-size: 14px;
-    background: linear-gradient(to right,
-        rgba(255, 255, 255, 0.5),
-        rgba(240, 255, 240, 0.7)
-    );
-    backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(74, 140, 56, 0.1);
+    color: #6b8f5b;
+    font-size: 13px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(74, 140, 56, 0.08);
 }
 
 @media (max-width: 992px) {
@@ -313,25 +303,25 @@ export default {
         width: 100%;
         flex-direction: column;
     }
-    
+
     .auth-card-content,
     .brand-tagline {
         width: 100%;
     }
-    
+
     .brand-tagline {
         order: -1;
         padding: 30px 0;
     }
-    
+
     .tagline-content {
         padding: 30px 20px;
     }
-    
+
     .features {
         gap: 20px;
     }
-    
+
     .feature-item i {
         width: 50px;
         height: 50px;
@@ -343,45 +333,45 @@ export default {
     .auth-header {
         padding: 16px 24px;
     }
-    
+
     .logo {
         font-size: 18px;
     }
-    
+
     .logo:hover {
         opacity: 0.9;
     }
-    
+
     .home-btn {
-        padding: 8px 12px;
+        padding: 8px 14px;
         font-size: 13px;
     }
-    
+
     .auth-content {
         padding: 24px 16px;
     }
-    
+
     .auth-card-content {
         padding: 30px 20px;
     }
-    
+
     .features {
         flex-direction: column;
         gap: 15px;
     }
-    
+
     .feature-item {
         flex-direction: row;
         justify-content: center;
     }
-    
+
     .feature-item i {
         width: 40px;
         height: 40px;
         font-size: 20px;
         margin-right: 10px;
     }
-    
+
     .logo i {
         font-size: 20px;
     }

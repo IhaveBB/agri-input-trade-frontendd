@@ -299,7 +299,7 @@ export default {
 .search-box :deep(.el-input__inner:focus) {
   background: #fff;
   border-color: #67c23a;
-  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+  box-shadow: 0 0 0 2px rgba(44, 150, 120, 0.1);
 }
 
 .search-box :deep(.el-input__prefix) {

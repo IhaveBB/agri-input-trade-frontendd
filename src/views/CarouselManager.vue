@@ -422,7 +422,7 @@ export default {
   align-items: center;
 
   &:hover {
-    border-color: #409EFF;
+    border-color: #2c9678;
   }
 
   .carousel-image {

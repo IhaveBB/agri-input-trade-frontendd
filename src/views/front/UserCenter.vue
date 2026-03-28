@@ -747,7 +747,7 @@ export default {
   top: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(to bottom, #409EFF, #66B1FF);
+  background: linear-gradient(to bottom, #2c9678, #36a88a);
 }
 
 .page-header h2 {
@@ -783,12 +783,12 @@ export default {
 }
 
 .menu-list .el-menu-item:hover {
-  background: linear-gradient(to right, rgba(64, 158, 255, 0.05), transparent);
+  background: linear-gradient(to right, rgba(44, 150, 120, 0.05), transparent);
 }
 
 .menu-list .el-menu-item.is-active {
-  background: linear-gradient(to right, rgba(64, 158, 255, 0.1), transparent);
-  border-right: 3px solid #409EFF;
+  background: linear-gradient(to right, rgba(44, 150, 120, 0.1), transparent);
+  border-right: 3px solid #2c9678;
 }
 
 .menu-list .el-menu-item i {
@@ -798,7 +798,7 @@ export default {
 }
 
 .menu-list .el-menu-item.is-active i {
-  color: #409EFF;
+  color: #2c9678;
 }
 
 /* 右侧内容区样式 */
@@ -854,7 +854,7 @@ export default {
 
 .address-item:hover {
   transform: translateY(-2px);
-  background: linear-gradient(to right, rgba(64, 158, 255, 0.02), transparent);
+  background: linear-gradient(to right, rgba(44, 150, 120, 0.02), transparent);
 }
 
 .address-item::before {
@@ -864,7 +864,7 @@ export default {
   top: 0;
   width: 3px;
   height: 100%;
-  background: linear-gradient(to bottom, #409EFF, #66B1FF);
+  background: linear-gradient(to bottom, #2c9678, #36a88a);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -913,7 +913,7 @@ export default {
 
 /* 按钮样式 */
 .el-button--primary {
-  background: linear-gradient(135deg, #67c23a, #66B1FF);
+  background: linear-gradient(135deg, #67c23a, #36a88a);
   border: none;
   padding: 10px 20px;
   border-radius: 6px;
@@ -991,7 +991,7 @@ export default {
 }
 
 :deep(.el-empty .el-button--primary) {
-  background: linear-gradient(135deg, #67c23a, #66B1FF);
+  background: linear-gradient(135deg, #67c23a, #36a88a);
   border: none;
   transition: all 0.3s ease;
 }
@@ -1011,12 +1011,12 @@ export default {
 }
 
 .balance-card {
-  background: linear-gradient(135deg, #409EFF 0%, #66B1FF 100%);
+  background: linear-gradient(135deg, #2c9678 0%, #36a88a 100%);
   border-radius: 12px;
   padding: 32px;
   margin-bottom: 32px;
   color: white;
-  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(44, 150, 120, 0.3);
 }
 
 .balance-info {

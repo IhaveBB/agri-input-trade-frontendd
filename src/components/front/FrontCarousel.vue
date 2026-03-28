@@ -175,13 +175,13 @@ export default {
 .tag {
   display: inline-block;
   padding: 6px 16px;
-  background: rgba(64, 158, 255, 0.9);
+  background: rgba(44, 150, 120, 0.9);
   color: white;
   border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
   backdrop-filter: blur(4px);
-  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(44, 150, 120, 0.3);
 }
 
 .title {
@@ -210,7 +210,7 @@ export default {
 .current-price {
   display: flex;
   align-items: baseline;
-  background: rgba(64, 158, 255, 0.2);
+  background: rgba(44, 150, 120, 0.2);
   padding: 4px 12px;
   border-radius: 20px;
   backdrop-filter: blur(4px);
@@ -228,7 +228,7 @@ export default {
   font-weight: 600;
   color: #67c23a;
   margin-left: 4px;
-  text-shadow: 0 2px 4px rgba(64, 158, 255, 0.2);
+  text-shadow: 0 2px 4px rgba(44, 150, 120, 0.2);
 }
 
 .original-price {
@@ -255,7 +255,7 @@ export default {
 
 .action-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(64, 158, 255, 0.4);
+  box-shadow: 0 4px 15px rgba(44, 150, 120, 0.4);
 }
 
 .action-button i {

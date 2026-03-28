@@ -7,7 +7,15 @@
       "Bash(timeout 30 npm run serve:*)",
       "Bash(timeout 60 npm run serve:*)",
       "Bash(timeout 20 npm run serve:*)",
-      "Bash(timeout 25 npm run serve:*)"
+      "Bash(timeout 25 npm run serve:*)",
+      "Bash(npx vue-cli-service:*)",
+      "Bash(npm run:*)",
+      "Bash(./node_modules/.bin/vue-cli-service build:*)",
+      "Bash(export PATH=/usr/local/bin:/opt/homebrew/bin:$HOME/.nvm/versions/node/*/bin:$PATH)",
+      "Read(//Users/ihavebb/workspace/code/agri-input-trade/agri-input-trade-frontend/$HOME/.nvm/versions/node/*/bin/**)",
+      "Read(//usr/local/**)",
+      "Bash(export PATH=\"/Users/ihavebb/.nvm/versions/node/v22.22.1/bin:$PATH\")",
+      "Bash(node ./node_modules/.bin/vue-cli-service build)"
     ]
   }
 }

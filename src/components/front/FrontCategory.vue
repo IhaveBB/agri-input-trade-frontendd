@@ -130,8 +130,8 @@ export default {
   position: absolute;
   inset: 0;
   background-image: 
-    radial-gradient(circle at 0% 0%, rgba(64, 158, 255, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 100% 0%, rgba(64, 158, 255, 0.03) 0%, transparent 50%);
+    radial-gradient(circle at 0% 0%, rgba(44, 150, 120, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 100% 0%, rgba(44, 150, 120, 0.03) 0%, transparent 50%);
   opacity: 0.8;
   z-index: 0;
 }
@@ -177,7 +177,7 @@ export default {
 
 .icon {
   font-size: 24px;
-  color: #409EFF;
+  color: #2c9678;
   position: relative;
   z-index: 2;
   transition: all 0.3s ease;
@@ -187,8 +187,8 @@ export default {
   position: absolute;
   inset: 0;
   background: linear-gradient(135deg, 
-    rgba(64, 158, 255, 0.1),
-    rgba(64, 158, 255, 0.15)
+    rgba(44, 150, 120, 0.1),
+    rgba(44, 150, 120, 0.15)
   );
   border-radius: 12px;
   transition: all 0.3s ease;
@@ -197,8 +197,8 @@ export default {
 .category-item:hover .icon-bg {
   transform: scale(1.1) rotate(-5deg);
   background: linear-gradient(135deg, 
-    rgba(64, 158, 255, 0.15),
-    rgba(64, 158, 255, 0.2)
+    rgba(44, 150, 120, 0.15),
+    rgba(44, 150, 120, 0.2)
   );
 }
 
@@ -220,7 +220,7 @@ export default {
   left: 50%;
   width: 0;
   height: 2px;
-  background: #409EFF;
+  background: #2c9678;
   transition: all 0.3s ease;
   transform: translateX(-50%);
 }

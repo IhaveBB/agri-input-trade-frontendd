@@ -307,15 +307,14 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 14px;
 }
 
 .title-wrapper {
-  position: relative;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 12px;
+  position: relative;
 }
 
 .section-title {
@@ -323,12 +322,11 @@ export default {
   font-size: 20px;
   font-weight: 600;
   color: #333;
-  position: relative;
-  z-index: 1;
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-right: 12px;
+  padding-left: 16px;
+  border-left: 4px solid #2c9678;
 }
 
 .section-title i {
@@ -337,14 +335,7 @@ export default {
 }
 
 .title-line {
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 80px;
-  height: 3px;
-  background: #2c9678;
-  border-radius: 2px;
-  z-index: 0;
+  display: none;
 }
 
 .subtitle {
@@ -356,25 +347,24 @@ export default {
 }
 
 .more-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
-  border-radius: 4px;
-  background: #f5f5f5;
-  color: #333;
-  font-size: 14px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  background: #f0faf5;
+  color: #2c9678;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #e0e8e8;
 }
 
 .more-btn:hover {
   background: #2c9678;
   color: #fff;
   border-color: #2c9678;
-  transform: translateX(2px);
 }
 
 .more-btn i {
@@ -478,7 +468,7 @@ export default {
 
 .loading-spinner {
   font-size: 48px;
-  color: #409EFF;
+  color: #2c9678;
   animation: pulse 1.5s infinite;
 }
 

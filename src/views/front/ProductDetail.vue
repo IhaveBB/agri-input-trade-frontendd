@@ -520,7 +520,7 @@ export default {
 }
 
 .badge.new {
-  background: linear-gradient(135deg, #409EFF, #66B1FF);
+  background: linear-gradient(135deg, #2c9678, #36a88a);
 }
 
 .badge.discount {
@@ -546,8 +546,8 @@ export default {
 .category-tag {
   display: inline-block;
   padding: 4px 12px;
-  background: rgba(64, 158, 255, 0.1);
-  color: #409EFF;
+  background: rgba(44, 150, 120, 0.1);
+  color: #2c9678;
   border-radius: 20px;
   font-size: 14px;
   margin-bottom: 16px;
@@ -638,13 +638,13 @@ export default {
 }
 
 .cart-btn {
-  background: linear-gradient(135deg, #409EFF, #5aad32);
+  background: linear-gradient(135deg, #2c9678, #5aad32);
   border: none;
 }
 
 .cart-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(44, 150, 120, 0.2);
 }
 
 .buy-btn {
@@ -681,7 +681,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #409EFF;
+  color: #2c9678;
   font-size: 20px;
 }
 
@@ -727,11 +727,11 @@ export default {
 }
 
 :deep(.el-tabs__item.is-active) {
-  color: #409EFF;
+  color: #2c9678;
 }
 
 :deep(.el-tabs__active-bar) {
-  background-color: #409EFF;
+  background-color: #2c9678;
 }
 
 .review-items {
