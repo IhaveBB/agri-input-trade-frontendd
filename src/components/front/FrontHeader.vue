@@ -162,6 +162,7 @@ export default {
   background: #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   height: 60px;
+  border-bottom: 2px solid #2c9678;
 }
 
 .header-container {

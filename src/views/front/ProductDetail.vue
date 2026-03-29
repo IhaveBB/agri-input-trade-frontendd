@@ -1,7 +1,21 @@
 <template>
   <div class="product-detail">
     <front-header></front-header>
-    <div class="main-content">
+    <div v-if="!product.id" class="loading-container">
+      <el-skeleton style="width: 100%" animated>
+        <template slot="template">
+          <div style="display: flex; gap: 48px; padding: 24px;">
+            <el-skeleton-item variant="image" style="width: 400px; height: 400px; border-radius: 8px;" />
+            <div style="flex: 1">
+              <el-skeleton-item variant="p" style="width: 50%; height: 24px; margin-bottom: 20px" />
+              <el-skeleton-item variant="h3" style="width: 100%; height: 36px; margin-bottom: 24px" />
+              <el-skeleton-item variant="text" style="width: 40%; height: 40px; margin-bottom: 24px" />
+            </div>
+          </div>
+        </template>
+      </el-skeleton>
+    </div>
+    <div v-else class="main-content">
       <!-- 面包屑导航 -->
       <div class="breadcrumb">
         <el-breadcrumb separator="/">
@@ -11,35 +25,15 @@
         </el-breadcrumb>
       </div>
 
-      <!-- 加载状态显示 -->
-      <div v-if="loading" class="loading-container">
-        <el-skeleton style="width: 100%" animated>
-          <template slot="template">
-            <div style="display: flex; gap: 48px; padding: 24px;">
-              <el-skeleton-item variant="image" style="width: 400px; height: 400px; border-radius: 8px;" />
-              <div style="flex: 1">
-                <el-skeleton-item variant="p" style="width: 50%; height: 24px; margin-bottom: 20px" />
-                <el-skeleton-item variant="h3" style="width: 100%; height: 36px; margin-bottom: 24px" />
-                <el-skeleton-item variant="text" style="width: 40%; height: 40px; margin-bottom: 24px" />
-                <el-skeleton-item variant="p" style="width: 70%; height: 24px; margin-bottom: 16px" />
-                <el-skeleton-item variant="p" style="width: 60%; height: 24px; margin-bottom: 32px" />
-                <el-skeleton-item variant="text" style="width: 100%; height: 48px; margin-top: 32px" />
-              </div>
-            </div>
-          </template>
-        </el-skeleton>
-      </div>
-
       <!-- 商品基本信息区域 -->
-      <div v-else class="product-info-section">
+      <div class="product-info-section">
         <div class="product-main">
           <div class="image-container">
-            <el-image 
-              :src="product.imageUrl?.startsWith('http') ? product.imageUrl : `/api${product.imageUrl}`"
+            <el-image
+              :src="getImageUrl(product.imageUrl)"
               fit="cover"
-              :preview-src-list="[product.imageUrl?.startsWith('http') ? product.imageUrl : `/api${product.imageUrl}`]"
-            >
-              <div slot="error" class="image-slot">
+              :preview-src-list="[getImageUrl(product.imageUrl)]"
+            >              <div slot="error" class="image-slot">
                 <i class="el-icon-picture-outline"></i>
               </div>
             </el-image>
@@ -50,7 +44,7 @@
           </div>
           
           <div class="product-info">
-            <div class="category-tag">{{ product.category.name || '商品' }}</div>
+            <div class="category-tag">{{ product.categoryName || '商品' }}</div>
             <h1 class="product-name">{{ product.name }}</h1>
             
             <div class="price-section">
@@ -119,16 +113,13 @@
             </div>
 
             <!-- 店铺信息 -->
-            <div v-if="product.merchant" class="shop-info-card">
+            <div v-if="product.merchantName" class="shop-info-card">
               <div class="shop-info-header">
                 <div class="shop-icon">
                   <i class="el-icon-shop"></i>
                 </div>
                 <div class="shop-info-detail">
-                  <span class="shop-name">{{ product.merchant.username }}</span>
-                  <span class="shop-location" v-if="product.merchant.location">
-                    <i class="el-icon-location"></i> {{ product.merchant.location }}
-                  </span>
+                  <span class="shop-name">{{ product.merchantName }}</span>
                 </div>
               </div>
               <el-button
@@ -149,10 +140,42 @@
       <div class="detail-tabs">
         <el-tabs v-model="activeTab" type="card">
           <el-tab-pane label="商品详情" name="detail">
-            <div v-if="loading" class="loading-detail">
-              <el-skeleton :rows="10" animated />
+            <div class="detail-content rich-text-content" v-html="sanitizedDescription"></div>
+          </el-tab-pane>
+          <el-tab-pane label="商品参数" name="specs">
+            <div class="specs-content">
+              <!-- 扩展属性参数表 -->
+              <div v-if="extAttrList.length > 0" class="specs-section">
+                <h3 class="specs-section-title">产品参数</h3>
+                <table class="specs-table">
+                  <tr v-for="item in extAttrList" :key="item.label">
+                    <td class="specs-label">{{ item.label }}</td>
+                    <td class="specs-value">{{ item.value }}</td>
+                  </tr>
+                </table>
+              </div>
+              <!-- 适用作物 -->
+              <div v-if="product.crops && product.crops.length > 0" class="specs-section">
+                <h3 class="specs-section-title">适用作物</h3>
+                <div class="specs-tags">
+                  <el-tag v-for="crop in product.crops" :key="crop.id" size="medium" type="success">
+                    {{ crop.name }}
+                  </el-tag>
+                </div>
+              </div>
+              <!-- 适用地区与季节 -->
+              <div v-if="product.regionSeasonList && product.regionSeasonList.length > 0" class="specs-section">
+                <h3 class="specs-section-title">适用地区与季节</h3>
+                <table class="specs-table">
+                  <tr v-for="rs in product.regionSeasonList" :key="rs.id">
+                    <td class="specs-label">{{ rs.regionName }}</td>
+                    <td class="specs-value">{{ rs.seasonName }}</td>
+                  </tr>
+                </table>
+              </div>
+              <!-- 无参数提示 -->
+              <el-empty v-if="extAttrList.length === 0 && (!product.crops || product.crops.length === 0) && (!product.regionSeasonList || product.regionSeasonList.length === 0)" description="暂无参数信息"></el-empty>
             </div>
-            <div v-else class="detail-content rich-text-content" v-html="sanitizedDescription"></div>
           </el-tab-pane>
           <el-tab-pane label="商品评价" name="reviews">
             <div v-if="reviewsLoading" class="loading-reviews">
@@ -190,8 +213,8 @@
     <!-- 添加确认订单对话框 -->
     <el-dialog title="确认订单" :visible.sync="orderDialogVisible" width="500px" custom-class="order-dialog">
       <!-- 商品信息 -->
-      <div class="confirm-product-info">
-        <el-image :src="product.imageUrl?.startsWith('http') ? product.imageUrl : `/api${product.imageUrl}`" 
+      <div v-if="product.id" class="confirm-product-info">
+        <el-image :src="getImageUrl(product.imageUrl)"
           fit="cover" class="confirm-product-image">
         </el-image>
         <div class="confirm-product-detail">
@@ -277,7 +300,10 @@ export default {
       activeTab: 'detail',
       loading: true,
       reviewsLoading: true,
-      addressesLoading: false
+      addressesLoading: false,
+      extFieldMap: {},
+      extAttrList: [],
+      enterTime: Date.now()
     }
   },
   created() {
@@ -286,18 +312,60 @@ export default {
   },
   mounted() {
     this.userInfo = JSON.parse(localStorage.getItem('frontUser') || '{}')
+    // 记录进入商品详情页的时间（用于停留时长上报）
+    this.enterTime = Date.now()
+    // 监听页面可见性变化（切Tab/最小化时上报）
+    this._visibilityHandler = () => {
+      if (document.visibilityState === 'hidden') {
+        this.reportDwellDuration()
+      }
+    }
+    document.addEventListener('visibilitychange', this._visibilityHandler)
+  },
+  beforeDestroy() {
+    // 离开页面时上报停留时长
+    this.reportDwellDuration()
+    if (this._visibilityHandler) {
+      document.removeEventListener('visibilitychange', this._visibilityHandler)
+    }
+  },
+  renderError(h, err) {
+    console.error('renderError:', err)
+    return h('pre', { style: { color: 'red' } }, 'Render Error: ' + err.message)
   },
   methods: {
     formatTime,
+    reportDwellDuration() {
+      if (!this.enterTime || !this.product || !this.product.id) return
+      const duration = Math.round((Date.now() - this.enterTime) / 1000)
+      this.enterTime = Date.now() // 重置，避免重复上报累加
+      if (duration < 1) return
+      const userStr = localStorage.getItem('frontUser')
+      if (!userStr) return
+      // 异步上报，不阻塞页面
+      Request.post('/recommendation/dwell', {
+        productId: this.product.id,
+        duration: duration
+      }).catch(() => {}) // 静默失败
+    },
+    getImageUrl(url) {
+      if (!url) return ''
+      return url.startsWith('http') ? url : `/api${url}`
+    },
     goToShop(merchantId) {
       this.$router.push(`/shop?merchantId=${merchantId}`)
     },
     async getProductDetail() {
       try {
         this.loading = true
-        const res = await Request.get(`/product/${this.$route.params.id}`)
+        // 使用扩展接口获取完整商品信息（包含 extraAttributes、crops、regionSeasonList）
+        const res = await Request.get(`/product/ext/${this.$route.params.id}`)
         if (res.code === '0') {
           this.product = res.data
+          // 获取该分类的扩展字段配置（用于显示中文标签）
+          if (this.product.categoryId) {
+            this.getExtFieldsConfig(this.product.categoryId)
+          }
         }
       } catch (error) {
         console.error('获取商品详情失败:', error)
@@ -305,6 +373,49 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    /**
+     * 获取扩展字段配置，用于将 key 映射为中文标签
+     */
+    async getExtFieldsConfig(categoryId) {
+      try {
+        const res = await Request.get('/product/ext/fields', { params: { categoryId } })
+        if (res.code === '0' && res.data) {
+          const map = {}
+          // res.data 是 List<ExtFieldConfigVO>，取第一个元素的 fields
+          const configList = Array.isArray(res.data) ? res.data : [res.data]
+          const fields = (configList[0] && configList[0].fields) || []
+          fields.forEach(field => {
+            map[field.key] = field
+          })
+          this.extFieldMap = map
+          this.buildExtAttrList()
+        }
+      } catch (error) {
+        console.error('获取扩展字段配置失败:', error)
+      }
+    },
+    /**
+     * 根据产品扩展属性和字段配置，构建展示列表
+     */
+    buildExtAttrList() {
+      const attrs = this.product && this.product.extraAttributes
+      if (!attrs || typeof attrs !== 'object' || Array.isArray(attrs) || Object.keys(attrs).length === 0) {
+        this.extAttrList = []
+        return
+      }
+      const map = this.extFieldMap || {}
+      this.extAttrList = Object.keys(attrs)
+        .filter(key => map[key])
+        .map(key => {
+          const field = map[key]
+          let displayValue = attrs[key]
+          if (field.type === 'select' && field.options) {
+            const opt = field.options.find(o => String(o.value) === String(displayValue))
+            if (opt) displayValue = opt.label
+          }
+          return { label: field.label, value: displayValue }
+        })
     },
     async getProductReviews() {
       try {
@@ -315,7 +426,7 @@ export default {
           }
         })
         if (res.code === '0') {
-          this.reviews = res.data
+          this.reviews = res.data || []
         }
       } catch (error) {
         console.error('获取商品评价失败:', error)
@@ -350,6 +461,8 @@ export default {
         const res = await Request.post('/cart', data)
         if (res.code === '0') {
           this.$message.success('已添加到购物车')
+        } else {
+          this.$message.error(res.msg || '添加失败')
         }
       } catch (error) {
         console.error('添加到购物车失败:', error)
@@ -715,6 +828,66 @@ export default {
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 24px;
+}
+
+/* 商品参数样式 */
+.specs-content {
+  padding: 24px;
+}
+
+.specs-section {
+  margin-bottom: 28px;
+}
+
+.specs-section:last-child {
+  margin-bottom: 0;
+}
+
+.specs-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+  margin: 0 0 16px 0;
+  padding-left: 10px;
+  border-left: 3px solid #2c9678;
+}
+
+.specs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.specs-table tr {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.specs-table tr:last-child {
+  border-bottom: none;
+}
+
+.specs-label {
+  width: 180px;
+  padding: 12px 16px;
+  background: #fafafa;
+  color: #909399;
+  font-size: 14px;
+}
+
+.specs-value {
+  padding: 12px 16px;
+  color: #303133;
+  font-size: 14px;
+}
+
+.specs-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.specs-tags .el-tag {
+  font-size: 14px;
+  padding: 6px 16px;
 }
 
 :deep(.el-tabs__nav-wrap::after) {

@@ -430,6 +430,21 @@ export default {
 .stat-card {
   flex: 1;
   min-width: 220px;
+  position: relative;
+  overflow: hidden;
+  border-top: 3px solid #2c9678;
+
+  &:nth-child(2) {
+    border-top-color: #e6a23c;
+  }
+
+  &:nth-child(3) {
+    border-top-color: #409EFF;
+  }
+
+  &:nth-child(4) {
+    border-top-color: #f56c6c;
+  }
 
   .stat-header {
     display: flex;
@@ -453,8 +468,8 @@ export default {
   }
 
   .stat-value {
-    font-size: 26px;
-    font-weight: bold;
+    font-size: 28px;
+    font-weight: 700;
     color: #303133;
     margin-bottom: 14px;
   }

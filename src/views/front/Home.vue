@@ -39,7 +39,7 @@
               <i class="el-icon-arrow-right"></i>
             </div>
           </div>
-          <el-row :gutter="24">
+          <el-row :gutter="20">
             <el-col :span="6" v-for="product in recommendProducts" :key="product.id">
               <product-card :product="product" @add-to-cart="handleAddToCart" @toggle-favorite="handleToggleFavorite"></product-card>
             </el-col>
@@ -62,7 +62,7 @@
               <i class="el-icon-arrow-right"></i>
             </div>
           </div>
-          <el-row :gutter="24">
+          <el-row :gutter="20">
             <el-col :span="6" v-for="product in newProducts" :key="product.id">
               <product-card :product="product" @add-to-cart="handleAddToCart" @toggle-favorite="handleToggleFavorite"></product-card>
             </el-col>

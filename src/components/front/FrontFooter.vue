@@ -51,6 +51,7 @@ export default {
   margin-top: 40px;
   position: relative;
   overflow: hidden;
+  border-top: 3px solid #2c9678;
 }
 
 .front-footer::before {

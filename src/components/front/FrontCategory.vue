@@ -173,6 +173,9 @@ export default {
   align-items: center;
   justify-content: center;
   margin-bottom: 8px;
+  border-radius: 10px;
+  border: 1px solid #e0ebe0;
+  background: #fff;
 }
 
 .icon {

@@ -271,18 +271,34 @@ export default {
 <style scoped>
 .product-card {
   background: #fff;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  transition: all 0.25s ease;
   cursor: pointer;
-  min-height: 350px;
-  border: 1px solid #f0f0f0;
+  border: 1px solid #eee;
+  position: relative;
+}
+
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #2c9678;
+  transform: scaleX(0);
+  transition: transform 0.25s ease;
+  z-index: 1;
+}
+
+.product-card:hover::before {
+  transform: scaleX(1);
 }
 
 .product-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   border-color: #2c9678;
 }
 
@@ -345,10 +361,10 @@ export default {
 .image-container {
   position: relative;
   width: 100%;
+  height: 0;
   padding-bottom: 100%;
   overflow: hidden;
   background: #f8f8f8;
-  border-bottom: 1px solid #f0f0f0;
 }
 
 .product-image {
@@ -361,7 +377,7 @@ export default {
 }
 
 .product-card:hover .product-image {
-  transform: scale(1.03);
+  transform: scale(1.05);
 }
 
 .product-badges {

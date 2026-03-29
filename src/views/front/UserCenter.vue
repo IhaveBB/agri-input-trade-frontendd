@@ -48,6 +48,26 @@
               <el-form-item label="邮箱" prop="email">
                 <el-input v-model="userInfo.email"></el-input>
               </el-form-item>
+              <el-form-item label="所在地区">
+                <div class="location-row">
+                  <el-select v-model="selectedRegion" placeholder="请选择所在地区" @change="onRegionChange" style="flex: 1">
+                    <el-option v-for="r in regionList" :key="r.id" :label="r.name" :value="r.name"></el-option>
+                  </el-select>
+                  <el-button type="text" icon="el-icon-aim" @click="autoLocate" :loading="locating">
+                    自动定位
+                  </el-button>
+                </div>
+              </el-form-item>
+              <el-form-item label="关注作物">
+                <el-cascader
+                  v-model="selectedCrops"
+                  :options="cropOptions"
+                  :props="cropProps"
+                  placeholder="请选择关注的作物（可多选）"
+                  clearable
+                  style="width: 100%"
+                ></el-cascader>
+              </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click="updateUserInfo">保存修改</el-button>
               </el-form-item>
@@ -61,8 +81,8 @@
                 <h3>我的余额</h3>
                 <p class="section-desc">查看您的账户余额和交易记录</p>
               </div>
-              <el-button type="primary" icon="el-icon-wallet" @click="showRechargeDialog">
-                立即充值
+              <el-button type="primary" size="small" icon="el-icon-wallet" @click="showRechargeDialog">
+                充值
               </el-button>
             </div>
 
@@ -72,40 +92,43 @@
                 <div class="balance-label">当前余额</div>
                 <div class="balance-amount">¥ {{ formatBalance(balance) }}</div>
               </div>
+              <el-button type="primary" class="recharge-btn" icon="el-icon-plus" @click="showRechargeDialog">
+                充值
+              </el-button>
             </div>
 
-            <!-- 充值记录表格 -->
-            <div class="recharge-records">
+            <!-- 充值记录 -->
+            <div class="records-section">
               <h4 class="records-title">充值记录</h4>
-              <el-table :data="rechargeRecords" stripe style="width: 100%" v-loading="rechargeLoading">
-                <el-table-column prop="createdAt" label="创建时间" width="180">
+              <el-table :data="rechargeRecords" size="small" v-loading="rechargeLoading">
+                <el-table-column prop="createdAt" label="创建时间" width="170">
                   <template slot-scope="scope">
                     {{ formatDate(scope.row.createdAt) }}
                   </template>
                 </el-table-column>
-                <el-table-column prop="rechargeNo" label="充值单号" width="220">
+                <el-table-column prop="rechargeNo" label="充值单号" min-width="180">
                   <template slot-scope="scope">
                     <span class="recharge-no">{{ scope.row.rechargeNo }}</span>
                   </template>
                 </el-table-column>
-                <el-table-column prop="amount" label="充值金额" width="120">
+                <el-table-column prop="amount" label="金额" width="100">
                   <template slot-scope="scope">
-                    <span class="amount-positive">¥ {{ formatBalance(scope.row.amount) }}</span>
+                    <span class="amount-positive">¥{{ formatBalance(scope.row.amount) }}</span>
                   </template>
                 </el-table-column>
-                <el-table-column prop="status" label="状态" width="100">
+                <el-table-column prop="status" label="状态" width="80">
                   <template slot-scope="scope">
-                    <el-tag :type="getRechargeStatusType(scope.row.status)">
+                    <el-tag size="small" :type="getRechargeStatusType(scope.row.status)">
                       {{ getRechargeStatusText(scope.row.status) }}
                     </el-tag>
                   </template>
                 </el-table-column>
-                <el-table-column prop="paidAt" label="支付时间" width="180">
+                <el-table-column prop="paidAt" label="支付时间" width="170">
                   <template slot-scope="scope">
                     {{ scope.row.paidAt ? formatDate(scope.row.paidAt) : '-' }}
                   </template>
                 </el-table-column>
-                <el-table-column label="操作" width="120">
+                <el-table-column label="操作" width="100">
                   <template slot-scope="scope">
                     <el-button
                       v-if="scope.row.status === 0"
@@ -117,10 +140,9 @@
                   </template>
                 </el-table-column>
               </el-table>
-
-              <!-- 分页 -->
               <div class="pagination-wrapper">
                 <el-pagination
+                  small
                   @current-change="handleRechargePageChange"
                   :current-page="rechargePage"
                   :page-size="5"
@@ -130,40 +152,35 @@
               </div>
             </div>
 
-            <!-- 余额记录表格 -->
-            <div class="balance-records">
+            <!-- 余额变动记录 -->
+            <div class="records-section">
               <h4 class="records-title">余额变动记录</h4>
-              <el-table :data="balanceRecords" stripe style="width: 100%" v-loading="balanceLoading">
-                <el-table-column prop="createdAt" label="时间" width="180">
+              <el-table :data="balanceRecords" size="small" v-loading="balanceLoading">
+                <el-table-column prop="createdAt" label="时间" width="170">
                   <template slot-scope="scope">
                     {{ formatDate(scope.row.createdAt) }}
                   </template>
                 </el-table-column>
-                <el-table-column prop="type" label="类型" width="120">
+                <el-table-column prop="type" label="类型" width="80">
                   <template slot-scope="scope">
-                    <el-tag :type="getBalanceTypeType(scope.row.type)">
+                    <el-tag size="small" :type="getBalanceTypeType(scope.row.type)">
                       {{ getBalanceTypeText(scope.row.type) }}
                     </el-tag>
                   </template>
                 </el-table-column>
-                <el-table-column prop="amount" label="金额" width="150">
+                <el-table-column prop="amount" label="金额" width="120">
                   <template slot-scope="scope">
-                    <span :class="scope.row.amount > 0 ? 'amount-positive' : 'amount-negative'">
-                      {{ scope.row.amount > 0 ? '+' : '' }}¥ {{ formatBalance(scope.row.amount) }}
+                    <span :class="scope.row.type === 2 ? 'amount-negative' : 'amount-positive'">
+                      {{ scope.row.type === 2 ? '-' : '+' }}¥{{ formatBalance(Math.abs(scope.row.amount)) }}
                     </span>
                   </template>
                 </el-table-column>
-                <el-table-column prop="balanceAfter" label="余额" width="150">
-                  <template slot-scope="scope">
-                    ¥ {{ formatBalance(scope.row.balanceAfter) }}
-                  </template>
+                <el-table-column prop="description" label="描述" min-width="200">
                 </el-table-column>
-                <el-table-column prop="remark" label="备注"></el-table-column>
               </el-table>
-
-              <!-- 分页 -->
               <div class="pagination-wrapper">
                 <el-pagination
+                  small
                   @current-change="handleBalancePageChange"
                   :current-page="balancePage"
                   :page-size="10"
@@ -393,6 +410,20 @@ export default {
           { required: true, message: '请输入充值金额', trigger: 'blur' },
           { type: 'number', min: 0.01, message: '充值金额必须大于0', trigger: 'blur' }
         ]
+      },
+      // 地区相关
+      regionList: [],
+      selectedRegion: '',
+      locating: false,
+      // 作物相关
+      cropOptions: [],
+      selectedCrops: [],
+      cropProps: {
+        multiple: true,
+        emitPath: false,
+        value: 'id',
+        label: 'name',
+        children: 'children'
       }
     }
   },
@@ -406,6 +437,8 @@ export default {
       this.userInfo = JSON.parse(userInfo)
       this.getUserInfo()
       this.getAddresses()
+      this.loadRegions()
+      this.loadCropOptions()
     }
   },
 
@@ -424,6 +457,10 @@ export default {
         const res = await Request.get(`/user/${userId}`)
         if (res.code === '0') {
           this.userInfo = res.data
+          // 初始化地区选择（从location字段提取大区）
+          this.initSelectedRegion()
+          // 初始化关注作物
+          this.initSelectedCrops()
         }
       } catch (error) {
         console.error('获取用户信息失败:', error)
@@ -431,13 +468,143 @@ export default {
       }
     },
 
+    initSelectedRegion() {
+      if (this.userInfo.location) {
+        // 如果已经是直接的大区名（华北、华东等），直接使用
+        const regions = ['华北', '东北', '华东', '华中', '华南', '西南', '西北']
+        if (regions.includes(this.userInfo.location)) {
+          this.selectedRegion = this.userInfo.location
+          return
+        }
+        // 否则从省份映射到大区
+        const province = this.userInfo.location.split('-')[0]
+        const regionMap = {
+          '北京': '华北', '天津': '华北', '河北': '华北', '山西': '华北', '内蒙古': '华北',
+          '辽宁': '东北', '吉林': '东北', '黑龙江': '东北',
+          '上海': '华东', '江苏': '华东', '浙江': '华东', '安徽': '华东', '福建': '华东', '江西': '华东', '山东': '华东',
+          '河南': '华中', '湖北': '华中', '湖南': '华中',
+          '广东': '华南', '广西': '华南', '海南': '华南',
+          '重庆': '西南', '四川': '西南', '贵州': '西南', '云南': '西南', '西藏': '西南',
+          '陕西': '西北', '甘肃': '西北', '青海': '西北', '宁夏': '西北', '新疆': '西北'
+        }
+        this.selectedRegion = regionMap[province] || ''
+      }
+    },
+
+    initSelectedCrops() {
+      if (this.userInfo.interestedCrops) {
+        this.selectedCrops = this.userInfo.interestedCrops.split(',').map(id => Number(id))
+      }
+    },
+
+    async loadRegions() {
+      try {
+        const res = await Request.get('/region/all')
+        if (res.code === '0') {
+          this.regionList = res.data || []
+        }
+      } catch (error) {
+        console.error('获取地区列表失败:', error)
+      }
+    },
+
+    async loadCropOptions() {
+      try {
+        const res = await Request.get('/category/tree')
+        if (res.code === '0' && res.data) {
+          // 从分类树中提取种子分类（一级ID=1）下的四级分类（具体作物）
+          this.cropOptions = this.extractCropOptions(res.data)
+        }
+      } catch (error) {
+        console.error('获取作物分类失败:', error)
+      }
+    },
+
+    extractCropOptions(tree) {
+      // 找到种子分类（一级分类），递归获取其子分类作为可选项
+      const seedCategory = tree.find(c => c.id === 1)
+      if (!seedCategory || !seedCategory.children) return []
+      return seedCategory.children
+    },
+
+    onRegionChange(regionName) {
+      // 地区变更时更新location字段（用大区名称作为location）
+      this.userInfo.location = regionName
+    },
+
+    autoLocate() {
+      if (!navigator.geolocation) {
+        this.$message.warning('您的浏览器不支持定位功能')
+        return
+      }
+      this.locating = true
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords
+            // 使用 OpenStreetMap Nominatim 逆地理编码（免费，无需 key）
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=zh&zoom=5`
+            )
+            const data = await res.json()
+            if (data && data.address) {
+              // 从返回地址中提取省份（直辖市在city字段，省份在state字段）
+              const rawProvince = data.address.state || data.address.province || data.address.city || data.name || ''
+              const cleanProvince = rawProvince.replace(/省|市|自治区|壮族|回族|维吾尔|特别行政区/g, '')
+              const regionMap = {
+                '北京': '华北', '天津': '华北', '河北': '华北', '山西': '华北', '内蒙古': '华北',
+                '辽宁': '东北', '吉林': '东北', '黑龙江': '东北',
+                '上海': '华东', '江苏': '华东', '浙江': '华东', '安徽': '华东', '福建': '华东', '江西': '华东', '山东': '华东',
+                '河南': '华中', '湖北': '华中', '湖南': '华中',
+                '广东': '华南', '广西': '华南', '海南': '华南',
+                '重庆': '西南', '四川': '西南', '贵州': '西南', '云南': '西南', '西藏': '西南',
+                '陕西': '西北', '甘肃': '西北', '青海': '西北', '宁夏': '西北', '新疆': '西北',
+                '香港': '华南', '澳门': '华南', '台湾': '华东'
+              }
+              const region = regionMap[cleanProvince]
+              if (region) {
+                this.selectedRegion = region
+                this.userInfo.location = region
+                this.$message.success(`已定位到：${region}`)
+              } else {
+                this.$message.warning(`已定位到${cleanProvince || '未知位置'}，但无法匹配地区，请手动选择`)
+              }
+            } else {
+              this.$message.warning('定位解析失败，请手动选择')
+            }
+          } catch (e) {
+            this.$message.warning('定位解析失败，请手动选择')
+          } finally {
+            this.locating = false
+          }
+        },
+        (error) => {
+          this.locating = false
+          if (error.code === error.PERMISSION_DENIED) {
+            this.$message.warning('您拒绝了定位权限，请手动选择地区')
+          } else {
+            this.$message.warning('定位失败，请手动选择地区')
+          }
+        },
+        { timeout: 10000 }
+      )
+    },
+
     async updateUserInfo() {
       try {
         this.$refs.userForm.validate(async (valid) => {
           if (valid) {
-            const res = await Request.put(`/user/${this.userInfo.id}`, this.userInfo)
+            const data = {
+              name: this.userInfo.name,
+              email: this.userInfo.email,
+              location: this.userInfo.location || this.selectedRegion || '',
+              interestedCrops: this.selectedCrops.length > 0 ? this.selectedCrops.join(',') : ''
+            }
+            const res = await Request.put(`/user/${this.userInfo.id}`, data)
             if (res.code === '0') {
               this.$message.success('个人信息更新成功')
+            } else {
+              this.$message.error(res.msg || '更新失败')
             }
           }
         })
@@ -804,10 +971,12 @@ export default {
 /* 右侧内容区样式 */
 .content-area {
   flex: 1;
+  min-width: 0;
   background: white;
   border-radius: 12px;
   border: 1px solid #ebeef5;
   padding: 30px;
+  overflow: hidden;
 }
 
 .section-header {
@@ -835,6 +1004,20 @@ export default {
 /* 表单样式 */
 .user-form {
   max-width: 500px;
+}
+
+.location-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.location-row .el-select {
+  flex: 1;
+}
+
+.location-row .el-button {
+  white-space: nowrap;
 }
 
 /* 地址列表样式 */
@@ -1008,42 +1191,60 @@ export default {
 /* 余额部分样式 */
 .balance-section {
   width: 100%;
+  overflow: hidden;
 }
 
 .balance-card {
   background: linear-gradient(135deg, #2c9678 0%, #36a88a 100%);
   border-radius: 12px;
-  padding: 32px;
-  margin-bottom: 32px;
+  padding: 28px 32px;
+  margin-bottom: 28px;
   color: white;
   box-shadow: 0 4px 12px rgba(44, 150, 120, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .balance-info {
-  text-align: center;
+  flex: 1;
 }
 
 .balance-label {
   font-size: 14px;
   opacity: 0.9;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .balance-amount {
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 600;
   letter-spacing: 1px;
 }
 
-.balance-records {
-  margin-top: 24px;
+.recharge-btn {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  color: white !important;
+  border-radius: 20px;
+  padding: 8px 20px;
+}
+
+.recharge-btn:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+.records-section {
+  margin-bottom: 28px;
 }
 
 .records-title {
-  font-size: 18px;
+  font-size: 16px;
   color: #2c3e50;
-  margin: 0 0 20px 0;
+  margin: 0 0 16px 0;
   font-weight: 500;
+  padding-left: 10px;
+  border-left: 3px solid #2c9678;
 }
 
 .amount-positive {
@@ -1057,14 +1258,9 @@ export default {
 }
 
 .pagination-wrapper {
-  margin-top: 24px;
+  margin-top: 16px;
   display: flex;
   justify-content: center;
-}
-
-/* 充值记录样式 */
-.recharge-records {
-  margin-bottom: 32px;
 }
 
 .recharge-no {
@@ -1082,4 +1278,4 @@ export default {
 .recharge-tips p {
   margin: 4px 0;
 }
-</style> 
+</style>
