@@ -500,7 +500,8 @@ export default {
           this.userInfo = res.data
           // 初始化地区选择（从location字段提取大区）
           this.initSelectedProvince()
-          // 初始化关注动物
+          // 初始化关注作物和动物
+          this.initSelectedCrops()
           this.initSelectedAnimals()
         }
       } catch (error) {
@@ -548,6 +549,8 @@ export default {
         if (res.code === '0' && res.data) {
           // 从分类树中提取种子分类（一级ID=1）下的子分类作为作物选项
           this.cropOptions = this.extractCropOptions(res.data)
+          // 分类选项加载完成后，初始化已选的作物（解决异步时序问题）
+          this.initSelectedCrops()
           // 从分类树中提取畜禽分类下的子分类作为动物选项
           const animalCategory = res.data.find(c => c.name === '畜禽')
           if (animalCategory && animalCategory.children) {
@@ -757,7 +760,7 @@ export default {
         const userId = this.currentUser.id
         const res = await Request.get(`/address/user/${userId}`)
         if (res.code === '0') {
-          this.addresses = res.data
+          this.addresses = res.data || []
         }
       } catch (error) {
         console.error('获取地址列表失败:', error)

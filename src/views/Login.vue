@@ -121,6 +121,10 @@ export default {
                   localStorage.setItem("token", res.data.token);
                 }
                 if (res.data) {
+                  // 登录前清理所有旧认证数据，防止残留导致串号
+                  localStorage.removeItem("frontUser");
+                  localStorage.removeItem("backUser");
+                  localStorage.removeItem("userMenuList");
                   if (res.data.role === 'USER') {
                     localStorage.setItem("frontUser", JSON.stringify(res.data));
                   } else {

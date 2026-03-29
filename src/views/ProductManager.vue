@@ -673,6 +673,18 @@ export default {
     this.getList()
   },
   methods: {
+    // 在树中查找从根到目标节点的路径（用于el-cascader回显）
+    findPathInTree(tree, targetId, path = []) {
+      for (const node of tree) {
+        const currentPath = [...path, node.id]
+        if (node.id === targetId) return currentPath
+        if (node.children && node.children.length > 0) {
+          const found = this.findPathInTree(node.children, targetId, currentPath)
+          if (found) return found
+        }
+      }
+      return null
+    },
     // 构建树形结构
     buildTree(flatList) {
       const map = {}
@@ -962,9 +974,19 @@ export default {
             discountPrice: data.discountPrice || 0,
             placeOfOrigin: data.placeOfOrigin,
             extraAttributes: data.extraAttributes || {},
-            cropIds: data.cropIds || [],
-            animalIds: data.animalIds || [],
-            regionSeasonConfigs: data.regionSeasonConfigs || []
+            cropIds: data.crops ? data.crops.map(c => this.findPathInTree(this.cropTree, c.id)).filter(Boolean) : [],
+            animalIds: data.animals ? data.animals.map(a => this.findPathInTree(this.animalTree, a.id)).filter(Boolean) : [],
+            regionSeasonConfigs: (data.regionSeasonList || []).reduce((acc, item) => {
+              const existing = acc.find(b => b.regionId === item.regionId)
+              if (existing) {
+                if (!existing.seasonIds.includes(item.seasonId)) {
+                  existing.seasonIds.push(item.seasonId)
+                }
+              } else {
+                acc.push({ regionId: item.regionId, seasonIds: [item.seasonId] })
+              }
+              return acc
+            }, [])
           }
 
           // 根据分类获取扩展字段配置
@@ -1124,14 +1146,14 @@ export default {
               extraAttributes: this.form.extraAttributes
             }
 
-            // 处理农药/肥料的适用作物
+            // 处理农药/肥料的适用作物（cascader返回路径数组，取最后一级ID）
             if (this.currentCategoryId === 2 || this.currentCategoryId === 3) {
-              submitData.categoryIds = this.form.cropIds
+              submitData.categoryIds = this.form.cropIds.map(path => Array.isArray(path) ? path[path.length - 1] : path)
             }
 
-            // 处理饲料/兽药的适用动物
+            // 处理饲料/兽药的适用动物（cascader返回路径数组，取最后一级ID）
             if ((this.currentCategoryId === 4 || this.currentCategoryId === 5) && this.form.animalIds.length > 0) {
-              submitData.animalIds = this.form.animalIds
+              submitData.animalIds = this.form.animalIds.map(path => Array.isArray(path) ? path[path.length - 1] : path)
               // 清除 cropIds，避免混淆
               delete submitData.cropIds
             }

@@ -45,7 +45,10 @@ export default {
         type: 'warning'
       }).then(() => {
         localStorage.removeItem("backUser")
-  
+        localStorage.removeItem("frontUser")
+        localStorage.removeItem("token")
+        localStorage.removeItem("userMenuList")
+
         this.$router.push({ path: '/login'});
         //   removeToken()
         //   location.reload()

@@ -134,10 +134,12 @@ export default {
     logout() {
       localStorage.removeItem('token');
       localStorage.removeItem('frontUser');
+      localStorage.removeItem('backUser');
+      localStorage.removeItem('userMenuList');
       this.isLoggedIn = false;
       // 强制刷新整个页面
       window.location.reload()
-   
+
     },
 
     // 获取推荐产品
@@ -164,7 +166,7 @@ export default {
           const user = JSON.parse(userStr);
           const userId = user.id;
 
-          const res = await Request.get('/api/recommendation/personalized');
+          const res = await Request.get('/api/recommendation/smart?limit=8');
           if (res.code === '0') {
             // 融合推荐接口返回的数据结构需要转换
             const recommendData = (res.data && (res.data.records || res.data)) || [];
@@ -175,6 +177,7 @@ export default {
               imageUrl: item.imageUrl,
               categoryId: item.categoryId,
               categoryName: item.categoryName,
+              salesCount: item.salesCount,
               // 保留推荐相关的额外信息
               recommendScore: item.score,
               recommendReason: item.reason,
@@ -217,18 +220,26 @@ export default {
         }, 500);
       }
     },
-    // 获取新品
+    // 获取新品推荐（使用新品推荐接口）
     async getNewProducts() {
       try {
-        const res = await Request.get('/product/page?status=1&sortField=updatedAt&sortOrder=desc&size=4')
+        const res = await Request.get('/api/recommendation/new?limit=4')
         if (res.code === '0') {
-          this.newProducts = (res.data && res.data.records || []).map(product => ({
-            ...product,
-            isFavorite: false
+          this.newProducts = (res.data || []).map(item => ({
+            id: item.productId,
+            name: item.productName,
+            price: item.price,
+            imageUrl: item.imageUrl,
+            categoryId: item.categoryId,
+            categoryName: item.categoryName,
+            salesCount: item.salesCount,
+            isFavorite: false,
+            recommendScore: item.score,
+            matchTags: item.matchTags
           }))
         }
       } catch (error) {
-        console.error('获取新品失败:', error)
+        console.error('获取新品推荐失败:', error)
       }
     },
     // 添加到购物车

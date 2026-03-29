@@ -184,6 +184,7 @@
             <div ref="provinceBarRef" class="chart"></div>
           </div>
         </div>
+      </div>
 
       <!-- 省份详细数据表格 -->
       <div class="data-table-panel">

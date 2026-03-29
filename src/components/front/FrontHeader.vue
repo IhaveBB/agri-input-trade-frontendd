@@ -109,6 +109,8 @@ export default {
     logout() {
       localStorage.removeItem('token');
       localStorage.removeItem('frontUser');
+      localStorage.removeItem('backUser');
+      localStorage.removeItem('userMenuList');
       this.isLoggedIn = false;
       this.userInfo = {};
       this.$message.success('已退出登录');
