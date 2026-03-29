@@ -163,6 +163,15 @@
                   </el-tag>
                 </div>
               </div>
+              <!-- 适用动物 -->
+              <div v-if="product.animals && product.animals.length > 0" class="specs-section">
+                <h3 class="specs-section-title">适用动物</h3>
+                <div class="specs-tags">
+                  <el-tag v-for="animal in product.animals" :key="animal.id" size="medium" type="warning">
+                    {{ animal.name }}
+                  </el-tag>
+                </div>
+              </div>
               <!-- 适用地区与季节 -->
               <div v-if="product.regionSeasonList && product.regionSeasonList.length > 0" class="specs-section">
                 <h3 class="specs-section-title">适用地区与季节</h3>
@@ -174,7 +183,7 @@
                 </table>
               </div>
               <!-- 无参数提示 -->
-              <el-empty v-if="extAttrList.length === 0 && (!product.crops || product.crops.length === 0) && (!product.regionSeasonList || product.regionSeasonList.length === 0)" description="暂无参数信息"></el-empty>
+              <el-empty v-if="extAttrList.length === 0 && (!product.crops || product.crops.length === 0) && (!product.animals || product.animals.length === 0) && (!product.regionSeasonList || product.regionSeasonList.length === 0)" description="暂无参数信息"></el-empty>
             </div>
           </el-tab-pane>
           <el-tab-pane label="商品评价" name="reviews">

@@ -2,14 +2,14 @@ import request from '@/utils/request'
 
 // ==================== 库存预警接口 ====================
 
-// 获取库存概览统计
-export function getStockOverview() {
-  return request({ url: '/stock-warning/overview', method: 'get' })
+// 获取库存概览统计（支持按商户筛选，管理员场景传 merchantId）
+export function getStockOverview(merchantId) {
+  return request({ url: '/stock-warning/overview', method: 'get', params: { merchantId } })
 }
 
-// 获取所有库存预警（管理员）
-export function getAllStockWarnings() {
-  return request({ url: '/stock-warning/all', method: 'get' })
+// 获取所有库存预警（管理员，支持按商户筛选）
+export function getAllStockWarnings(merchantId) {
+  return request({ url: '/stock-warning/all', method: 'get', params: { merchantId } })
 }
 
 // 获取当前商户的库存预警

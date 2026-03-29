@@ -380,9 +380,9 @@
               <div v-if="hasNationalRegion" class="crop-tip">已选择"全国"区域，其他区域不可选；季节仍可多选</div>
             </div>
 
-            <!-- 农药/肥料/饲料/兽药-适用作物/动物选择 -->
-            <div v-if="currentCategoryId === 2 || currentCategoryId === 3 || currentCategoryId === 4 || currentCategoryId === 5" class="crop-config">
-              <div class="subsection-title">{{ currentCategoryId === 4 || currentCategoryId === 5 ? '适用动物选择' : '适用作物选择' }}</div>
+            <!-- 农药/肥料-适用作物选择 -->
+            <div v-if="currentCategoryId === 2 || currentCategoryId === 3" class="crop-config">
+              <div class="subsection-title">适用作物选择</div>
               <el-cascader
                 v-model="form.cropIds"
                 :options="cropTree"
@@ -392,6 +392,20 @@
                 style="width: 100%;"
               ></el-cascader>
               <div class="crop-tip">提示：选择作物对应的分类，如需选择具体品种请选择四级分类</div>
+            </div>
+
+            <!-- 饲料/兽药-适用动物选择 -->
+            <div v-if="currentCategoryId === 4 || currentCategoryId === 5" class="crop-config">
+              <div class="subsection-title">适用动物选择</div>
+              <el-cascader
+                v-model="form.animalIds"
+                :options="animalTree"
+                :props="{ value: 'id', label: 'name', children: 'children', multiple: true, checkStrictly: true }"
+                placeholder="请选择适用动物"
+                clearable
+                style="width: 100%;"
+              ></el-cascader>
+              <div class="crop-tip">提示：选择动物对应的分类</div>
             </div>
           </div>
 
@@ -512,6 +526,8 @@ export default {
       categoryTree: [],
       // 作物树（用于农药/肥料选择适用作物）
       cropTree: [],
+      // 动物树（用于饲料/兽药选择适用动物）
+      animalTree: [],
       // 区域列表
       regions: [],
       // 季节列表
@@ -546,6 +562,8 @@ export default {
         extraAttributes: {},
         // 适用作物（农药/肥料用）
         cropIds: [],
+        // 适用动物（饲料/兽药用）
+        animalIds: [],
         // 区域-季节配置（种子用）
         regionSeasonConfigs: []
       },
@@ -734,6 +752,11 @@ export default {
           } else {
             this.cropTree = res.data
           }
+          // 过滤出畜禽分类及其子分类（用于饲料/兽药选择适用动物）
+          const animalCategory = res.data.find(c => c.name === '畜禽')
+          if (animalCategory) {
+            this.animalTree = [animalCategory]
+          }
         }
       } catch (error) {
         console.error('获取作物树失败:', error)
@@ -904,6 +927,7 @@ export default {
         placeOfOrigin: '',
         extraAttributes: {},
         cropIds: [],
+        animalIds: [],
         regionSeasonConfigs: []
       }
       // 重置扩展字段状态
@@ -939,6 +963,7 @@ export default {
             placeOfOrigin: data.placeOfOrigin,
             extraAttributes: data.extraAttributes || {},
             cropIds: data.cropIds || [],
+            animalIds: data.animalIds || [],
             regionSeasonConfigs: data.regionSeasonConfigs || []
           }
 
@@ -1099,9 +1124,16 @@ export default {
               extraAttributes: this.form.extraAttributes
             }
 
-            // 处理农药/肥料的适用作物（将级联选择的值展平）
-            if (this.form.cropIds.length > 0) {
-              // cropIds 已经是展开的叶子节点ID数组
+            // 处理农药/肥料的适用作物
+            if (this.currentCategoryId === 2 || this.currentCategoryId === 3) {
+              submitData.categoryIds = this.form.cropIds
+            }
+
+            // 处理饲料/兽药的适用动物
+            if ((this.currentCategoryId === 4 || this.currentCategoryId === 5) && this.form.animalIds.length > 0) {
+              submitData.animalIds = this.form.animalIds
+              // 清除 cropIds，避免混淆
+              delete submitData.cropIds
             }
 
             // 处理区域-季节配置

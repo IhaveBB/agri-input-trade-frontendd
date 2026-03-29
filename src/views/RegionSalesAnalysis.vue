@@ -7,6 +7,12 @@
         <p class="page-subtitle">全国各省份农资销售数据可视化分析</p>
       </div>
       <div class="header-right">
+        <span v-if="isAdmin && merchantList.length > 0" style="margin-right: 12px;">
+          <el-select v-model="selectedMerchantId" placeholder="全部店铺" size="small" style="width: 150px;" @change="handleMerchantChange">
+            <el-option label="全部店铺" :value="null" />
+            <el-option v-for="m in merchantList" :key="m.id" :label="m.name || m.username" :value="m.id" />
+          </el-select>
+        </span>
         <el-select v-model="viewMode" size="small" style="width: 120px; margin-right: 12px;">
           <el-option label="地图视图" value="map"></el-option>
           <el-option label="大区视图" value="region"></el-option>
@@ -179,16 +185,6 @@
           </div>
         </div>
 
-        <div class="chart-panel">
-          <div class="panel-header">
-            <h3>销售趋势</h3>
-          </div>
-          <div class="panel-body">
-            <div ref="trendLineRef" class="chart"></div>
-          </div>
-        </div>
-      </div>
-
       <!-- 省份详细数据表格 -->
       <div class="data-table-panel">
         <div class="panel-header">
@@ -233,6 +229,8 @@
 <script>
 import * as echarts from 'echarts'
 import Request from '@/utils/request'
+import { getRegionMerchantList } from '@/api/regionSales'
+import { getMerchantList } from '@/api/statistics'
 
 // 中国地图 GeoJSON URL（使用阿里云 DataV 标准中国地图，包含完整疆域）
 const CHINA_MAP_URL = 'https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json'
@@ -280,12 +278,16 @@ export default {
       overview: {},
       provinceData: [],
       regionData: [],
+      // 商户筛选相关
+      isAdmin: false,
+      isMerchant: false,
+      merchantList: [],
+      selectedMerchantId: null,
       // 图表实例
       chinaMapChart: null,
       regionPieChart: null,
       regionBarChart: null,
-      provinceBarChart: null,
-      trendLineChart: null
+      provinceBarChart: null
     }
   },
   computed: {
@@ -313,15 +315,14 @@ export default {
           } else if (newVal === 'province') {
             this.ensureChartInited('province')
             this.provinceBarChart && this.provinceBarChart.resize()
-            this.trendLineChart && this.trendLineChart.resize()
             this.renderProvinceBar()
-            this.renderTrendLine()
           }
         }, 200)
       })
     }
   },
   mounted() {
+    this.checkUserRole()
     this.initDateRange()
     this.initCharts()
     this.loadData()
@@ -332,6 +333,44 @@ export default {
     this.disposeCharts()
   },
   methods: {
+    // 检查用户角色
+    checkUserRole() {
+      const userStr = localStorage.getItem('backUser')
+      if (userStr) {
+        const user = JSON.parse(userStr)
+        this.isAdmin = user.role === 'ADMIN' || user.role === 'SUPER_ADMIN'
+        this.isMerchant = user.role === 'MERCHANT'
+        if (this.isMerchant) {
+          this.selectedMerchantId = user.id
+        }
+      }
+      // 管理员加载商户列表
+      if (this.isAdmin) {
+        this.fetchMerchantList()
+      }
+    },
+    // 获取商户列表（管理员用）
+    async fetchMerchantList() {
+      try {
+        const res = await getRegionMerchantList()
+        if (res.code === '0') {
+          this.merchantList = res.data || []
+        }
+      } catch (error) {
+        console.error('获取商户列表失败:', error)
+      }
+    },
+    // 商户选择变化
+    handleMerchantChange() {
+      this.loadData()
+    },
+    // 获取当前查询的 merchantId
+    getMerchantId() {
+      if (this.isMerchant) {
+        return this.selectedMerchantId
+      }
+      return this.isAdmin ? this.selectedMerchantId : null
+    },
     initDateRange() {
       const end = new Date()
       const start = new Date()
@@ -363,9 +402,6 @@ export default {
         if (!this.provinceBarChart) {
           this.provinceBarChart = echarts.init(this.$refs.provinceBarRef)
         }
-        if (!this.trendLineChart) {
-          this.trendLineChart = echarts.init(this.$refs.trendLineRef)
-        }
       }
     },
     disposeCharts() {
@@ -373,7 +409,6 @@ export default {
       this.regionPieChart && this.regionPieChart.dispose()
       this.regionBarChart && this.regionBarChart.dispose()
       this.provinceBarChart && this.provinceBarChart.dispose()
-      this.trendLineChart && this.trendLineChart.dispose()
     },
     handleResize() {
       // 使用 setTimeout 确保 DOM 已更新后再 resize
@@ -385,7 +420,6 @@ export default {
           this.regionBarChart && this.regionBarChart.resize()
         } else if (this.viewMode === 'province') {
           this.provinceBarChart && this.provinceBarChart.resize()
-          this.trendLineChart && this.trendLineChart.resize()
         }
       }, 50)
     },
@@ -413,7 +447,8 @@ export default {
       this.loadData()
     },
     async loadOverview(params) {
-      const res = await Request.get('/region-sales/overview', { params })
+      const merchantId = this.getMerchantId()
+      const res = await Request.get('/region-sales/overview', { params: { ...params, merchantId } })
       if (res.code === '0' && res.data) {
         this.overview = {
           totalSales: res.data.totalSales || 0,
@@ -424,7 +459,8 @@ export default {
       }
     },
     async loadProvinceData(params) {
-      const res = await Request.get('/region-sales/heatmap', { params })
+      const merchantId = this.getMerchantId()
+      const res = await Request.get('/region-sales/heatmap', { params: { ...params, merchantId } })
       if (res.code === '0' && res.data) {
         this.provinceData = res.data
           .filter(p => parseFloat(p.salesAmount) > 0)
@@ -439,7 +475,8 @@ export default {
       }
     },
     async loadRegionData(params) {
-      const res = await Request.get('/region-sales/distribution', { params })
+      const merchantId = this.getMerchantId()
+      const res = await Request.get('/region-sales/distribution', { params: { ...params, merchantId } })
       if (res.code === '0' && res.data) {
         // 计算总销售额
         const total = res.data.reduce((sum, r) => sum + parseFloat(r.salesAmount || 0), 0)
@@ -463,7 +500,6 @@ export default {
       } else if (this.viewMode === 'province') {
         this.ensureChartInited('province')
         this.renderProvinceBar()
-        this.renderTrendLine()
       }
     },
     onRegionChange() {
@@ -744,60 +780,6 @@ export default {
       }
 
       this.provinceBarChart.setOption(option)
-    },
-    // 渲染趋势线图
-    renderTrendLine() {
-      if (!this.trendLineChart) return
-
-      // 模拟7天趋势数据
-      const days = []
-      const values = []
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date()
-        d.setDate(d.getDate() - i)
-        days.push(`${d.getMonth() + 1}/${d.getDate()}`)
-        values.push(Math.random() * 10000 + 5000)
-      }
-
-      const option = {
-        tooltip: {
-          trigger: 'axis',
-          formatter: '{b}<br/>销售额: ¥{c}'
-        },
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          top: '10%',
-          containLabel: true
-        },
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: days
-        },
-        yAxis: {
-          type: 'value',
-          axisLabel: {
-            formatter: val => '¥' + (val / 1000).toFixed(0) + 'k'
-          }
-        },
-        series: [{
-          type: 'line',
-          data: values,
-          smooth: true,
-          areaStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: 'rgba(84, 112, 198, 0.4)' },
-              { offset: 1, color: 'rgba(84, 112, 198, 0.05)' }
-            ])
-          },
-          lineStyle: { color: '#5470c6', width: 2 },
-          itemStyle: { color: '#5470c6' }
-        }]
-      }
-
-      this.trendLineChart.setOption(option)
     },
     formatAmount(amount) {
       if (!amount) return '0.00'

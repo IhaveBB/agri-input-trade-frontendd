@@ -48,10 +48,12 @@
               <el-form-item label="邮箱" prop="email">
                 <el-input v-model="userInfo.email"></el-input>
               </el-form-item>
-              <el-form-item label="所在地区">
+              <el-form-item label="所在省份">
                 <div class="location-row">
-                  <el-select v-model="selectedRegion" placeholder="请选择所在地区" @change="onRegionChange" style="flex: 1">
-                    <el-option v-for="r in regionList" :key="r.id" :label="r.name" :value="r.name"></el-option>
+                  <el-select v-model="selectedProvince" placeholder="请选择所在省份" clearable @change="onProvinceChange" style="flex: 1">
+                    <el-option-group v-for="group in provinceGroups" :key="group.region" :label="group.region">
+                      <el-option v-for="p in group.provinces" :key="p" :label="p" :value="p"></el-option>
+                    </el-option-group>
                   </el-select>
                   <el-button type="text" icon="el-icon-aim" @click="autoLocate" :loading="locating">
                     自动定位
@@ -64,6 +66,16 @@
                   :options="cropOptions"
                   :props="cropProps"
                   placeholder="请选择关注的作物（可多选）"
+                  clearable
+                  style="width: 100%"
+                ></el-cascader>
+              </el-form-item>
+              <el-form-item label="关注动物">
+                <el-cascader
+                  v-model="selectedAnimals"
+                  :options="animalOptions"
+                  :props="cropProps"
+                  placeholder="请选择关注的动物（可多选）"
                   clearable
                   style="width: 100%"
                 ></el-cascader>
@@ -431,12 +443,23 @@ export default {
         ]
       },
       // 地区相关
-      regionList: [],
-      selectedRegion: '',
+      selectedProvince: '',
       locating: false,
+      provinceGroups: [
+        { region: '华北', provinces: ['北京', '天津', '河北', '山西', '内蒙古'] },
+        { region: '东北', provinces: ['辽宁', '吉林', '黑龙江'] },
+        { region: '华东', provinces: ['上海', '江苏', '浙江', '安徽', '福建', '江西', '山东'] },
+        { region: '华中', provinces: ['河南', '湖北', '湖南'] },
+        { region: '华南', provinces: ['广东', '广西', '海南'] },
+        { region: '西南', provinces: ['重庆', '四川', '贵州', '云南', '西藏'] },
+        { region: '西北', provinces: ['陕西', '甘肃', '青海', '宁夏', '新疆'] }
+      ],
       // 作物相关
       cropOptions: [],
       selectedCrops: [],
+      // 动物相关
+      animalOptions: [],
+      selectedAnimals: [],
       cropProps: {
         multiple: true,
         emitPath: false,
@@ -456,7 +479,6 @@ export default {
       this.userInfo = JSON.parse(userInfo)
       this.getUserInfo()
       this.getAddresses()
-      this.loadRegions()
       this.loadCropOptions()
     }
   },
@@ -477,9 +499,9 @@ export default {
         if (res.code === '0') {
           this.userInfo = res.data
           // 初始化地区选择（从location字段提取大区）
-          this.initSelectedRegion()
-          // 初始化关注作物
-          this.initSelectedCrops()
+          this.initSelectedProvince()
+          // 初始化关注动物
+          this.initSelectedAnimals()
         }
       } catch (error) {
         console.error('获取用户信息失败:', error)
@@ -487,27 +509,31 @@ export default {
       }
     },
 
-    initSelectedRegion() {
+    initSelectedProvince() {
       if (this.userInfo.location) {
-        // 如果已经是直接的大区名（华北、华东等），直接使用
-        const regions = ['华北', '东北', '华东', '华中', '华南', '西南', '西北']
-        if (regions.includes(this.userInfo.location)) {
-          this.selectedRegion = this.userInfo.location
+        // 如果是省份名称，直接使用
+        const allProvinces = this.provinceGroups.flatMap(g => g.provinces)
+        if (allProvinces.includes(this.userInfo.location)) {
+          this.selectedProvince = this.userInfo.location
           return
         }
-        // 否则从省份映射到大区
-        const province = this.userInfo.location.split('-')[0]
-        const regionMap = {
-          '北京': '华北', '天津': '华北', '河北': '华北', '山西': '华北', '内蒙古': '华北',
-          '辽宁': '东北', '吉林': '东北', '黑龙江': '东北',
-          '上海': '华东', '江苏': '华东', '浙江': '华东', '安徽': '华东', '福建': '华东', '江西': '华东', '山东': '华东',
-          '河南': '华中', '湖北': '华中', '湖南': '华中',
-          '广东': '华南', '广西': '华南', '海南': '华南',
-          '重庆': '西南', '四川': '西南', '贵州': '西南', '云南': '西南', '西藏': '西南',
-          '陕西': '西北', '甘肃': '西北', '青海': '西北', '宁夏': '西北', '新疆': '西北'
+        // 如果是大区名（兼容旧数据），无法反推省份，置空让用户重新选
+        const regions = ['华北', '东北', '华东', '华中', '华南', '西南', '西北']
+        if (regions.includes(this.userInfo.location)) {
+          this.selectedProvince = ''
+          return
         }
-        this.selectedRegion = regionMap[province] || ''
+        // 其他情况，尝试从省份映射
+        const province = this.userInfo.location.split('-')[0]
+        if (allProvinces.includes(province)) {
+          this.selectedProvince = province
+        }
       }
+    },
+
+    onProvinceChange(province) {
+      // 省份变更时更新location字段
+      this.userInfo.location = province || ''
     },
 
     initSelectedCrops() {
@@ -516,26 +542,20 @@ export default {
       }
     },
 
-    async loadRegions() {
-      try {
-        const res = await Request.get('/region/all')
-        if (res.code === '0') {
-          this.regionList = res.data || []
-        }
-      } catch (error) {
-        console.error('获取地区列表失败:', error)
-      }
-    },
-
     async loadCropOptions() {
       try {
         const res = await Request.get('/category/tree')
         if (res.code === '0' && res.data) {
-          // 从分类树中提取种子分类（一级ID=1）下的四级分类（具体作物）
+          // 从分类树中提取种子分类（一级ID=1）下的子分类作为作物选项
           this.cropOptions = this.extractCropOptions(res.data)
+          // 从分类树中提取畜禽分类下的子分类作为动物选项
+          const animalCategory = res.data.find(c => c.name === '畜禽')
+          if (animalCategory && animalCategory.children) {
+            this.animalOptions = animalCategory.children
+          }
         }
       } catch (error) {
-        console.error('获取作物分类失败:', error)
+        console.error('获取分类失败:', error)
       }
     },
 
@@ -546,9 +566,24 @@ export default {
       return seedCategory.children
     },
 
-    onRegionChange(regionName) {
-      // 地区变更时更新location字段（用大区名称作为location）
-      this.userInfo.location = regionName
+    initSelectedAnimals() {
+      if (this.userInfo.interestedAnimals) {
+        this.selectedAnimals = this.userInfo.interestedAnimals.split(',').map(id => Number(id))
+      }
+    },
+
+    async loadAnimalOptions() {
+      try {
+        const res = await Request.get('/category/tree')
+        if (res.code === '0' && res.data) {
+          const animalCategory = res.data.find(c => c.name === '畜禽')
+          if (animalCategory && animalCategory.children) {
+            this.animalOptions = animalCategory.children
+          }
+        }
+      } catch (error) {
+        console.error('获取动物分类失败:', error)
+      }
     },
 
     autoLocate() {
@@ -561,40 +596,27 @@ export default {
         async (position) => {
           try {
             const { latitude, longitude } = position.coords
-            // 使用 OpenStreetMap Nominatim 逆地理编码（免费，无需 key）
             const res = await fetch(
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=zh&zoom=5`
             )
             const data = await res.json()
             if (data && data.address) {
-              // 直辖市通过 ISO3166-2-lvl4 代码识别
               const isoCode = data.address['ISO3166-2-lvl4'] || ''
-              const municipalityProvinceMap = {
+              const municipalityMap = {
                 'CN-BJ': '北京', 'CN-SH': '上海', 'CN-TJ': '天津', 'CN-CQ': '重庆'
               }
-              let cleanProvince = municipalityProvinceMap[isoCode] || null
+              let cleanProvince = municipalityMap[isoCode] || null
               if (!cleanProvince) {
-                // 非直辖市，从 state 字段提取省份
                 const rawProvince = data.address.state || data.address.province || ''
                 cleanProvince = rawProvince.replace(/省|市|自治区|壮族|回族|维吾尔|特别行政区/g, '')
               }
-              const regionMap = {
-                '北京': '华北', '天津': '华北', '河北': '华北', '山西': '华北', '内蒙古': '华北',
-                '辽宁': '东北', '吉林': '东北', '黑龙江': '东北',
-                '上海': '华东', '江苏': '华东', '浙江': '华东', '安徽': '华东', '福建': '华东', '江西': '华东', '山东': '华东',
-                '河南': '华中', '湖北': '华中', '湖南': '华中',
-                '广东': '华南', '广西': '华南', '海南': '华南',
-                '重庆': '西南', '四川': '西南', '贵州': '西南', '云南': '西南', '西藏': '西南',
-                '陕西': '西北', '甘肃': '西北', '青海': '西北', '宁夏': '西北', '新疆': '西北',
-                '香港': '华南', '澳门': '华南', '台湾': '华东'
-              }
-              const region = regionMap[cleanProvince]
-              if (region) {
-                this.selectedRegion = region
-                this.userInfo.location = region
-                this.$message.success(`已定位到：${region}`)
+              const allProvinces = this.provinceGroups.flatMap(g => g.provinces)
+              if (allProvinces.includes(cleanProvince)) {
+                this.selectedProvince = cleanProvince
+                this.userInfo.location = cleanProvince
+                this.$message.success(`已定位到：${cleanProvince}`)
               } else {
-                this.$message.warning(`已定位到${cleanProvince || '未知位置'}，但无法匹配大区，请手动选择`)
+                this.$message.warning(`已定位到${cleanProvince || '未知位置'}，但无法匹配省份，请手动选择`)
               }
             } else {
               this.$message.warning('定位解析失败，请手动选择')
@@ -608,9 +630,9 @@ export default {
         (error) => {
           this.locating = false
           if (error.code === error.PERMISSION_DENIED) {
-            this.$message.warning('您拒绝了定位权限，请手动选择地区')
+            this.$message.warning('您拒绝了定位权限，请手动选择省份')
           } else {
-            this.$message.warning('定位失败，请手动选择地区')
+            this.$message.warning('定位失败，请手动选择省份')
           }
         },
         { timeout: 10000 }
@@ -712,8 +734,9 @@ export default {
             const data = {
               name: this.userInfo.name,
               email: this.userInfo.email,
-              location: this.userInfo.location || this.selectedRegion || '',
-              interestedCrops: this.selectedCrops.length > 0 ? this.selectedCrops.join(',') : ''
+              location: this.userInfo.location || this.selectedProvince || '',
+              interestedCrops: this.selectedCrops.length > 0 ? this.selectedCrops.join(',') : '',
+              interestedAnimals: this.selectedAnimals.length > 0 ? this.selectedAnimals.join(',') : ''
             }
             const res = await Request.put(`/user/${this.userInfo.id}`, data)
             if (res.code === '0') {

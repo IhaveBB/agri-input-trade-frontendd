@@ -5,7 +5,13 @@
       <div class="header-left">
         <h2 class="page-title">库存预警</h2>
         <p class="page-subtitle">
-          <span v-if="isAdmin">管理员视图 - 查看全平台库存预警</span>
+          <span v-if="isAdmin">
+            管理员视图
+            <el-select v-model="selectedMerchantId" placeholder="全部店铺" size="mini" style="width: 150px; margin-left: 8px;" @change="handleMerchantChange">
+              <el-option label="全平台" :value="null" />
+              <el-option v-for="m in merchantList" :key="m.id" :label="m.name || m.username" :value="m.id" />
+            </el-select>
+          </span>
           <span v-else-if="isMerchant">商户视图 - 查看您的商品库存状态</span>
           <span v-else>数据更新时间: {{ lastUpdateTime }}</span>
         </p>
@@ -290,6 +296,7 @@ import {
   updateProductConfig,
   batchToggleProductAlert
 } from '@/api/stockWarning'
+import { getMerchantList } from '@/api/statistics'
 
 export default {
   name: 'StockWarning',
@@ -311,6 +318,8 @@ export default {
         safeStockCount: 0
       },
       warnings: [],
+      merchantList: [],
+      selectedMerchantId: null,
       pieChart: null,
       barChart: null,
       // 预警配置相关
@@ -348,6 +357,7 @@ export default {
   },
   mounted() {
     this.checkUserRole()
+    this.fetchMerchantListForAdmin()
     this.initCharts()
     this.loadData()
     window.addEventListener('resize', this.handleResize)
@@ -365,6 +375,20 @@ export default {
         this.isAdmin = user.role === 'ADMIN' || user.role === 'SUPER_ADMIN'
         this.isMerchant = user.role === 'MERCHANT'
       }
+    },
+    async fetchMerchantListForAdmin() {
+      if (!this.isAdmin) return
+      try {
+        const res = await getMerchantList()
+        if (res.code === '0') {
+          this.merchantList = res.data || []
+        }
+      } catch (error) {
+        console.error('获取商户列表失败:', error)
+      }
+    },
+    handleMerchantChange() {
+      this.loadData()
     },
     // 初始化图表
     initCharts() {
@@ -414,7 +438,8 @@ export default {
     },
     // 获取概览数据
     async fetchOverview() {
-      const res = await getStockOverview()
+      const merchantId = this.isAdmin ? this.selectedMerchantId : null
+      const res = await getStockOverview(merchantId)
       if (res.code === '0' && res.data) {
         this.overview = res.data
         this.renderPieChart()
@@ -424,7 +449,7 @@ export default {
     async fetchWarnings() {
       let res
       if (this.isAdmin) {
-        res = await getAllStockWarnings()
+        res = await getAllStockWarnings(this.selectedMerchantId)
       } else {
         res = await getMerchantStockWarnings()
       }

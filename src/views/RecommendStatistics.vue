@@ -7,6 +7,12 @@
         <p class="page-subtitle">智能推荐系统运行状况监控</p>
       </div>
       <div class="header-right">
+        <span v-if="isAdmin && merchantList.length > 0" style="margin-right: 12px;">
+          <el-select v-model="selectedMerchantId" placeholder="全部店铺" size="small" style="width: 150px;" @change="handleMerchantChange">
+            <el-option label="全平台" :value="null" />
+            <el-option v-for="m in merchantList" :key="m.id" :label="m.name || m.username" :value="m.id" />
+          </el-select>
+        </span>
         <el-button icon="el-icon-refresh" circle @click="refreshData" :loading="loading"></el-button>
       </div>
     </div>
@@ -212,7 +218,8 @@ import {
   getRecommendationDiversity,
   getUserSimilarityDistribution,
   getOptimizationSuggestions,
-  predictNextPeriodEffect
+  predictNextPeriodEffect,
+  getMerchantList
 } from '@/api/statistics'
 
 export default {
@@ -223,6 +230,10 @@ export default {
   data() {
     return {
       loading: false,
+      isAdmin: false,
+      isMerchant: false,
+      merchantList: [],
+      selectedMerchantId: null,
       activeTrendTab: 30,
       trendTabs: [
         { label: '近7天', value: 7 },
@@ -252,6 +263,7 @@ export default {
     }
   },
   mounted() {
+    this.checkUserRole()
     this.initCharts()
     this.loadData()
     window.addEventListener('resize', this.handleResize)
@@ -261,6 +273,39 @@ export default {
     window.removeEventListener('resize', this.handleResize)
   },
   methods: {
+    checkUserRole() {
+      const userStr = localStorage.getItem('backUser')
+      if (userStr) {
+        const user = JSON.parse(userStr)
+        this.isAdmin = user.role === 'ADMIN' || user.role === 'SUPER_ADMIN'
+        this.isMerchant = user.role === 'MERCHANT'
+        if (this.isMerchant) {
+          this.selectedMerchantId = user.id
+        }
+      }
+      if (this.isAdmin) {
+        this.fetchMerchantList()
+      }
+    },
+    async fetchMerchantList() {
+      try {
+        const res = await getMerchantList()
+        if (res.code === '0') {
+          this.merchantList = res.data || []
+        }
+      } catch (error) {
+        console.error('获取商户列表失败:', error)
+      }
+    },
+    handleMerchantChange() {
+      this.loadData()
+    },
+    getMerchantId() {
+      if (this.isMerchant) {
+        return this.selectedMerchantId
+      }
+      return this.isAdmin ? this.selectedMerchantId : null
+    },
     // 格式化比率（去掉%符号）
     formatRate(value) {
       if (!value) return '0'
@@ -353,13 +398,15 @@ export default {
     },
     // API 调用
     async fetchOverview() {
-      const res = await getRecommendOverview()
+      const merchantId = this.getMerchantId()
+      const res = await getRecommendOverview(merchantId)
       if (res.code === '0' && res.data) {
         this.overviewData = res.data
       }
     },
     async fetchTrend() {
-      const res = await getRecommendTrend(this.activeTrendTab)
+      const merchantId = this.getMerchantId()
+      const res = await getRecommendTrend(this.activeTrendTab, merchantId)
       if (res.code === '0' && res.data) {
         // 后端返回的是 trend 数组，每个元素包含 date, exposureCount, clickCount, buyCount
         this.trendData = res.data.trend || []
@@ -367,28 +414,32 @@ export default {
       }
     },
     async fetchCategoryEffect() {
-      const res = await getCategoryEffect()
+      const merchantId = this.getMerchantId()
+      const res = await getCategoryEffect(merchantId)
       if (res.code === '0' && res.data) {
         this.categoryEffectData = res.data.categoryEffect || []
         this.renderCategoryEffectChart()
       }
     },
     async fetchAlgorithm() {
-      const res = await getAlgorithmComposition()
+      const merchantId = this.getMerchantId()
+      const res = await getAlgorithmComposition(merchantId)
       if (res.code === '0' && res.data) {
         this.algorithmData = res.data
         this.renderAlgorithmChart()
       }
     },
     async fetchDiversity() {
-      const res = await getRecommendationDiversity()
+      const merchantId = this.getMerchantId()
+      const res = await getRecommendationDiversity(merchantId)
       if (res.code === '0' && res.data) {
         this.diversityData = res.data
         this.renderGaugeChart()
       }
     },
     async fetchSimilarity() {
-      const res = await getUserSimilarityDistribution()
+      const merchantId = this.getMerchantId()
+      const res = await getUserSimilarityDistribution(merchantId)
       if (res.code === '0' && res.data) {
         this.similarityData = res.data
         this.renderSimilarityChart()
@@ -398,7 +449,8 @@ export default {
       this.suggestionsLoading = true
       this.suggestionsError = false
       try {
-        const res = await getOptimizationSuggestions()
+        const merchantId = this.getMerchantId()
+        const res = await getOptimizationSuggestions(merchantId)
         if (res.code === '0' && res.data) {
           this.suggestions = res.data.suggestions || res.data || []
         } else {
@@ -412,7 +464,8 @@ export default {
       }
     },
     async fetchPrediction() {
-      const res = await predictNextPeriodEffect()
+      const merchantId = this.getMerchantId()
+      const res = await predictNextPeriodEffect(merchantId)
       if (res.code === '0' && res.data) {
         this.predictionData = res.data
         this.renderPredictionChart()

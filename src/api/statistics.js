@@ -61,42 +61,42 @@ export function getMerchantList() {
 
 // ==================== 推荐系统效果评估接口 ====================
 
-// 获取推荐系统效果概览
-export function getRecommendOverview() {
-  return request({ url: '/statistics/recommend/overview', method: 'get' })
+// 获取推荐系统效果概览（支持 merchantId，管理员可查看指定商户数据）
+export function getRecommendOverview(merchantId) {
+  return request({ url: '/statistics/recommend/overview', method: 'get', params: { merchantId } })
 }
 
-// 获取推荐效果趋势
-export function getRecommendTrend(days = 30) {
-  return request({ url: '/statistics/recommend/trend', method: 'get', params: { days } })
+// 获取推荐效果趋势（支持 merchantId，管理员可查看指定商户数据）
+export function getRecommendTrend(days = 30, merchantId) {
+  return request({ url: '/statistics/recommend/trend', method: 'get', params: { days, merchantId } })
 }
 
-// 获取分类推荐效果
-export function getCategoryEffect() {
-  return request({ url: '/statistics/recommend/category-effect', method: 'get' })
+// 获取分类推荐效果（支持 merchantId，管理员可查看指定商户数据）
+export function getCategoryEffect(merchantId) {
+  return request({ url: '/statistics/recommend/category-effect', method: 'get', params: { merchantId } })
 }
 
-// 获取推荐算法构成
-export function getAlgorithmComposition() {
-  return request({ url: '/statistics/recommend/algorithm-composition', method: 'get' })
+// 获取推荐算法构成（支持 merchantId，管理员可查看指定商户数据）
+export function getAlgorithmComposition(merchantId) {
+  return request({ url: '/statistics/recommend/algorithm-composition', method: 'get', params: { merchantId } })
 }
 
-// 获取推荐多样性指标
-export function getRecommendationDiversity() {
-  return request({ url: '/statistics/recommend/diversity', method: 'get' })
+// 获取推荐多样性指标（支持 merchantId，管理员可查看指定商户数据）
+export function getRecommendationDiversity(merchantId) {
+  return request({ url: '/statistics/recommend/diversity', method: 'get', params: { merchantId } })
 }
 
-// 获取用户行为相似度分布
-export function getUserSimilarityDistribution() {
-  return request({ url: '/statistics/recommend/user-similarity', method: 'get' })
+// 获取用户行为相似度分布（支持 merchantId，管理员可查看指定商户数据）
+export function getUserSimilarityDistribution(merchantId) {
+  return request({ url: '/statistics/recommend/user-similarity', method: 'get', params: { merchantId } })
 }
 
-// 获取智能优化建议
-export function getOptimizationSuggestions() {
-  return request({ url: '/statistics/recommend/suggestions', method: 'get' })
+// 获取智能优化建议（支持 merchantId，管理员可查看指定商户数据）
+export function getOptimizationSuggestions(merchantId) {
+  return request({ url: '/statistics/recommend/suggestions', method: 'get', params: { merchantId } })
 }
 
-// 预测下期推荐效果
-export function predictNextPeriodEffect() {
-  return request({ url: '/statistics/recommend/prediction', method: 'get' })
+// 预测下期推荐效果（支持 merchantId，管理员可查看指定商户数据）
+export function predictNextPeriodEffect(merchantId) {
+  return request({ url: '/statistics/recommend/prediction', method: 'get', params: { merchantId } })
 }

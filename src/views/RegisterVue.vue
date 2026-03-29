@@ -66,17 +66,22 @@
                     </el-select>
                 </el-form-item>
 
-                <!-- 普通用户/商户显示地理位置选择 -->
-                <el-form-item v-if="registerForm.role === 'USER' || registerForm.role === 'MERCHANT'" label="所在省份">
-                    <el-select
-                        v-model="registerForm.province"
-                        placeholder="请选择所在省份（可选）"
-                        clearable
-                        style="width: 100%">
-                        <el-option-group v-for="group in provinceGroups" :key="group.region" :label="group.region">
-                            <el-option v-for="p in group.provinces" :key="p" :label="p" :value="p"></el-option>
-                        </el-option-group>
-                    </el-select>
+                <!-- 普通用户显示地理位置选择 -->
+                <el-form-item v-if="registerForm.role === 'USER'" label="所在省份">
+                    <div style="display: flex; gap: 12px;">
+                        <el-select
+                            v-model="registerForm.province"
+                            placeholder="请选择所在省份（可选）"
+                            clearable
+                            style="flex: 1">
+                            <el-option-group v-for="group in provinceGroups" :key="group.region" :label="group.region">
+                                <el-option v-for="p in group.provinces" :key="p" :label="p" :value="p"></el-option>
+                            </el-option-group>
+                        </el-select>
+                        <el-button type="text" icon="el-icon-aim" @click="autoLocate" :loading="locating">
+                            定位
+                        </el-button>
+                    </div>
                     <div class="form-tip">填写省份可帮助系统为您推荐当地适用的农资商品</div>
                 </el-form-item>
 
@@ -91,6 +96,19 @@
                         style="width: 100%">
                     </el-cascader>
                     <div class="form-tip">选择作物可帮助我们为您推荐更精准的农资商品</div>
+                </el-form-item>
+
+                <!-- 普通用户显示感兴趣动物选择 -->
+                <el-form-item v-if="registerForm.role === 'USER'" label="养殖动物">
+                    <el-cascader
+                        v-model="registerForm.interestedAnimalIds"
+                        :options="animalTree"
+                        :props="{ value: 'id', label: 'name', children: 'children', multiple: true, emitPath: false }"
+                        placeholder="请选择您养殖的动物（可选）"
+                        clearable
+                        style="width: 100%">
+                    </el-cascader>
+                    <div class="form-tip">选择养殖动物可帮助我们为您推荐饲料、兽药等商品</div>
                 </el-form-item>
 
                 <el-form-item prop="invitationCode" v-if="registerForm.role === 'ADMIN'">
@@ -152,6 +170,7 @@ export default {
             disabled: false,
             timer: null,
             buttonContent: '发送验证码',
+            locating: false,
             registerForm: {
                 username: '',
                 password: '',
@@ -162,9 +181,11 @@ export default {
                 status: 1,
                 invitationCode: '', // 添加邀请码字段
                 interestedCropIds: [], // 感兴趣作物ID列表
+                interestedAnimalIds: [], // 感兴趣动物ID列表
                 province: '' // 所在省份
             },
             cropTree: [], // 作物分类树
+            animalTree: [], // 动物分类树
             provinceGroups: [
                 { region: '华北', provinces: ['北京', '天津', '河北', '山西', '内蒙古'] },
                 { region: '东北', provinces: ['辽宁', '吉林', '黑龙江'] },
@@ -209,19 +230,77 @@ export default {
         // 加载作物分类树（种子分类下的四级分类）
         async loadCropTree() {
             try {
-                // 获取分类树，然后提取种子分类（id=1）下的子分类
+                // 获取分类树
                 const res = await request.get('/category/tree');
                 if (res.code === '0' && res.data) {
+                    // 提取种子分类（id=1）下的子分类作为作物选项
                     const seedCategory = res.data.find(c => c.id === 1);
                     if (seedCategory && seedCategory.children) {
-                        // 只取种子分类下的子分类作为作物选项
                         this.cropTree = seedCategory.children;
+                    }
+                    // 提取畜禽分类下的子分类作为动物选项
+                    const animalCategory = res.data.find(c => c.name === '畜禽');
+                    if (animalCategory && animalCategory.children) {
+                        this.animalTree = animalCategory.children;
                     }
                 }
             } catch (error) {
-                console.error('加载作物分类失败:', error);
+                console.error('加载分类失败:', error);
             }
         },
+        autoLocate() {
+            if (!navigator.geolocation) {
+                this.$message.warning('您的浏览器不支持定位功能');
+                return;
+            }
+            this.locating = true;
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    try {
+                        const { latitude, longitude } = position.coords;
+                        const res = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=zh&zoom=5`
+                        );
+                        const data = await res.json();
+                        if (data && data.address) {
+                            const isoCode = data.address['ISO3166-2-lvl4'] || '';
+                            const municipalityMap = {
+                                'CN-BJ': '北京', 'CN-SH': '上海', 'CN-TJ': '天津', 'CN-CQ': '重庆'
+                            };
+                            let cleanProvince = municipalityMap[isoCode] || null;
+                            if (!cleanProvince) {
+                                const rawProvince = data.address.state || data.address.province || '';
+                                cleanProvince = rawProvince.replace(/省|市|自治区|壮族|回族|维吾尔|特别行政区/g, '');
+                            }
+                            // 验证省份是否在可选列表中
+                            const allProvinces = this.provinceGroups.flatMap(g => g.provinces);
+                            if (allProvinces.includes(cleanProvince)) {
+                                this.registerForm.province = cleanProvince;
+                                this.$message.success(`已定位到：${cleanProvince}`);
+                            } else {
+                                this.$message.warning(`已定位到${cleanProvince || '未知位置'}，但无法匹配省份，请手动选择`);
+                            }
+                        } else {
+                            this.$message.warning('定位解析失败，请手动选择');
+                        }
+                    } catch (e) {
+                        this.$message.warning('定位解析失败，请手动选择');
+                    } finally {
+                        this.locating = false;
+                    }
+                },
+                (error) => {
+                    this.locating = false;
+                    if (error.code === error.PERMISSION_DENIED) {
+                        this.$message.warning('您拒绝了定位权限，请手动选择省份');
+                    } else {
+                        this.$message.warning('定位失败，请手动选择省份');
+                    }
+                },
+                { timeout: 10000 }
+            );
+        },
+
         sendVerificationCode() {
             if (this.disabled) return;
 
@@ -276,12 +355,16 @@ export default {
                         return;
                     }
 
-                    // 构建提交数据，转换感兴趣作物为逗号分隔字符串
+                    // 构建提交数据，转换感兴趣作物/动物为逗号分隔字符串
                     const submitData = { ...this.registerForm };
                     if (submitData.interestedCropIds && submitData.interestedCropIds.length > 0) {
                         submitData.interestedCrops = submitData.interestedCropIds.join(',');
                     }
+                    if (submitData.interestedAnimalIds && submitData.interestedAnimalIds.length > 0) {
+                        submitData.interestedAnimals = submitData.interestedAnimalIds.join(',');
+                    }
                     delete submitData.interestedCropIds; // 删除临时字段
+                    delete submitData.interestedAnimalIds; // 删除临时字段
                     // 将省份转换为 location 字段格式（省份-省会城市）
                     if (submitData.province) {
                         submitData.location = submitData.province;
