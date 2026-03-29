@@ -92,9 +92,6 @@
                 <div class="balance-label">当前余额</div>
                 <div class="balance-amount">¥ {{ formatBalance(balance) }}</div>
               </div>
-              <el-button type="primary" class="recharge-btn" icon="el-icon-plus" @click="showRechargeDialog">
-                充值
-              </el-button>
             </div>
 
             <!-- 充值记录 -->
@@ -262,7 +259,7 @@
     </div>
 
     <!-- 地址编辑对话框 -->
-    <el-dialog :title="dialogType === 'add' ? '新增地址' : '编辑地址'" :visible.sync="addressDialogVisible" width="500px" :close-on-click-modal="false">
+    <el-dialog :title="dialogType === 'add' ? '新增地址' : '编辑地址'" :visible.sync="addressDialogVisible" width="560px" :close-on-click-modal="false">
       <el-form :model="addressForm" :rules="addressRules" ref="addressForm" label-width="100px">
         <el-form-item label="收货人" prop="receiver">
           <el-input v-model="addressForm.receiver" placeholder="请输入收货人姓名"></el-input>
@@ -270,12 +267,28 @@
         <el-form-item label="手机号码" prop="phone">
           <el-input v-model="addressForm.phone" placeholder="请输入手机号码"></el-input>
         </el-form-item>
-        <el-form-item label="详细地址" prop="address">
-          <el-input 
-            type="textarea" 
-            v-model="addressForm.address"
-            placeholder="请输入详细地址，如：xx省xx市xx区xx街道xx号"
-            :rows="3"
+        <el-form-item label="所在地区" prop="region">
+          <div class="region-row">
+            <el-cascader
+              v-model="addressForm.region"
+              :options="areaOptions"
+              :props="{ value: 'value', label: 'label', children: 'children' }"
+              placeholder="请选择省/市/区"
+              filterable
+              clearable
+              style="flex: 1"
+            ></el-cascader>
+            <el-button type="text" icon="el-icon-aim" @click="addressAutoLocate" :loading="addressLocating">
+              定位
+            </el-button>
+          </div>
+        </el-form-item>
+        <el-form-item label="详细地址" prop="detail">
+          <el-input
+            v-model="addressForm.detail"
+            placeholder="请输入详细地址，如：xx街道xx小区xx栋xx号"
+            :rows="2"
+            type="textarea"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -322,6 +335,7 @@
 import FrontHeader from '@/components/front/FrontHeader.vue'
 import FrontFooter from '@/components/front/FrontFooter.vue'
 import Request from '@/utils/request'
+import { areaOptions } from '@/data/area-data'
 
 export default {
   name: 'UserCenter',
@@ -348,11 +362,15 @@ export default {
       addresses: [],
       addressDialogVisible: false,
       dialogType: 'add',
+      areaOptions: areaOptions,
+      addressLocating: false,
       addressForm: {
         id: '',
         receiver: '',
         phone: '',
-        address: '',
+        region: [],
+        detail: '',
+        address: ''
       },
       addressRules: {
         receiver: [{ required: true, message: '请输入收货人姓名', trigger: 'blur' }],
@@ -360,7 +378,8 @@ export default {
           { required: true, message: '请输入手机号码', trigger: 'blur' },
           { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
         ],
-        address: [{ required: true, message: '请输入详细地址', trigger: 'blur' }]
+        region: [{ required: true, type: 'array', message: '请选择所在地区', trigger: 'change' }],
+        detail: [{ required: true, message: '请输入详细地址', trigger: 'blur' }]
       },
       passwordForm: {
         oldPassword: '',
@@ -548,9 +567,17 @@ export default {
             )
             const data = await res.json()
             if (data && data.address) {
-              // 从返回地址中提取省份（直辖市在city字段，省份在state字段）
-              const rawProvince = data.address.state || data.address.province || data.address.city || data.name || ''
-              const cleanProvince = rawProvince.replace(/省|市|自治区|壮族|回族|维吾尔|特别行政区/g, '')
+              // 直辖市通过 ISO3166-2-lvl4 代码识别
+              const isoCode = data.address['ISO3166-2-lvl4'] || ''
+              const municipalityProvinceMap = {
+                'CN-BJ': '北京', 'CN-SH': '上海', 'CN-TJ': '天津', 'CN-CQ': '重庆'
+              }
+              let cleanProvince = municipalityProvinceMap[isoCode] || null
+              if (!cleanProvince) {
+                // 非直辖市，从 state 字段提取省份
+                const rawProvince = data.address.state || data.address.province || ''
+                cleanProvince = rawProvince.replace(/省|市|自治区|壮族|回族|维吾尔|特别行政区/g, '')
+              }
               const regionMap = {
                 '北京': '华北', '天津': '华北', '河北': '华北', '山西': '华北', '内蒙古': '华北',
                 '辽宁': '东北', '吉林': '东北', '黑龙江': '东北',
@@ -567,7 +594,7 @@ export default {
                 this.userInfo.location = region
                 this.$message.success(`已定位到：${region}`)
               } else {
-                this.$message.warning(`已定位到${cleanProvince || '未知位置'}，但无法匹配地区，请手动选择`)
+                this.$message.warning(`已定位到${cleanProvince || '未知位置'}，但无法匹配大区，请手动选择`)
               }
             } else {
               this.$message.warning('定位解析失败，请手动选择')
@@ -580,6 +607,94 @@ export default {
         },
         (error) => {
           this.locating = false
+          if (error.code === error.PERMISSION_DENIED) {
+            this.$message.warning('您拒绝了定位权限，请手动选择地区')
+          } else {
+            this.$message.warning('定位失败，请手动选择地区')
+          }
+        },
+        { timeout: 10000 }
+      )
+    },
+
+    /**
+     * 地址编辑对话框中的自动定位
+     * 使用 Nominatim 获取省市信息，填充到级联选择器
+     * @author IhaveBB
+     * @date 2026/03/29
+     */
+    addressAutoLocate() {
+      if (!navigator.geolocation) {
+        this.$message.warning('您的浏览器不支持定位功能')
+        return
+      }
+      this.addressLocating = true
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=zh&zoom=10`
+            )
+            const data = await res.json()
+            if (data && data.address) {
+              // 直辖市（北京/上海/天津/重庆）通过 ISO3166-2-lvl4 代码识别
+              const isoCode = data.address['ISO3166-2-lvl4'] || ''
+              const municipalityMap = {
+                'CN-BJ': '北京', 'CN-SH': '上海', 'CN-TJ': '天津', 'CN-CQ': '重庆'
+              }
+              let standardProvince = municipalityMap[isoCode] || null
+              let rawCity = data.address.city || data.address.town || data.address.county || ''
+
+              // 非直辖市，从 state 字段提取省份
+              if (!standardProvince) {
+                const rawProvince = data.address.state || data.address.province || ''
+                for (const province of areaOptions) {
+                  const names = [province.value, province.value + '省', province.value + '市',
+                    province.value + '自治区', province.value + '壮族自治区', province.value + '回族自治区',
+                    province.value + '维吾尔自治区', province.value + '特别行政区']
+                  if (names.some(n => rawProvince.startsWith(n))) {
+                    standardProvince = province.value
+                    break
+                  }
+                }
+                if (!standardProvince) {
+                  this.$message.warning('定位到：' + rawProvince + '，无法匹配省份，请手动选择')
+                  return
+                }
+              }
+
+              // 匹配城市/区
+              let standardCity = null
+              const provinceData = areaOptions.find(p => p.value === standardProvince)
+              if (provinceData && provinceData.children) {
+                for (const city of provinceData.children) {
+                  const cityNames = [city.value, city.value + '市', city.value + '区',
+                    city.value + '自治州', city.value + '盟', city.value + '地区']
+                  if (cityNames.some(cn => rawCity.startsWith(cn) || rawCity.includes(cn))) {
+                    standardCity = city.value
+                    break
+                  }
+                }
+              }
+
+              if (standardCity) {
+                this.$set(this.addressForm, 'region', [standardProvince, standardCity])
+              } else {
+                this.$set(this.addressForm, 'region', [standardProvince])
+              }
+              this.$message.success('已定位到：' + standardProvince + (standardCity ? ' ' + standardCity : ''))
+            } else {
+              this.$message.warning('定位解析失败，请手动选择')
+            }
+          } catch (e) {
+            this.$message.warning('定位解析失败，请手动选择')
+          } finally {
+            this.addressLocating = false
+          }
+        },
+        (error) => {
+          this.addressLocating = false
           if (error.code === error.PERMISSION_DENIED) {
             this.$message.warning('您拒绝了定位权限，请手动选择地区')
           } else {
@@ -631,27 +746,93 @@ export default {
       this.dialogType = type
       this.addressDialogVisible = true
       if (type === 'edit' && address) {
+        // 尝试从已有地址中解析出省/市和详细地址
+        const parsed = this.parseAddressToRegion(address.address)
         this.addressForm = {
           id: address.id,
           receiver: address.receiver,
           phone: address.phone,
+          region: parsed.region,
+          detail: parsed.detail,
           address: address.address
         }
       } else {
         this.addressForm = {
           receiver: '',
           phone: '',
+          region: [],
+          detail: '',
           address: ''
         }
       }
+      this.$nextTick(() => {
+        if (this.$refs.addressForm) {
+          this.$refs.addressForm.clearValidate()
+        }
+      })
+    },
+
+    /**
+     * 解析已有地址字符串为省/市和详细地址
+     * @param address 完整地址字符串
+     * @returns {{ region: string[], detail: string }}
+     * @author IhaveBB
+     * @date 2026/03/29
+     */
+    parseAddressToRegion(address) {
+      if (!address) return { region: [], detail: '' }
+      // 遍历省份数据尝试匹配
+      for (const province of areaOptions) {
+        // 构建带后缀的匹配模式
+        const provinceNames = [province.value, province.value + '省', province.value + '市',
+          province.value + '自治区', province.value + '壮族自治区', province.value + '回族自治区',
+          province.value + '维吾尔自治区', province.value + '特别行政区']
+        let matchedProvinceName = null
+        for (const pn of provinceNames) {
+          if (address.startsWith(pn)) {
+            matchedProvinceName = pn
+            break
+          }
+        }
+        if (!matchedProvinceName) continue
+
+        // 匹配到省份，继续匹配城市
+        const remaining = address.substring(matchedProvinceName.length)
+        for (const city of province.children) {
+          const cityNames = [city.value, city.value + '市', city.value + '区', city.value + '州',
+            city.value + '盟', city.value + '地区', city.value + '自治州']
+          let matchedCityName = null
+          for (const cn of cityNames) {
+            if (remaining.startsWith(cn)) {
+              matchedCityName = cn
+              break
+            }
+          }
+          if (matchedCityName) {
+            return {
+              region: [province.value, city.value],
+              detail: remaining.substring(matchedCityName.length)
+            }
+          }
+        }
+        // 匹配到省份但没匹配到城市
+        return { region: [province.value], detail: remaining }
+      }
+      // 完全无法匹配
+      return { region: [], detail: address }
     },
 
     async saveAddress() {
       try {
         await this.$refs.addressForm.validate()
         const userId = this.currentUser.id
+        // 拼接完整地址
+        const fullAddress = (this.addressForm.region || []).join('') + this.addressForm.detail
         const addressData = {
-          ...this.addressForm,
+          id: this.addressForm.id,
+          receiver: this.addressForm.receiver,
+          phone: this.addressForm.phone,
+          address: fullAddress,
           userId,
         }
 
@@ -1010,6 +1191,20 @@ export default {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.region-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.region-row .el-cascader {
+  flex: 1;
+}
+
+.region-row .el-button {
+  white-space: nowrap;
 }
 
 .location-row .el-select {
