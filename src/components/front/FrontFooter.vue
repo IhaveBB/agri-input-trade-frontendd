@@ -46,8 +46,8 @@ export default {
 
 <style scoped>
 .front-footer {
-  background: linear-gradient(to bottom, #fff, #f8faf5);
-  padding: 24px 0 16px;
+  background: linear-gradient(to bottom, #f8faf5, #f0f4ec);
+  padding: 28px 0 18px;
   margin-top: 40px;
   position: relative;
   overflow: hidden;
@@ -58,9 +58,9 @@ export default {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: 
-    radial-gradient(circle at 0% 0%, rgba(44, 150, 120,0.03) 0%, transparent 50%),
-    radial-gradient(circle at 100% 0%, rgba(44, 150, 120,0.03) 0%, transparent 50%);
+  background-image:
+    radial-gradient(circle at 0% 0%, rgba(44, 150, 120,0.04) 0%, transparent 50%),
+    radial-gradient(circle at 100% 0%, rgba(44, 150, 120,0.04) 0%, transparent 50%);
   opacity: 0.8;
   z-index: 0;
 }

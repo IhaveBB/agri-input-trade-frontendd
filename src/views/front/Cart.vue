@@ -35,7 +35,7 @@
                   <el-checkbox v-model="item.selected" @change="handleItemSelect"></el-checkbox>
 
                   <div class="product-info">
-                    <el-image :src="'api'+item.product.imageUrl" fit="cover" class="product-image" @click="$router.push(`/product/${item.product.id}`)">
+                    <el-image :src="getProductImage(item.product)" fit="cover" class="product-image" @click="$router.push(`/product/${item.product.id}`)">
                       <div slot="error" class="image-slot">
                         <i class="el-icon-picture-outline"></i>
                       </div>
@@ -121,6 +121,7 @@
 import FrontHeader from '@/components/front/FrontHeader.vue'
 import FrontFooter from '@/components/front/FrontFooter.vue'
 import Request from '@/utils/request'
+import { getProductImageSrc } from '@/utils/productImage'
 
 export default {
   name: 'Cart',
@@ -182,6 +183,9 @@ export default {
     this.getAddresses()
   },
   methods: {
+    getProductImage(product) {
+      return getProductImageSrc(product)
+    },
     formatAddress(addr) {
       return `${addr.phone} ${addr.address}`
     },

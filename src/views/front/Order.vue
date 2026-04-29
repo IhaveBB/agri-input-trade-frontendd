@@ -41,7 +41,7 @@
             <!-- 修改订单商品和收货信息的布局 -->
             <div class="order-products">
               <div class="product-info">
-                <el-image :src="order.product.imageUrl?.startsWith('http') ? order.product.imageUrl : `/api${order.product.imageUrl}`" fit="cover"
+                <el-image :src="getProductImage(order.product)" fit="cover"
                   class="product-image">
                   <div slot="error" class="image-slot">
                     <i class="el-icon-picture-outline"></i>
@@ -266,7 +266,7 @@
     <!-- 修改评价对话框 -->
     <el-dialog title="商品评价" :visible.sync="reviewDialogVisible" width="500px">
       <div v-if="currentOrder" class="review-product-info">
-        <el-image :src="currentOrder.product.imageUrl?.startsWith('http') ? currentOrder.product.imageUrl : `/api${currentOrder.product.imageUrl}`" fit="cover"
+        <el-image :src="getProductImage(currentOrder.product)" fit="cover"
           class="review-product-image">
         </el-image>
         <div class="review-product-detail">
@@ -381,6 +381,7 @@ import FrontHeader from '@/components/front/FrontHeader.vue'
 import FrontFooter from '@/components/front/FrontFooter.vue'
 import Request from '@/utils/request'
 import { formatTime } from '@/utils/time'
+import { getProductImageSrc } from '@/utils/productImage'
 
 export default {
   name: 'Order',
@@ -486,6 +487,9 @@ export default {
       }
     },
     formatTime,
+    getProductImage(product) {
+      return getProductImageSrc(product || {})
+    },
     async getOrders() {
       this.isLogin()
       this.loading = true

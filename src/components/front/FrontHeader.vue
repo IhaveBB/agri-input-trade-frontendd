@@ -161,8 +161,9 @@ export default {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
   height: 60px;
   border-bottom: 2px solid #2c9678;
 }
@@ -187,8 +188,12 @@ export default {
   font-weight: 600;
   padding: 4px 8px;
   border-radius: 6px;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s ease;
   flex-shrink: 0;
+}
+
+.logo-area:hover {
+  background: rgba(44, 150, 120, 0.06);
 }
 
 .logo-area:hover {

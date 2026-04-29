@@ -67,7 +67,7 @@
               <div v-loading="productsLoading">
                 <div v-for="product in products" :key="product.id" class="product-item">
                   <div class="product-image">
-                    <img :src="getImageSrc(product.imageUrl)" :alt="product.name" @click="goToProduct(product.id)" />
+                    <img :src="getProductImage(product)" :alt="product.name" @click="goToProduct(product.id)" />
                   </div>
                   <div class="product-info">
                     <h3 class="product-name" @click="goToProduct(product.id)">{{ product.name }}</h3>
@@ -153,6 +153,7 @@ import FrontHeader from '@/components/front/FrontHeader.vue'
 import FrontFooter from '@/components/front/FrontFooter.vue'
 import { getShopInfo, getShopProducts, getShopReviews, getShopStatistics } from '@/api/shop'
 import Request from '@/utils/request'
+import { getProductImageSrc, normalizeImageUrl } from '@/utils/productImage'
 
 export default {
   name: 'ShopPage',
@@ -278,12 +279,12 @@ export default {
       // 移除 <p> 标签，保留内部内容
       return content.replace(/<p[^>]*>/g, '').replace(/<\/p>/g, '<br/>')
     },
+    getProductImage(product) {
+      return getProductImageSrc(product)
+    },
     // 处理图片 src，如果是 base64 则直接使用，否则添加 api 前缀
     getImageSrc(url) {
-      if (!url) return '/placeholder.png'
-      if (url.startsWith('data:image')) return url
-      if (url.startsWith('http')) return url
-      return 'api' + url
+      return normalizeImageUrl(url)
     }
   }
 }

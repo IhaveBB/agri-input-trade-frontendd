@@ -10,7 +10,7 @@
         <div class="carousel-item">
           <div class="carousel-image-wrapper">
             <el-image 
-              :src="'api'+item.imageUrl" 
+              :src="getCarouselImage(item)" 
               fit="cover"
               class="carousel-image"
             >
@@ -61,6 +61,7 @@
 
 <script>
 import Request from '@/utils/request'
+import { getProductImageSrc, normalizeImageUrl } from '@/utils/productImage'
 
 export default {
   name: 'FrontCarousel',
@@ -94,6 +95,15 @@ export default {
       } catch (error) {
         console.error('获取轮播图数据失败:', error)
       }
+    },
+    getCarouselImage(item) {
+      if (item.product) {
+        return getProductImageSrc({
+          ...item.product,
+          imageUrl: item.imageUrl || item.product.imageUrl
+        })
+      }
+      return normalizeImageUrl(item.imageUrl)
     },
     handleView(item) {
       if (item.product) {

@@ -293,25 +293,29 @@ export default {
   margin: 0 auto;
   width: 100%;
   box-sizing: border-box;
-  background-color: #f8f8f8;
+  background-color: #f5f6f8;
 }
 .section {
   margin: 24px 0;
   position: relative;
   padding: 24px;
   background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease;
+}
+.section:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 .section::before {
   content: '';
   position: absolute;
   inset: -12px;
   background:
-    radial-gradient(circle at 0% 0%, rgba(44, 150, 120, 0.04) 0%, transparent 50%),
-    radial-gradient(circle at 100% 100%, rgba(44, 150, 120, 0.04) 0%, transparent 50%);
+    radial-gradient(circle at 0% 0%, rgba(44, 150, 120, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(44, 150, 120, 0.03) 0%, transparent 50%);
   z-index: -1;
-  border-radius: 8px;
+  border-radius: 12px;
 }
 .section-header {
   display: flex;
@@ -338,6 +342,18 @@ export default {
   gap: 8px;
   padding-left: 16px;
   border-left: 4px solid #2c9678;
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 16px;
+  width: 30px;
+  height: 3px;
+  background: linear-gradient(90deg, #2c9678, transparent);
+  border-radius: 2px;
 }
 
 .section-title i {
@@ -361,21 +377,22 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 16px;
+  padding: 8px 18px;
   border-radius: 20px;
   background: #f0faf5;
   color: #2c9678;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid #e0e8e8;
+  transition: all 0.25s ease;
+  border: 1px solid rgba(44, 150, 120, 0.15);
 }
 
 .more-btn:hover {
-  background: #2c9678;
+  background: linear-gradient(135deg, #2c9678, #3aaf8e);
   color: #fff;
-  border-color: #2c9678;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(44, 150, 120, 0.25);
 }
 
 .more-btn i {
@@ -445,9 +462,9 @@ export default {
   flex: 1;
   min-width: 0;
   height: 100%;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .notice-wrapper {

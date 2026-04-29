@@ -14,8 +14,8 @@
     <!-- 实际内容 -->
     <template v-else>
       <div class="image-container">
-        <el-image 
-          :src="product.imageUrl?.startsWith('http') ? product.imageUrl : `/api${product.imageUrl}`" 
+        <el-image
+          :src="productImageSrc"
           class="product-image"
           fit="cover"
           lazy
@@ -75,6 +75,7 @@
 
 <script>
 import Request from '@/utils/request'
+import { getProductImageSrc } from '@/utils/productImage'
 
 export default {
   name: 'ProductCard',
@@ -91,7 +92,13 @@ export default {
   data() {
     return {
       userInfo: JSON.parse(localStorage.getItem('frontUser') || '{}'),
-      loading: false
+      loading: false,
+      usePlaceholder: false
+    }
+  },
+  computed: {
+    productImageSrc() {
+      return getProductImageSrc(this.product, { forcePlaceholder: this.usePlaceholder })
     }
   },
   methods: {
@@ -104,8 +111,9 @@ export default {
     // 图片加载失败
     imageError() {
       this.loading = false;
+      this.usePlaceholder = true;
     },
-    
+
     isLogin() {
       // 检查是否登录
       const userStr = localStorage.getItem('frontUser')
@@ -246,9 +254,7 @@ export default {
   mounted() {
     // 使用缓存的方式处理图片URL
     if (this.product.imageUrl) {
-      const imgSrc = this.product.imageUrl.startsWith('http') 
-        ? this.product.imageUrl 
-        : `/api${this.product.imageUrl}`;
+      const imgSrc = getProductImageSrc(this.product);
       
       // 预加载图片
       this.preloadImage(imgSrc)

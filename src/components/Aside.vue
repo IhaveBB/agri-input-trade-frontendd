@@ -12,8 +12,8 @@ import '../assets/iconfont.css';
             class="el-menu-vertical"
             router
             :collapse-transition="false"
-            background-color="#fff"
-            text-color="#606266">
+            background-color="transparent"
+            text-color="rgba(255, 255, 255, 0.7)">
 
             <div v-for="item in userMenuList" :key="item.id">
                 <div v-if="item.path">
@@ -121,7 +121,7 @@ export default {
 .el-menu {
     border-right: none;
     padding: 18px 8px 12px;
-    background-color: #fff;
+    background-color: transparent;
 }
 
 .el-menu-item {
@@ -129,21 +129,21 @@ export default {
     line-height: 42px;
     border-radius: 8px;
     margin-bottom: 2px;
-    color: #606266;
+    color: rgba(255, 255, 255, 0.7);
     font-size: 14px;
     padding-left: 20px !important;
     transition: all 0.2s ease;
 
     &:hover {
-        color: #2c9678;
-        background-color: #f0faf6 !important;
+        color: #fff;
+        background-color: rgba(255, 255, 255, 0.08) !important;
     }
 
     &.is-active {
         color: #fff;
         background: linear-gradient(135deg, #2c9678, #35b08e) !important;
         font-weight: 500;
-        box-shadow: 0 2px 8px rgba(44, 150, 120, 0.25);
+        box-shadow: 0 2px 10px rgba(44, 150, 120, 0.4);
     }
 }
 
@@ -151,18 +151,19 @@ export default {
     height: 42px;
     line-height: 42px;
     border-radius: 8px;
-    color: #606266;
+    color: rgba(255, 255, 255, 0.7);
     font-size: 14px;
     padding-left: 20px !important;
 
     &:hover {
-        color: #2c9678;
-        background-color: #f0faf6 !important;
+        color: #fff;
+        background-color: rgba(255, 255, 255, 0.08) !important;
     }
 }
 
 .el-submenu ::v-deep .el-menu--inline {
     padding-left: 0;
+    background-color: transparent !important;
 
     .el-menu-item {
         height: 40px;
@@ -173,13 +174,13 @@ export default {
         font-size: 13px;
 
         &:hover {
-            color: #2c9678;
-            background-color: #f0faf6 !important;
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.06) !important;
         }
 
         &.is-active {
-            color: #2c9678;
-            background-color: #f0faf6 !important;
+            color: #4dd9a5;
+            background-color: rgba(44, 150, 120, 0.15) !important;
             font-weight: 600;
             box-shadow: none;
         }
@@ -190,7 +191,7 @@ export default {
 .el-submenu [class^="el-icon-"] {
     font-size: 17px;
     margin-right: 10px;
-    color: #909399;
+    color: rgba(255, 255, 255, 0.45);
 }
 
 .el-menu-item.is-active [class^="el-icon-"],
@@ -199,6 +200,15 @@ export default {
 }
 
 .el-submenu .el-menu-item.is-active [class^="el-icon-"] {
-    color: #2c9678;
+    color: #4dd9a5;
+}
+
+/* Submenu arrow color */
+::v-deep .el-submenu__title .el-submenu__icon-arrow {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+::v-deep .el-menu--inline {
+    background-color: transparent !important;
 }
 </style>

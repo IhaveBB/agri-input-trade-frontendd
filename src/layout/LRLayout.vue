@@ -73,7 +73,7 @@ export default {
     background-image: url('@/assets/imgs/loginBg.jpeg');
     background-size: cover;
     background-position: center;
-    filter: blur(8px);
+    filter: blur(10px) brightness(1.05);
     transform: scale(1.1);
     z-index: 0;
 }
@@ -85,9 +85,9 @@ export default {
     right: 0;
     bottom: 0;
     background: linear-gradient(135deg,
-        rgba(74, 140, 56, 0.06),
-        rgba(248, 251, 240, 0.92),
-        rgba(240, 248, 230, 0.88)
+        rgba(30, 120, 80, 0.08),
+        rgba(248, 251, 245, 0.94),
+        rgba(235, 245, 230, 0.90)
     );
     z-index: 1;
 }
@@ -99,16 +99,17 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: 20px 48px;
-    backdrop-filter: blur(12px);
-    background: rgba(255, 255, 255, 0.85);
-    border-bottom: 1px solid rgba(74, 140, 56, 0.08);
+    backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.75);
+    border-bottom: 1px solid rgba(44, 150, 120, 0.1);
+    box-shadow: 0 1px 12px rgba(0, 0, 0, 0.03);
 }
 
 .logo {
     cursor: pointer;
     font-size: 22px;
     font-weight: 700;
-    color: #3a7029;
+    color: #1e7a56;
     letter-spacing: 2px;
     display: flex;
     align-items: center;
@@ -117,13 +118,13 @@ export default {
 
 .logo i {
     font-size: 26px;
-    color: #4a8c38;
+    color: #2c9678;
     transition: all 0.3s ease;
 }
 
 .logo:hover i {
     transform: scale(1.1);
-    filter: drop-shadow(0 2px 6px rgba(74, 140, 56, 0.25));
+    filter: drop-shadow(0 2px 6px rgba(44, 150, 120, 0.3));
 }
 
 .home-btn {
@@ -131,16 +132,16 @@ export default {
     border-radius: 24px;
     font-weight: 500;
     transition: all 0.3s ease;
-    background: #4a8c38;
+    background: linear-gradient(135deg, #2c9678, #3aaf8e);
     border: none;
     color: white;
-    box-shadow: 0 2px 8px rgba(74, 140, 56, 0.2);
+    box-shadow: 0 2px 8px rgba(44, 150, 120, 0.25);
 }
 
 .home-btn:hover {
-    background: #3a7029;
+    background: linear-gradient(135deg, #248a6d, #32a07e);
     color: white;
-    box-shadow: 0 4px 14px rgba(74, 140, 56, 0.35);
+    box-shadow: 0 4px 16px rgba(44, 150, 120, 0.35);
     transform: translateY(-1px);
 }
 
@@ -162,11 +163,12 @@ export default {
 .auth-card {
     display: flex;
     width: 920px;
-    border-radius: 20px;
+    border-radius: 24px;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
-    background-color: white;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+    background-color: rgba(255, 255, 255, 0.95);
     position: relative;
+    backdrop-filter: blur(4px);
 }
 
 .auth-card-content {
@@ -175,12 +177,12 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: white;
+    background: transparent;
 }
 
 .brand-tagline {
     width: 50%;
-    background: linear-gradient(160deg, #2d6e1e 0%, #4a8c38 50%, #5da842 100%);
+    background: linear-gradient(160deg, #1a6b4a 0%, #2c9678 40%, #3aaf8e 100%);
     color: white;
     display: flex;
     align-items: center;
@@ -197,15 +199,15 @@ export default {
     right: 0;
     bottom: 0;
     background-image:
+        radial-gradient(circle at 15% 85%, rgba(255, 255, 255, 0.08), transparent 45%),
+        radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.06), transparent 45%),
         repeating-linear-gradient(
             120deg,
             transparent,
             transparent 30px,
             rgba(255, 255, 255, 0.015) 30px,
             rgba(255, 255, 255, 0.015) 60px
-        ),
-        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.06), transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.04), transparent 50%);
+        );
     z-index: 0;
 }
 
@@ -216,7 +218,7 @@ export default {
     bottom: -50px;
     right: -50px;
     font-size: 180px;
-    opacity: 0.04;
+    opacity: 0.05;
     transform: rotate(-15deg);
     z-index: 0;
 }
@@ -265,19 +267,21 @@ export default {
 
 .feature-item i {
     font-size: 28px;
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 18px;
     width: 56px;
     height: 56px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
 }
 
 .feature-item:hover i {
-    background: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.28);
     transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .feature-item span {
@@ -291,11 +295,11 @@ export default {
     z-index: 2;
     padding: 18px 0;
     text-align: center;
-    color: #6b8f5b;
+    color: #5a9a7e;
     font-size: 13px;
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(8px);
-    border-top: 1px solid rgba(74, 140, 56, 0.08);
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(44, 150, 120, 0.1);
 }
 
 @media (max-width: 992px) {

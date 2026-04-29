@@ -30,10 +30,12 @@
         <div class="product-main">
           <div class="image-container">
             <el-image
-              :src="getImageUrl(product.imageUrl)"
+              :src="productImageSrc"
               fit="cover"
-              :preview-src-list="[getImageUrl(product.imageUrl)]"
-            >              <div slot="error" class="image-slot">
+              :preview-src-list="[productImageSrc]"
+              @error="handleProductImageError"
+            >
+              <div slot="error" class="image-slot">
                 <i class="el-icon-picture-outline"></i>
               </div>
             </el-image>
@@ -223,7 +225,7 @@
     <el-dialog title="确认订单" :visible.sync="orderDialogVisible" width="500px" custom-class="order-dialog">
       <!-- 商品信息 -->
       <div v-if="product.id" class="confirm-product-info">
-        <el-image :src="getImageUrl(product.imageUrl)"
+        <el-image :src="productImageSrc"
           fit="cover" class="confirm-product-image">
         </el-image>
         <div class="confirm-product-detail">
@@ -288,6 +290,7 @@ import FrontHeader from '@/components/front/FrontHeader.vue'
 import FrontFooter from '@/components/front/FrontFooter.vue'
 import { Loading } from 'element-ui'
 import DOMPurify from 'dompurify'
+import { getProductImageSrc } from '@/utils/productImage'
 
 let loadingInstance = null
 
@@ -312,7 +315,8 @@ export default {
       addressesLoading: false,
       extFieldMap: {},
       extAttrList: [],
-      enterTime: Date.now()
+      enterTime: Date.now(),
+      imageLoadFailed: false
     }
   },
   created() {
@@ -357,9 +361,8 @@ export default {
         duration: duration
       }).catch(() => {}) // 静默失败
     },
-    getImageUrl(url) {
-      if (!url) return ''
-      return url.startsWith('http') ? url : `/api${url}`
+    handleProductImageError() {
+      this.imageLoadFailed = true
     },
     goToShop(merchantId) {
       this.$router.push(`/shop?merchantId=${merchantId}`)
@@ -371,6 +374,7 @@ export default {
         const res = await Request.get(`/product/ext/${this.$route.params.id}`)
         if (res.code === '0') {
           this.product = res.data
+          this.imageLoadFailed = false
           // 获取该分类的扩展字段配置（用于显示中文标签）
           if (this.product.categoryId) {
             this.getExtFieldsConfig(this.product.categoryId)
@@ -559,6 +563,9 @@ export default {
     }
   },
   computed: {
+    productImageSrc() {
+      return getProductImageSrc(this.product, { forcePlaceholder: this.imageLoadFailed })
+    },
     sanitizedDescription() {
       return this.product.description ? DOMPurify.sanitize(this.product.description) : ''
     }

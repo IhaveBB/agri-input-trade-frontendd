@@ -109,7 +109,7 @@ export default {
   height: 100%;
   padding: 0 20px;
   background: #fff;
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: none;
 
   .header-left {
     display: flex;
@@ -125,13 +125,12 @@ export default {
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #666;
+      color: #606266;
       font-size: 13px;
-      background: #f5f5f5;
-      padding: 6px 12px;
-      border-radius: 4px;
+      background: #f5f7fa;
+      padding: 6px 14px;
+      border-radius: 20px;
       white-space: nowrap;
-      border: 1px solid #e8e8e8;
 
       i {
         color: #2c9678;
@@ -148,16 +147,17 @@ export default {
         display: flex;
         align-items: center;
         gap: 6px;
-        padding: 7px 14px;
-        border-radius: 4px;
+        padding: 7px 16px;
+        border-radius: 20px;
         cursor: pointer;
-        transition: all 0.2s ease;
-        background: #2c9678;
+        transition: all 0.25s ease;
+        background: linear-gradient(135deg, #2c9678, #3aaf8e);
         color: white;
         font-size: 14px;
 
         &:hover {
-          background: #36a88a;
+          box-shadow: 0 4px 12px rgba(44, 150, 120, 0.3);
+          transform: translateY(-1px);
         }
 
         i {
@@ -168,11 +168,10 @@ export default {
       .action-group {
         display: flex;
         align-items: center;
-        gap: 6px;
-        background: #f5f5f5;
+        gap: 4px;
+        background: #f5f7fa;
         padding: 3px;
-        border-radius: 4px;
-        border: 1px solid #e8e8e8;
+        border-radius: 20px;
       }
 
       .action-icon-btn {
@@ -181,10 +180,10 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 4px;
+        border-radius: 50%;
         cursor: pointer;
         transition: all 0.2s ease;
-        color: #666;
+        color: #606266;
 
         i {
           font-size: 16px;
@@ -194,7 +193,7 @@ export default {
         &:hover {
           background-color: #fff;
           color: #2c9678;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
           i.el-icon-refresh-right {
             transform: rotate(180deg);
@@ -206,7 +205,7 @@ export default {
         width: 1px;
         height: 20px;
         background: #e8e8e8;
-        margin: 0 8px;
+        margin: 0 4px;
       }
     }
   }

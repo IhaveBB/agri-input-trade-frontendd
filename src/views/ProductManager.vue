@@ -95,7 +95,7 @@
         <el-table-column prop="id" label="ID" width="80"></el-table-column>
         <el-table-column label="商品图片" width="120">
           <template slot-scope="scope">
-            <el-image :src="'api'+scope.row.imageUrl" :preview-src-list="['api'+scope.row.imageUrl]" fit="cover" style="width: 80px; height: 80px"></el-image>
+            <el-image :src="getProductImage(scope.row)" :preview-src-list="[getProductImage(scope.row)]" fit="cover" style="width: 80px; height: 80px"></el-image>
           </template>
         </el-table-column>
         <el-table-column prop="name" label="商品名称"></el-table-column>
@@ -480,6 +480,7 @@ import Pagination from '@/components/Pagination/index.vue'
 import { VueCropper } from 'vue-cropper'
 import '@wangeditor/editor/dist/css/style.css'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+import { getProductImageSrc } from '@/utils/productImage'
 
 export default {
   name: 'ProductManager',
@@ -673,6 +674,9 @@ export default {
     this.getList()
   },
   methods: {
+    getProductImage(product) {
+      return getProductImageSrc(product)
+    },
     // 在树中查找从根到目标节点的路径（用于el-cascader回显）
     findPathInTree(tree, targetId, path = []) {
       for (const node of tree) {

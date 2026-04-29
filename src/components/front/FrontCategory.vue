@@ -8,8 +8,7 @@
         @click="handleCategoryClick(category)"
       >
         <div class="icon-wrapper">
-          <i :class="['icon', category.icon]"></i>
-          <div class="icon-bg"></div>
+          <img :src="getCategoryImage(category)" :alt="category.name" class="category-img" />
         </div>
         <span class="category-name">{{ category.name }}</span>
         <div class="hover-indicator"></div>
@@ -20,8 +19,7 @@
         @click="handleMoreClick"
       >
         <div class="icon-wrapper">
-          <i class="el-icon-more"></i>
-          <div class="icon-bg"></div>
+          <img :src="genCategoryImg('更多')" alt="更多分类" class="category-img" />
         </div>
         <span class="category-name">更多分类</span>
         <div class="hover-indicator"></div>
@@ -32,6 +30,7 @@
 
 <script>
 import Request from '@/utils/request.js'
+import { normalizeImageUrl } from '@/utils/productImage'
 
 export default {
   name: 'FrontCategory',
@@ -110,6 +109,66 @@ export default {
     },
     handleMoreClick() {
       this.$router.push('/products')
+    },
+    getCategoryImage(category) {
+      const imageUrl = category.imageUrl || category.image || category.coverImage || category.picture || category.iconUrl
+      if (imageUrl) {
+        const normalized = normalizeImageUrl(imageUrl)
+        if (normalized) return normalized
+      }
+      const icon = category.icon ? String(category.icon) : ''
+      if (icon && /^(https?:)?\/\//.test(icon)) {
+        return icon
+      }
+      if (icon && (icon.startsWith('/') || icon.startsWith('data:image'))) {
+        const normalized = normalizeImageUrl(icon)
+        if (normalized) return normalized
+      }
+      return this.genCategoryImg(category.name)
+    },
+    genCategoryImg(name) {
+      const s = 160
+      const c = document.createElement('canvas')
+      c.width = s; c.height = s
+      const ctx = c.getContext('2d')
+      let h = 0
+      for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h)
+      const hue = Math.abs(h) % 360
+
+      const bg = ctx.createLinearGradient(0, 0, s, s)
+      bg.addColorStop(0, `hsl(${hue}, 38%, 96%)`)
+      bg.addColorStop(1, `hsl(${(hue + 24) % 360}, 42%, 88%)`)
+      ctx.fillStyle = bg
+      ctx.fillRect(0, 0, s, s)
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.72)'
+      ctx.beginPath()
+      ctx.arc(s * 0.78, s * 0.2, s * 0.28, 0, Math.PI * 2)
+      ctx.fill()
+
+      ctx.fillStyle = `hsla(${hue}, 45%, 52%, 0.12)`
+      ctx.beginPath()
+      ctx.arc(s * 0.18, s * 0.82, s * 0.34, 0, Math.PI * 2)
+      ctx.fill()
+
+      ctx.strokeStyle = `hsla(${hue}, 35%, 52%, 0.28)`
+      ctx.lineWidth = 4
+      ctx.beginPath()
+      ctx.moveTo(s * 0.24, s * 0.68)
+      ctx.quadraticCurveTo(s * 0.5, s * 0.56, s * 0.76, s * 0.68)
+      ctx.stroke()
+
+      ctx.fillStyle = `hsl(${hue}, 42%, 42%)`
+      ctx.font = '700 36px "PingFang SC","Microsoft YaHei",sans-serif'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      const t = Array.from(name || '分类').slice(0, 3).join('')
+      ctx.fillText(t, s / 2, s / 2)
+
+      ctx.fillStyle = `hsla(${hue}, 42%, 42%, 0.16)`
+      ctx.fillRect(s * 0.32, s * 0.66, s * 0.36, 4)
+
+      return c.toDataURL()
     }
   }
 }
@@ -166,16 +225,29 @@ export default {
 }
 
 .icon-wrapper {
-  width: 52px;
-  height: 52px;
+  width: 64px;
+  height: 64px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 8px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid #e0ebe0;
   background: #fff;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(44, 150, 120, 0.08);
+}
+
+.category-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.category-item:hover .category-img {
+  transform: scale(1.06);
 }
 
 .icon {

@@ -72,21 +72,21 @@ export default {
   background-color: #f0f2f5;
 
   .side-container {
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
-    background-color: #fff;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
+    background: linear-gradient(180deg, #1a2a3a 0%, #1e3348 100%);
     float: left;
     width: 220px;
     height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
-    scrollbar-color: #2c9678 #f0f0f0;
+    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
     position: relative;
     z-index: 2;
 
     .logo-container {
       height: 64px;
-      background: linear-gradient(135deg, #2c9678, #3aaf8e);
+      background: linear-gradient(135deg, #2c9678, #248a6d);
       display: flex;
       align-items: center;
       padding: 0 20px;
@@ -102,7 +102,7 @@ export default {
         left: 0;
         right: 0;
         height: 12px;
-        background: #fff;
+        background: #1e3348;
         border-radius: 50% 50% 0 0;
       }
 
@@ -155,9 +155,9 @@ export default {
 
     .main-header {
       background: #fff;
-      border-radius: 8px;
+      border-radius: 10px;
       margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
       padding: 12px 20px;
 
       .el-header {
@@ -168,8 +168,8 @@ export default {
 
     .main-content {
       background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
       min-height: calc(100vh - 124px);
 
       .el-scrollbar {

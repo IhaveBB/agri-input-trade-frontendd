@@ -184,13 +184,13 @@ export default {
 .login-icon {
   width: 70px;
   height: 70px;
-  background: linear-gradient(135deg, #4a8c38 0%, #56a032 100%);
+  background: linear-gradient(135deg, #2c9678 0%, #3aaf8e 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
-  box-shadow: 0 10px 20px rgba(74, 140, 56, 0.2);
+  box-shadow: 0 8px 24px rgba(44, 150, 120, 0.25);
 }
 
 .login-icon i {
@@ -230,22 +230,24 @@ export default {
 
 .login-button {
   width: 100%;
-    height: 42px;
+    height: 44px;
     font-size: 16px;
     font-weight: 500;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
     margin-top: 20px;
-    border-radius: 8px;
+    border-radius: 10px;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
+    background: linear-gradient(135deg, #2c9678, #3aaf8e);
+    border: none;
 }
 
 .login-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 140, 56, 0.3);
+  box-shadow: 0 6px 20px rgba(44, 150, 120, 0.35);
 }
 
 .login-button i {
@@ -272,16 +274,17 @@ export default {
 /* Element UI 组件样式覆盖 */
 /* Element UI 组件样式覆盖 */
 :deep(.el-input__inner) {
-    height: 42px;
-    line-height: 42px;
-    border-radius: 8px;
-    border: 1px solid #dcdfe6;
+    height: 44px;
+    line-height: 44px;
+    border-radius: 10px;
+    border: 1.5px solid #e4e7ed;
     transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
 }
 
 :deep(.el-input__inner:focus) {
-    border-color: #4a8c38;
-    box-shadow: 0 0 0 2px rgba(74, 140, 56, 0.15);
+    border-color: #2c9678;
+    box-shadow: 0 0 0 3px rgba(44, 150, 120, 0.12);
 }
 
 :deep(.el-form-item) {
@@ -374,11 +377,11 @@ export default {
 }
 
 :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-  background-color: #4a8c38;
-  border-color: #4a8c38;
+  background-color: #2c9678;
+  border-color: #2c9678;
 }
 
 :deep(.el-checkbox__input.is-checked + .el-checkbox__label) {
-  color: #4a8c38;
+  color: #2c9678;
 }
 </style>

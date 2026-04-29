@@ -41,8 +41,8 @@
           <template slot-scope="scope">
             <div class="product-info">
               <el-image 
-                :src="'api'+scope.row.product.imageUrl" 
-                :preview-src-list="['api'+scope.row.product.imageUrl]"
+                :src="getProductImage(scope.row.product)" 
+                :preview-src-list="[getProductImage(scope.row.product)]"
                 fit="cover"
                 style="width: 50px; height: 50px">
               </el-image>
@@ -92,6 +92,7 @@
 import Request from '@/utils/request'
 import Pagination from '@/components/Pagination/index.vue'
 import { formatTime } from '@/utils/time'
+import { getProductImageSrc } from '@/utils/productImage'
 
 export default {
   name: 'CartManager',
@@ -127,6 +128,9 @@ export default {
     this.getList()
   },
   methods: {
+    getProductImage(product) {
+      return getProductImageSrc(product)
+    },
     // 获取购物车列表
     async getList() {
       try {

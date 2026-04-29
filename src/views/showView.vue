@@ -432,18 +432,36 @@ export default {
   min-width: 220px;
   position: relative;
   overflow: hidden;
-  border-top: 3px solid #2c9678;
+  border-top: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f0faf6 0%, #fff 100%);
+  transition: all 0.3s ease;
 
-  &:nth-child(2) {
-    border-top-color: #e6a23c;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   }
 
-  &:nth-child(3) {
-    border-top-color: #409EFF;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #2c9678, #3aaf8e);
   }
 
-  &:nth-child(4) {
-    border-top-color: #f56c6c;
+  &:nth-child(2)::before {
+    background: linear-gradient(90deg, #e6a23c, #f0c78a);
+  }
+
+  &:nth-child(3)::before {
+    background: linear-gradient(90deg, #409EFF, #79bbff);
+  }
+
+  &:nth-child(4)::before {
+    background: linear-gradient(90deg, #f56c6c, #fab6b6);
   }
 
   .stat-header {
@@ -511,7 +529,6 @@ export default {
   font-size: 15px;
   font-weight: 600;
   color: #333;
-  border-bottom: 2px solid #f0f0f0;
   padding-bottom: 12px;
 }
 
@@ -530,7 +547,6 @@ export default {
   font-size: 15px;
   font-weight: 600;
   color: #333;
-  border-bottom: 2px solid #f0f0f0;
   padding-bottom: 12px;
 }
 

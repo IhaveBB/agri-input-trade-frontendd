@@ -86,7 +86,7 @@
         <el-table-column label="商品信息" min-width="300">
           <template slot-scope="scope">
             <div class="product-info">
-              <el-image :src="'api'+scope.row.product.imageUrl" :preview-src-list="['api'+scope.row.product.imageUrl]" fit="cover"
+              <el-image :src="getProductImage(scope.row.product)" :preview-src-list="[getProductImage(scope.row.product)]" fit="cover"
                 style="width: 50px; height: 50px">
               </el-image>
               <div class="product-detail">
@@ -214,8 +214,8 @@
           <h4>商品信息</h4>
           <div class="product-detail-info">
             <el-image 
-              :src="'api'+currentOrder?.product?.imageUrl" 
-              :preview-src-list="['api'+currentOrder?.product?.imageUrl]"
+              :src="getProductImage(currentOrder && currentOrder.product)" 
+              :preview-src-list="[getProductImage(currentOrder && currentOrder.product)]"
               fit="cover"
               style="width: 80px; height: 80px; border-radius: 4px;">
             </el-image>
@@ -370,6 +370,7 @@
 import Request from '@/utils/request'
 import Pagination from '@/components/Pagination/index.vue'
 import { formatTime } from '@/utils/time'  // 导入时间格式化函数
+import { getProductImageSrc } from '@/utils/productImage'
 
 export default {
   name: 'OrderManager',
@@ -497,6 +498,9 @@ export default {
     this.getList()
   },
   methods: {
+    getProductImage(product) {
+      return getProductImageSrc(product || {})
+    },
     // 获取订单列表
     async getList() {
       try {
