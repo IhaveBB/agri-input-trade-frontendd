@@ -9,15 +9,12 @@
       <el-carousel-item v-for="item in carouselItems" :key="item.id">
         <div class="carousel-item">
           <div class="carousel-image-wrapper">
-            <el-image 
+            <img
               :src="getCarouselImage(item)" 
-              fit="cover"
+              :alt="item.title || '轮播图'"
               class="carousel-image"
-            >
-              <div slot="error" class="image-slot">
-                <i class="el-icon-picture-outline"></i>
-              </div>
-            </el-image>
+              @error="handleImageError(item)"
+            />
           </div>
           <div class="carousel-content">
             <div class="content-wrapper">
@@ -68,7 +65,8 @@ export default {
   data() {
     return {
       carouselItems: [],
-      carouselHeight: 0
+      carouselHeight: 380,
+      failedImageMap: {}
     }
   },
   mounted() {
@@ -84,26 +82,49 @@ export default {
   methods: {
     calculateHeight() {
       const containerWidth = this.$el.clientWidth
-      this.carouselHeight = Math.floor(containerWidth / 3)
+      this.carouselHeight = containerWidth ? Math.max(280, Math.floor(containerWidth / 3)) : 380
     },
     async getCarouselItems() {
       try {
         const res = await Request.get('/carousel/active')
         if (res.code === '0') {
-          this.carouselItems = res.data
+          const data = res.data || []
+          const list = Array.isArray(data) ? data : (data.records || data.list || [])
+          this.carouselItems = list
+            .filter(item => Number(item.status) === 1)
+            .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+          this.$nextTick(this.calculateHeight)
         }
       } catch (error) {
         console.error('获取轮播图数据失败:', error)
       }
     },
     getCarouselImage(item) {
-      if (item.product) {
-        return getProductImageSrc({
-          ...item.product,
-          imageUrl: item.imageUrl || item.product.imageUrl
-        })
+      const imageUrl = item.imageUrl || item.image || item.coverImage || item.picture
+      if (this.failedImageMap[item.id]) {
+        return getProductImageSrc(item.product || {
+          name: item.title || '轮播图',
+          categoryName: item.tag || '活动推荐',
+          placeOfOrigin: item.description
+        }, { forcePlaceholder: true })
       }
-      return normalizeImageUrl(item.imageUrl)
+      const normalizedCarouselImage = normalizeImageUrl(imageUrl)
+      if (normalizedCarouselImage) {
+        return normalizedCarouselImage
+      }
+      if (item.product && item.product.imageUrl) {
+        return getProductImageSrc(item.product)
+      }
+      return getProductImageSrc({
+        name: item.title || '轮播图',
+        categoryName: item.tag || '活动推荐',
+        placeOfOrigin: item.description
+      }, { forcePlaceholder: true })
+    },
+    handleImageError(item) {
+      if (item && item.id) {
+        this.$set(this.failedImageMap, item.id, true)
+      }
     },
     handleView(item) {
       if (item.product) {
@@ -145,8 +166,10 @@ export default {
 }
 
 .carousel-image {
+  display: block;
   width: 100%;
   height: 100%;
+  object-fit: cover;
   transition: transform 0.6s ease;
 }
 

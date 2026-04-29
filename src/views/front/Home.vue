@@ -174,6 +174,7 @@ export default {
               id: item.productId,
               name: item.productName,
               price: item.price,
+              stock: item.stock,
               imageUrl: item.imageUrl,
               categoryId: item.categoryId,
               categoryName: item.categoryName,
@@ -229,11 +230,13 @@ export default {
             id: item.productId,
             name: item.productName,
             price: item.price,
+            stock: item.stock,
             imageUrl: item.imageUrl,
             categoryId: item.categoryId,
             categoryName: item.categoryName,
             salesCount: item.salesCount,
             isFavorite: false,
+            recommendReason: item.reason,
             recommendScore: item.score,
             matchTags: item.matchTags
           }))

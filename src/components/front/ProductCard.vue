@@ -53,6 +53,14 @@
             <i class="el-icon-location-outline"></i>
             <span>{{ product.placeOfOrigin }}</span>
           </div>
+          <div class="recommend-info" v-if="product.recommendReason || (product.matchTags && product.matchTags.length)">
+            <span class="recommend-reason" v-if="product.recommendReason">{{ product.recommendReason }}</span>
+            <span
+              class="recommend-tag"
+              v-for="tag in (product.matchTags || []).slice(0, 2)"
+              :key="tag"
+            >{{ tag }}</span>
+          </div>
         </div>
         
         <div class="product-footer">
@@ -484,6 +492,43 @@ export default {
 .origin-info i {
   font-size: 14px;
   color: #2c9678;
+}
+
+.recommend-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  min-height: 20px;
+  overflow: hidden;
+}
+
+.recommend-reason,
+.recommend-tag {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 3px;
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.recommend-reason {
+  flex: 1;
+  min-width: 0;
+  color: #2c9678;
+  background: #eefaf6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recommend-tag {
+  flex: 0 0 auto;
+  color: #8a5a00;
+  background: #fff7e6;
 }
 
 .product-footer {

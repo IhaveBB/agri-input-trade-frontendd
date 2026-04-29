@@ -35,7 +35,13 @@
                   <el-checkbox v-model="item.selected" @change="handleItemSelect"></el-checkbox>
 
                   <div class="product-info">
-                    <el-image :src="getProductImage(item.product)" fit="cover" class="product-image" @click="$router.push(`/product/${item.product.id}`)">
+                    <el-image
+                      :src="getProductImage(item.product)"
+                      fit="cover"
+                      class="product-image"
+                      @error="handleProductImageError(item.product)"
+                      @click="$router.push(`/product/${item.product.id}`)"
+                    >
                       <div slot="error" class="image-slot">
                         <i class="el-icon-picture-outline"></i>
                       </div>
@@ -184,7 +190,12 @@ export default {
   },
   methods: {
     getProductImage(product) {
-      return getProductImageSrc(product)
+      return getProductImageSrc(product, { forcePlaceholder: product && product.__imageLoadFailed })
+    },
+    handleProductImageError(product) {
+      if (product) {
+        this.$set(product, '__imageLoadFailed', true)
+      }
     },
     formatAddress(addr) {
       return `${addr.phone} ${addr.address}`
