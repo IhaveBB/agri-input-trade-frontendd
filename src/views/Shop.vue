@@ -66,12 +66,17 @@
             <div class="product-list">
               <div v-loading="productsLoading">
                 <div v-for="product in products" :key="product.id" class="product-item">
-                  <div class="product-image">
-                    <img :src="getProductImage(product)" :alt="product.name" @click="goToProduct(product.id)" />
+                  <div class="product-image" @click="goToProduct(product.id)">
+                    <el-image :src="getProductImage(product)" fit="cover" lazy>
+                      <div slot="error" class="image-slot">
+                        <i class="el-icon-picture-outline"></i>
+                      </div>
+                    </el-image>
                   </div>
                   <div class="product-info">
                     <h3 class="product-name" @click="goToProduct(product.id)">{{ product.name }}</h3>
-                    <p class="product-desc">{{ product.description || '暂无描述' }}</p>
+                    <div class="product-desc" v-if="product.description" v-html="stripHtml(product.description)"></div>
+                    <p class="product-desc" v-else>暂无描述</p>
                     <div class="product-meta">
                       <span>销量：{{ product.salesCount }}</span>
                       <span>库存：{{ product.stock }}</span>
@@ -282,6 +287,10 @@ export default {
     getProductImage(product) {
       return getProductImageSrc(product)
     },
+    stripHtml(html) {
+      if (!html) return ''
+      return html.replace(/<[^>]+>/g, '')
+    },
     // 处理图片 src，如果是 base64 则直接使用，否则添加 api 前缀
     getImageSrc(url) {
       return normalizeImageUrl(url)
@@ -464,13 +473,24 @@ export default {
         width: 120px;
         height: 120px;
         flex-shrink: 0;
+        cursor: pointer;
 
-        img {
+        .el-image {
           width: 100%;
           height: 100%;
-          object-fit: cover;
           border-radius: 6px;
-          cursor: pointer;
+        }
+
+        .image-slot {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 100%;
+          color: #909399;
+          font-size: 28px;
+          background: #f5f7fa;
+          border-radius: 6px;
         }
       }
 

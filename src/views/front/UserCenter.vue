@@ -207,7 +207,7 @@
                 <h3>收货地址</h3>
                 <p class="section-desc">管理您的收货地址信息</p>
               </div>
-              <el-button type="primary" @click="showAddressDialog('add')" icon="el-icon-plus">
+              <el-button v-if="addresses.length > 0" type="primary" @click="showAddressDialog('add')" icon="el-icon-plus">
                 新增地址
               </el-button>
             </div>

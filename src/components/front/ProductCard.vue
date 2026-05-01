@@ -152,7 +152,8 @@ export default {
         if (res.code === '0') {
           this.$message({
             type: 'success',
-            message: '已添加到购物车'
+            message: '已添加到购物车',
+            offset: 100
           })
           this.$emit('add-to-cart', this.product)
         } else {
@@ -163,9 +164,11 @@ export default {
         }
       } catch (error) {
         console.error('添加到购物车失败:', error)
+        const errorMsg = (error && error.msg) || '添加到购物车失败'
         this.$message({
           type: 'error',
-          message: '添加到购物车失败'
+          message: errorMsg,
+          offset: 100
         })
       }
     },

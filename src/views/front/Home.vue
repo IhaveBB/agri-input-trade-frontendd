@@ -247,9 +247,25 @@ export default {
     },
     // 添加到购物车
     handleAddToCart(product) {
-      this.$message({
-        type: 'success',
-        message: '已添加到购物车'
+      const userStr = localStorage.getItem('frontUser')
+      if (!userStr) {
+        this.$message.warning('请先登录')
+        this.$router.push('/login')
+        return
+      }
+      const user = JSON.parse(userStr)
+      Request.post('/cart', {
+        userId: user.id,
+        productId: product.id,
+        quantity: 1
+      }).then(res => {
+        if (res.code === '0') {
+          this.$message.success('已添加到购物车')
+        } else {
+          this.$message.error(res.msg || '添加失败')
+        }
+      }).catch(() => {
+        this.$message.error('添加失败')
       })
     },
     // 切换收藏状态

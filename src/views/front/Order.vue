@@ -491,8 +491,9 @@ export default {
           message: '请先登录'
         })
         this.$router.push('/login')
-        return
+        return false
       }
+      return true
     },
     formatTime,
     getProductImage(product) {
@@ -504,7 +505,7 @@ export default {
       }
     },
     async getOrders() {
-      this.isLogin()
+      if (!this.isLogin()) return
       this.loading = true
       try {
         const userId = this.userInfo.id
@@ -561,7 +562,7 @@ export default {
         return classMap[status] || ''
       },
       async handleAlipay(order) {
-        this.isLogin()
+        if (!this.isLogin()) return
         try {
           console.log('发起支付请求，订单ID:', order.id);
           
@@ -714,7 +715,7 @@ export default {
       },
 
     async handleCancel(order) {
-        this.isLogin()
+        if (!this.isLogin()) return
         try {
           await this.$confirm('确定要取消订单吗？', '提示', {
             type: 'warning'
@@ -733,7 +734,7 @@ export default {
       },
 
       showPaymentDialog(order) {
-        this.isLogin()
+        if (!this.isLogin()) return
         this.currentOrder = order
         this.paymentMethod = 'balance' // 默认选择余额支付
         this.paymentDialogVisible = true
@@ -762,7 +763,7 @@ export default {
       },
 
     async getAddresses() {
-        this.isLogin()
+        if (!this.isLogin()) return
         try {
           const userId = this.userInfo.id
           const res = await Request.get(`/address/user/${userId}`)
@@ -930,7 +931,7 @@ export default {
     async submitReview() {
         try {
           await this.$refs.reviewForm.validate()
-          this.isLogin()
+          if (!this.isLogin()) return
           const reviewData = {
             userId: this.userInfo.id,
             productId: this.currentOrder.product.id,
