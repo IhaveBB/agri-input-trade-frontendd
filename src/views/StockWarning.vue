@@ -229,9 +229,10 @@
                   <span :class="{'stock-warning': scope.row.currentStock < (scope.row.thresholdValue || 10)}">{{ scope.row.currentStock }}</span>
                 </template>
               </el-table-column>
-              <el-table-column prop="enabled" label="启用预警" width="100" align="center">
+              <el-table-column prop="enabled" label="启用预警" width="140" align="center">
                 <template slot-scope="scope">
                   <el-switch v-model="scope.row.enabled" @change="toggleProductAlert(scope.row)"></el-switch>
+                  <el-tag v-if="scope.row.inherited" type="info" size="mini" style="margin-left: 4px;">跟随全局</el-tag>
                 </template>
               </el-table-column>
               <el-table-column label="操作" width="100" align="center">

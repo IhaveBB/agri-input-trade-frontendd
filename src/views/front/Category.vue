@@ -76,6 +76,17 @@ export default {
     }
   },
   created() {
+    const categoryId = this.$route.params.id
+    if (categoryId) {
+      this.$router.replace({
+        name: 'Products',
+        query: {
+          category: categoryId,
+          categoryName: this.$route.query.name || ''
+        }
+      })
+      return
+    }
     this.userInfo = JSON.parse(localStorage.getItem('frontUser') || '{}')
     this.categoryName = this.$route.query.name || '分类商品'
     this.debouncedSearch = debounce(() => {

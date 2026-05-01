@@ -15,13 +15,8 @@
             <div class="footer-divider">•</div>
             <div class="footer-contact">
               <div class="contact-item">
-                <i class="el-icon-phone"></i>
-                <span>客服专线 400-123-4567</span>
-              </div>
-              <div class="contact-divider">|</div>
-              <div class="contact-item">
                 <i class="el-icon-message"></i>
-                <span>服务邮箱 service@greenfarm.com</span>
+                <span>服务邮箱 ihavebb@outlook.com</span>
               </div>
             </div>
           </div>

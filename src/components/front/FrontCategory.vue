@@ -102,9 +102,11 @@ export default {
     },
     handleCategoryClick(category) {
       this.$router.push({
-        name: 'category',
-        params: { id: category.id },
-        query: { name: category.name }
+        name: 'Products',
+        query: {
+          category: category.id,
+          categoryName: category.name
+        }
       })
     },
     handleMoreClick() {

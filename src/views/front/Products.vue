@@ -22,8 +22,8 @@
                 v-for="category in categories"
                 :key="category.id"
                 class="filter-option"
-                :class="{ active: selectedCategory === category.id }"
-                @click="handleCategoryChange(category.id)"
+                :class="{ active: isSelectedCategory(category.id) }"
+                @click="handleCategoryChange(category.id, category.name)"
               >{{ category.name }}</div>
               <!-- 更多分类使用级联选择器 -->
               <el-cascader
@@ -74,8 +74,8 @@
         <!-- 页面标题 -->
         <div class="page-header">
           <div class="title-section">
-            <h2 class="page-title">全部产品</h2>
-            <div class="page-subtitle">精选优质农资，品质保障</div>
+            <h2 class="page-title">{{ pageTitle }}</h2>
+            <div class="page-subtitle">{{ pageSubtitle }}</div>
           </div>
           <div class="search-box">
             <el-input
@@ -182,6 +182,7 @@ export default {
       categories: [],
       categoryTree: [],
       selectedCategory: '',
+      selectedCategoryName: '',
       priceRange: '',
       priceRanges: [
         { label: '0-50元', value: '0-50' },
@@ -206,6 +207,15 @@ export default {
   computed: {
     hasFilters() {
       return this.selectedCategory || this.priceRange || this.sortBy !== 'default' || this.searchKeyword
+    },
+    pageSubtitle() {
+      if (this.selectedCategory) {
+        return `${this.getCategoryName(this.selectedCategory)}分类下的优质农资商品`
+      }
+      return '精选优质农资，品质保障'
+    },
+    pageTitle() {
+      return this.selectedCategory ? `${this.getCategoryName(this.selectedCategory)}专区` : '全部产品'
     }
   },
   methods: {
@@ -238,14 +248,17 @@ export default {
           const treeRes = await Request.get('/category/tree')
           if (treeRes.code === '0') {
             this.categoryTree = treeRes.data
+            this.fillSelectedCategoryName()
           }
         } catch (treeError) {
           // 备选：从 all 接口构建树
           const allRes = await Request.get('/category/all')
           if (allRes.code === '0') {
             this.categoryTree = this.buildTree(allRes.data)
+            this.fillSelectedCategoryName()
           }
         }
+        this.fillSelectedCategoryName()
       } catch (error) {
         console.error('获取分类失败:', error)
       }
@@ -310,9 +323,11 @@ export default {
         this.loading = false
       }
     },
-    handleCategoryChange(categoryId) {
+    handleCategoryChange(categoryId, categoryName) {
       this.selectedCategory = categoryId
+      this.selectedCategoryName = categoryId ? (categoryName || this.getCategoryName(categoryId)) : ''
       this.currentPage = 1
+      this.updateRouteQuery()
       this.getProducts()
     },
     handlePriceRangeChange(range) {
@@ -332,20 +347,45 @@ export default {
       this.currentPage = page
       this.getProducts()
     },
-    handleRouteChange() {
+    updateRouteQuery() {
       const query = {}
       if (this.selectedCategory) {
         query.category = this.selectedCategory
+        query.categoryName = this.selectedCategoryName || this.getCategoryName(this.selectedCategory)
       }
       if (this.searchKeyword) {
         query.keyword = this.searchKeyword
       }
-      // 更新URL，但不触发路由变化
       this.$router.replace({ query }).catch(() => {})
     },
     getCategoryName(id) {
-      const category = this.categories.find(c => c.id === id)
-      return category ? category.name : '全部'
+      const targetId = String(id)
+      const findInTree = (list = []) => {
+        for (const item of list) {
+          if (String(item.id) === targetId) return item
+          const child = findInTree(item.children || [])
+          if (child) return child
+        }
+        return null
+      }
+      const category = this.categories.find(c => String(c.id) === targetId) || findInTree(this.categoryTree)
+      return category ? category.name : (this.selectedCategoryName || '全部')
+    },
+    isSelectedCategory(id) {
+      return String(this.selectedCategory || '') === String(id)
+    },
+    syncQueryToState() {
+      const { category, categoryName, keyword } = this.$route.query
+      this.selectedCategory = category && /^\d+$/.test(String(category)) ? Number(category) : (category || '')
+      this.selectedCategoryName = categoryName || ''
+      this.searchKeyword = keyword || ''
+      this.currentPage = 1
+    },
+    fillSelectedCategoryName() {
+      if (this.selectedCategory && !this.selectedCategoryName) {
+        this.selectedCategoryName = this.getCategoryName(this.selectedCategory)
+        this.updateRouteQuery()
+      }
     },
     getPriceRangeLabel(value) {
       const range = this.priceRanges.find(r => r.value === value)
@@ -361,10 +401,12 @@ export default {
     },
     resetFilters() {
       this.selectedCategory = ''
+      this.selectedCategoryName = ''
       this.priceRange = ''
       this.sortBy = 'default'
       this.searchKeyword = ''
       this.currentPage = 1
+      this.updateRouteQuery()
       this.getProducts()
     },
     handleSizeChange(size) {
@@ -376,14 +418,19 @@ export default {
   watch: {
     searchKeyword() {
       this.handleSearch()
-      this.handleRouteChange()
-    },
-    selectedCategory() {
-      this.handleRouteChange()
+      this.updateRouteQuery()
     },
     sortBy() {
       this.currentPage = 1
       this.getProducts()
+    },
+    '$route.query'(query) {
+      const routeCategory = query.category || ''
+      const routeKeyword = query.keyword || ''
+      if (String(routeCategory) !== String(this.selectedCategory || '') || routeKeyword !== this.searchKeyword) {
+        this.syncQueryToState()
+        this.getProducts()
+      }
     }
   },
   created() {
@@ -392,15 +439,9 @@ export default {
       this.getProducts()
     }, 300)
 
+    this.syncQueryToState()
     this.getCategories()
     this.getProducts()
-    
-    const { category, keyword } = this.$route.query
-    if (category) this.selectedCategory = category
-    if (keyword) {
-      this.searchKeyword = keyword
-      this.handleSearch()
-    }
   },
   beforeDestroy() {
     if (this.debouncedSearch) {

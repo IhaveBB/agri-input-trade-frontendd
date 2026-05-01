@@ -189,7 +189,7 @@ export default {
           return
         }
 
-        const res = await Request.get('/api/recommendation/profile/me')
+        const res = await Request.get('/recommendation/profile/me')
         if (res.code === '0' && res.data) {
           this.profile = res.data
         }

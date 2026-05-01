@@ -452,12 +452,13 @@ export default {
       if (!userStr) {
         this.$message.warning('请先登录')
         this.$router.push('/login')
-        return
+        return false
       }
+      return true
     },
     async handleAddToCart() {
       try {
-        this.isLogin()
+        if (!this.isLogin()) return
 
         loadingInstance = Loading.service({
           lock: true,
@@ -488,7 +489,7 @@ export default {
     },
     async handleBuyNow() {
       try {
-        this.isLogin()
+        if (!this.isLogin()) return
 
         // 获取用户地址列表
         this.addressesLoading = true

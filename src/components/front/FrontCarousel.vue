@@ -1,4 +1,4 @@
-<template>
+  <template>
   <div class="carousel-container">
     <el-carousel 
       :interval="5000" 

@@ -166,7 +166,7 @@ export default {
           const user = JSON.parse(userStr);
           const userId = user.id;
 
-          const res = await Request.get('/api/recommendation/smart?limit=8');
+          const res = await Request.get('/recommendation/smart?limit=8');
           if (res.code === '0') {
             // 融合推荐接口返回的数据结构需要转换
             const recommendData = (res.data && (res.data.records || res.data)) || [];
@@ -224,7 +224,7 @@ export default {
     // 获取新品推荐（使用新品推荐接口）
     async getNewProducts() {
       try {
-        const res = await Request.get('/api/recommendation/new?limit=4')
+        const res = await Request.get('/recommendation/new?limit=4')
         if (res.code === '0') {
           this.newProducts = (res.data || []).map(item => ({
             id: item.productId,

@@ -41,8 +41,12 @@
             <!-- 修改订单商品和收货信息的布局 -->
             <div class="order-products">
               <div class="product-info">
-                <el-image :src="getProductImage(order.product)" fit="cover"
-                  class="product-image">
+                <el-image
+                  :src="getProductImage(order.product)"
+                  fit="cover"
+                  class="product-image"
+                  @error="handleProductImageError(order.product)"
+                >
                   <div slot="error" class="image-slot">
                     <i class="el-icon-picture-outline"></i>
                   </div>
@@ -266,8 +270,12 @@
     <!-- 修改评价对话框 -->
     <el-dialog title="商品评价" :visible.sync="reviewDialogVisible" width="500px">
       <div v-if="currentOrder" class="review-product-info">
-        <el-image :src="getProductImage(currentOrder.product)" fit="cover"
-          class="review-product-image">
+        <el-image
+          :src="getProductImage(currentOrder.product)"
+          fit="cover"
+          class="review-product-image"
+          @error="handleProductImageError(currentOrder.product)"
+        >
         </el-image>
         <div class="review-product-detail">
           <div class="review-product-name">{{ currentOrder.product.name }}</div>
@@ -488,7 +496,12 @@ export default {
     },
     formatTime,
     getProductImage(product) {
-      return getProductImageSrc(product || {})
+      return getProductImageSrc(product || {}, { forcePlaceholder: product && product.__imageLoadFailed })
+    },
+    handleProductImageError(product) {
+      if (product) {
+        this.$set(product, '__imageLoadFailed', true)
+      }
     },
     async getOrders() {
       this.isLogin()
