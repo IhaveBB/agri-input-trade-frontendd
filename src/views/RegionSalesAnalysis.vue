@@ -4,31 +4,35 @@
     <div class="page-header">
       <div class="header-left">
         <h2 class="page-title">地域销售分析</h2>
-        <p class="page-subtitle">全国各省份农资销售数据可视化分析</p>
+        <p class="page-subtitle">
+          <span v-if="isAdmin && merchantList.length > 0">
+            当前查看:
+            <el-select v-model="selectedMerchantId" placeholder="全部店铺" size="mini" style="width: 150px; margin-left: 8px;" @change="handleMerchantChange">
+              <el-option label="全部店铺" :value="null" />
+              <el-option v-for="m in merchantList" :key="m.id" :label="m.name || m.username" :value="m.id" />
+            </el-select>
+          </span>
+          <span style="margin-left: 12px;">
+            <el-select v-model="viewMode" size="mini" style="width: 100px;">
+              <el-option label="地图视图" value="map"></el-option>
+              <el-option label="大区视图" value="region"></el-option>
+              <el-option label="省份视图" value="province"></el-option>
+            </el-select>
+          </span>
+          <el-date-picker
+            v-model="dateRange"
+            type="daterange"
+            size="mini"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            value-format="yyyy-MM-dd"
+            style="width: 220px; margin-left: 12px;"
+            @change="loadData">
+          </el-date-picker>
+        </p>
       </div>
       <div class="header-right">
-        <span v-if="isAdmin && merchantList.length > 0" style="margin-right: 12px;">
-          <el-select v-model="selectedMerchantId" placeholder="全部店铺" size="small" style="width: 150px;" @change="handleMerchantChange">
-            <el-option label="全部店铺" :value="null" />
-            <el-option v-for="m in merchantList" :key="m.id" :label="m.name || m.username" :value="m.id" />
-          </el-select>
-        </span>
-        <el-select v-model="viewMode" size="small" style="width: 120px; margin-right: 12px;">
-          <el-option label="地图视图" value="map"></el-option>
-          <el-option label="大区视图" value="region"></el-option>
-          <el-option label="省份视图" value="province"></el-option>
-        </el-select>
-        <el-date-picker
-          v-model="dateRange"
-          type="daterange"
-          size="small"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          value-format="yyyy-MM-dd"
-          style="width: 240px; margin-right: 12px;"
-          @change="loadData">
-        </el-date-picker>
         <el-button icon="el-icon-refresh" circle @click="refreshData" :loading="loading"></el-button>
       </div>
     </div>
@@ -804,9 +808,7 @@ export default {
 
 <style lang="scss" scoped>
 .region-sales-page {
-  padding: 24px;
-  background: #f7f8fa;
-  min-height: calc(100vh - 84px);
+  padding: 0;
 }
 
 .page-header {
@@ -827,6 +829,8 @@ export default {
       margin: 0;
       font-size: 13px;
       color: #999;
+      display: flex;
+      align-items: center;
     }
   }
 
@@ -846,41 +850,53 @@ export default {
 .stat-card {
   background: #fff;
   border-radius: 12px;
-  padding: 20px 24px;
+  padding: 24px;
   display: flex;
   align-items: center;
   gap: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
 
   .stat-icon {
-    width: 52px;
-    height: 52px;
+    width: 56px;
+    height: 56px;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 28px;
     color: #fff;
+    flex-shrink: 0;
 
-    &.total { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
-    &.orders { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    &.covered { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-    &.top { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
+    &.total { background: linear-gradient(135deg, #7ec8c4 0%, #a8d8b9 100%); }
+    &.orders { background: linear-gradient(135deg, #b5c7d3 0%, #c4b5e0 100%); }
+    &.covered { background: linear-gradient(135deg, #a8d8b9 0%, #b5c7d3 100%); }
+    &.top { background: linear-gradient(135deg, #f2c78a 0%, #deb897 100%); }
+  }
+
+  .stat-content {
+    flex: 1;
+    min-width: 0;
   }
 
   .stat-label {
-    font-size: 13px;
+    font-size: 14px;
     color: #999;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
   }
 
   .stat-value {
-    font-size: 22px;
+    font-size: 28px;
     font-weight: 700;
     color: #1a1a1a;
 
     .unit {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: normal;
       color: #999;
       margin-left: 4px;

@@ -62,7 +62,6 @@
                         class="role-select">
                         <el-option label="普通用户" value="USER"></el-option>
                         <el-option label="商户" value="MERCHANT"></el-option>
-                        <el-option label="管理员" value="ADMIN"></el-option>
                     </el-select>
                 </el-form-item>
 

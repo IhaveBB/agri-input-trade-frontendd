@@ -80,36 +80,31 @@
       <el-table :data="logisticsList" border style="width: 100%">
         <el-table-column prop="orderId" label="订单号" width="120"></el-table-column>
         <el-table-column prop="companyName" label="快递公司" width="120"></el-table-column>
-        <el-table-column prop="trackingNumber" label="快递单号" width="150"></el-table-column>
-        <el-table-column label="收货信息" width="200">
+        <el-table-column prop="trackingNumber" label="快递单号" width="160"></el-table-column>
+        <el-table-column label="收货信息" min-width="200">
           <template slot-scope="scope">
             <div>{{ scope.row.order?.recvAddress }}</div>
             <div>{{ scope.row.order?.recvPhone }}</div>
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="物流状态" width="120">
+        <el-table-column prop="status" label="物流状态" width="100">
           <template slot-scope="scope">
             <el-tag :type="getLogisticsStatusType(scope.row.status)">
               {{ logisticsStatusMap[scope.row.status] }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="创建时间" width="180">
+        <el-table-column prop="createdAt" label="创建时间" width="160">
           <template slot-scope="scope">
             {{ formatTime(scope.row.createdAt) }}
           </template>
         </el-table-column>
-        <el-table-column prop="updatedAt" label="更新时间" width="180">
-          <template slot-scope="scope">
-            {{ formatTime(scope.row.updatedAt) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="expectedArrivalTime" label="预计到达时间" width="180">
+        <el-table-column prop="expectedArrivalTime" label="预计到达" width="160">
           <template slot-scope="scope">
             {{ formatTime(scope.row.expectedArrivalTime) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column label="操作" width="100" fixed="right">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="handleDetail(scope.row)">详情</el-button>
           </template>

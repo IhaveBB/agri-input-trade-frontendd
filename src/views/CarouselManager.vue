@@ -9,12 +9,10 @@
     <div class="content-box">
       <!-- 操作栏 -->
       <el-card class="operation-area" shadow="hover">
-        <div class="control-btns">
-          <div class="right-btns">
-            <el-button type="primary" plain size="medium" @click="handleAdd">
-              <i class="el-icon-plus"></i> 新增轮播图
-            </el-button>
-          </div>
+        <div class="operation-buttons">
+          <el-button type="primary" plain size="medium" @click="handleAdd">
+            <i class="el-icon-plus"></i> 新增轮播图
+          </el-button>
         </div>
       </el-card>
 
@@ -356,7 +354,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .carousel-manager {
   padding: 24px;
   background-color: #f0f2f5;
@@ -367,14 +365,14 @@ export default {
   display: flex;
   align-items: center;
   margin-bottom: 24px;
+}
 
-  h2 {
-    font-size: 24px;
-    font-weight: 500;
-    color: #1f2f3d;
-    margin: 0;
-    margin-right: 15px;
-  }
+.page-header h2 {
+  font-size: 24px;
+  font-weight: 500;
+  color: #1f2f3d;
+  margin: 0;
+  margin-right: 15px;
 }
 
 .operation-area {
@@ -384,21 +382,33 @@ export default {
   margin-bottom: 24px;
 }
 
+.operation-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+}
+
 .table-card {
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
-.control-btns {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
+:deep(.el-table) {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: none;
+}
 
-  .right-btns {
-    display: flex;
-    gap: 10px;
-  }
+:deep(.el-table th) {
+  background-color: #fafafa;
+  font-weight: 500;
+  color: #1f2f3d;
+  padding: 12px 0;
+}
+
+:deep(.el-table td) {
+  padding: 12px 0;
 }
 
 .preview-image {
@@ -420,40 +430,40 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
 
-  &:hover {
-    border-color: #2c9678;
-  }
+.carousel-uploader:hover {
+  border-color: #2c9678;
+}
 
-  .carousel-image {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: contain;
-    background-color: #f5f7fa;
-  }
+.carousel-uploader .carousel-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background-color: #f5f7fa;
+}
 
-  .carousel-uploader-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    color: #8c939d;
-    background-color: #f5f7fa;
+.carousel-uploader .carousel-uploader-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #8c939d;
+  background-color: #f5f7fa;
+}
 
-    .el-icon-plus {
-      font-size: 28px;
-      margin-bottom: 8px;
-      color: #c0c4cc;
-    }
+.carousel-uploader .carousel-uploader-placeholder .el-icon-plus {
+  font-size: 28px;
+  margin-bottom: 8px;
+  color: #c0c4cc;
+}
 
-    .placeholder-text {
-      font-size: 14px;
-      color: #909399;
-    }
-  }
+.carousel-uploader .carousel-uploader-placeholder .placeholder-text {
+  font-size: 14px;
+  color: #909399;
 }
 
 .upload-tip {
@@ -469,20 +479,27 @@ export default {
 :deep(.el-dialog) {
   border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
 
-  .el-dialog__header {
-    padding: 24px;
-    border-bottom: 1px solid #ebeef5;
-    margin: 0;
-  }
+:deep(.el-dialog__header) {
+  padding: 24px;
+  border-bottom: 1px solid #ebeef5;
+  margin: 0;
+}
 
-  .el-dialog__body {
-    padding: 32px 24px;
-  }
+:deep(.el-dialog__title) {
+  font-size: 18px;
+  font-weight: 500;
+  color: #1f2f3d;
+}
 
-  .el-dialog__footer {
-    padding: 16px 24px;
-    border-top: 1px solid #ebeef5;
-  }
+:deep(.el-dialog__body) {
+  padding: 32px 24px;
+}
+
+:deep(.el-dialog__footer) {
+  padding: 16px 24px;
+  border-top: 1px solid #ebeef5;
 }
 </style> 

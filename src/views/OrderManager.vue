@@ -145,11 +145,6 @@
             </template>
             
             <template v-else-if="isAdmin">
-              <!-- 管理员只能删除订单 -->
-              <el-button 
-                type="text" 
-                size="small" 
-                @click="handleDelete(scope.row)">删除</el-button>
             </template>
             
             <el-button type="text" size="small" @click="handleDetail(scope.row)">详情</el-button>

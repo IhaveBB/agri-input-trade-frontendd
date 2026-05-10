@@ -26,15 +26,13 @@
                 </el-form>
 
                 <!-- 按钮区域 -->
-                <div class="control-btns">
+                <div class="operation-buttons">
                     <el-button  type="danger" plain size="medium" @click="batchDelete" :disabled="!multipleSelection.length">
                         <i class="el-icon-delete"></i> 批量删除
                     </el-button>
-                    <div class="right-btns">
-                        <el-button type="primary" plain size="medium" @click="openDialog()">
-                            <i class="el-icon-plus"></i> 发布通知
-                        </el-button>
-                    </div>
+                    <el-button type="primary" plain size="medium" @click="openDialog()">
+                        <i class="el-icon-plus"></i> 发布通知
+                    </el-button>
                 </div>
             </el-card>
 
@@ -351,7 +349,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .notice-manager {
     padding: 24px;
     background-color: #f0f2f5;
@@ -362,14 +360,14 @@ export default {
     display: flex;
     align-items: center;
     margin-bottom: 24px;
+}
 
-    h2 {
-        font-size: 24px;
-        font-weight: 500;
-        color: #1f2f3d;
-        margin: 0;
-        margin-right: 15px;
-    }
+.page-header h2 {
+    font-size: 24px;
+    font-weight: 500;
+    color: #1f2f3d;
+    margin: 0;
+    margin-right: 15px;
 }
 
 .operation-area {
@@ -382,8 +380,13 @@ export default {
 .search-form {
     margin-bottom: 20px;
     padding: 20px 20px 0;
-    background-color: #fafafa;
-    border-radius: 4px;
+}
+
+.operation-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px 20px;
 }
 
 .table-card {
@@ -391,59 +394,47 @@ export default {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
-.control-btns {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px 20px;
-
-    .right-btns {
-        display: flex;
-        gap: 10px;
-    }
-}
-
 :deep(.el-table) {
     border-radius: 8px;
     overflow: hidden;
     box-shadow: none;
+}
 
-    th {
-        background-color: #fafafa;
-        font-weight: 500;
-        color: #1f2f3d;
-        padding: 12px 0;
-    }
+:deep(.el-table th) {
+    background-color: #fafafa;
+    font-weight: 500;
+    color: #1f2f3d;
+    padding: 12px 0;
+}
 
-    td {
-        padding: 12px 0;
-    }
+:deep(.el-table td) {
+    padding: 12px 0;
 }
 
 :deep(.el-dialog) {
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
 
-    .el-dialog__header {
-        padding: 24px;
-        border-bottom: 1px solid #ebeef5;
-        margin: 0;
-    }
+:deep(.el-dialog__header) {
+    padding: 24px;
+    border-bottom: 1px solid #ebeef5;
+    margin: 0;
+}
 
-    .el-dialog__title {
-        font-size: 18px;
-        font-weight: 500;
-        color: #1f2f3d;
-    }
+:deep(.el-dialog__title) {
+    font-size: 18px;
+    font-weight: 500;
+    color: #1f2f3d;
+}
 
-    .el-dialog__body {
-        padding: 32px 24px;
-    }
+:deep(.el-dialog__body) {
+    padding: 32px 24px;
+}
 
-    .el-dialog__footer {
-        padding: 16px 24px;
-        border-top: 1px solid #ebeef5;
-    }
+:deep(.el-dialog__footer) {
+    padding: 16px 24px;
+    border-top: 1px solid #ebeef5;
 }
 </style>

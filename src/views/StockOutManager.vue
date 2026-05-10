@@ -3,7 +3,7 @@
     <!-- 页面标题区域 -->
     <div class="page-header">
       <h2>出库管理</h2>
-      <el-button type="primary" @click="showCreateDialog">新增出库</el-button>
+      <el-button v-if="userInfo.role === 'MERCHANT'" type="primary" @click="showCreateDialog">新增出库</el-button>
     </div>
 
     <!-- 搜索和操作区域 -->
@@ -83,11 +83,11 @@
         <el-table-column prop="orderNo" label="订单号" width="150"></el-table-column>
         <el-table-column label="操作" width="150" fixed="right">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.status === 1" type="text" size="small" @click="handleInvalidate(scope.row)">
+            <el-button v-if="scope.row.status === 1 && userInfo.role === 'MERCHANT'" type="text" size="small" @click="handleInvalidate(scope.row)">
               作废
             </el-button>
             <el-button type="text" size="small" @click="handleDetail(scope.row)">详情</el-button>
-            <el-button type="text" size="small" class="delete-button" @click="handleDelete(scope.row)">删除</el-button>
+            <el-button v-if="userInfo.role === 'MERCHANT'" type="text" size="small" class="delete-button" @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

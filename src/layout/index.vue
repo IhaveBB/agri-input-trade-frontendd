@@ -66,8 +66,8 @@ export default {
 @import "../assets/less/scroller-bar";
 
 .app-wrapper {
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
   background-color: #f0f2f5;
 
@@ -147,9 +147,12 @@ export default {
 
   .main-container {
     margin-left: 220px;
-    min-height: 100vh;
+    width: calc(100vw - 220px);
+    max-width: calc(100vw - 220px);
+    height: 100vh;
     background-color: #f0f2f5;
     padding: 16px;
+    box-sizing: border-box;
     position: relative;
     overflow: hidden;
 

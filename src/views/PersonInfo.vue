@@ -4,15 +4,16 @@
     <div class="page-header">
       <h2>个人信息</h2>
       <el-tag type="info">{{ getRoleName(userInfo.role) }}</el-tag>
+      <el-button type="warning" size="small" icon="el-icon-key" class="pwd-btn" @click="passwordDialogVisible = true">修改密码</el-button>
     </div>
 
     <!-- 信息卡片 -->
     <div class="card-container">
       <el-card class="info-card" shadow="hover" v-loading="loading">
-        <el-form 
-          :model="userInfo" 
-          :rules="rules" 
-          ref="userInfoForm" 
+        <el-form
+          :model="userInfo"
+          :rules="rules"
+          ref="userInfoForm"
           label-width="80px"
           class="info-form"
         >
@@ -42,10 +43,10 @@
 
           <el-form-item label="营业执照" v-if="userInfo.role === 'MERCHANT'" prop="businessLicense">
             <div class="license-upload">
-              <input 
-                type="file" 
-                ref="fileInput" 
-                style="display: none" 
+              <input
+                type="file"
+                ref="fileInput"
+                style="display: none"
                 accept="image/jpeg,image/png"
                 @change="handleFileChange"
               >
@@ -71,6 +72,31 @@
         </el-form>
       </el-card>
     </div>
+
+    <!-- 修改密码弹窗 -->
+    <el-dialog title="修改密码" :visible.sync="passwordDialogVisible" width="450px" @close="resetPasswordForm">
+      <el-form :model="passwordForm" :rules="passwordRules" ref="passwordForm" label-width="100px">
+        <el-form-item label="旧密码" prop="oldPassword">
+          <el-input type="password" v-model="passwordForm.oldPassword" :show-password="true" autocomplete="off">
+            <template slot="prepend"><i class="el-icon-lock"></i></template>
+          </el-input>
+        </el-form-item>
+        <el-form-item label="新密码" prop="newPassword">
+          <el-input type="password" v-model="passwordForm.newPassword" :show-password="true" autocomplete="off">
+            <template slot="prepend"><i class="el-icon-key"></i></template>
+          </el-input>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="confirmPassword">
+          <el-input type="password" v-model="passwordForm.confirmPassword" :show-password="true" autocomplete="off">
+            <template slot="prepend"><i class="el-icon-check"></i></template>
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button @click="passwordDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitPassword">确认修改</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -80,10 +106,31 @@ import request from '@/utils/request';
 export default {
   name: 'PersonInfo',
   inject: ['userInfo'],
-  
+
   data() {
+    const validatePassword = (rule, value, callback) => {
+      if (value.length < 6) {
+        callback(new Error('密码长度不能少于6位'));
+      } else {
+        callback();
+      }
+    };
+    const validateConfirmPassword = (rule, value, callback) => {
+      if (value !== this.passwordForm.newPassword) {
+        callback(new Error('两次输入密码不一致'));
+      } else {
+        callback();
+      }
+    };
+
     return {
       loading: false,
+      passwordDialogVisible: false,
+      passwordForm: {
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      },
       rules: {
         name: [
           { required: true, message: '姓名不能为空', trigger: 'blur' },
@@ -93,6 +140,11 @@ export default {
           { required: true, message: '邮箱不能为空', trigger: 'blur' },
           { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
         ]
+      },
+      passwordRules: {
+        oldPassword: [{ required: true, message: '请输入旧密码', trigger: 'blur' }],
+        newPassword: [{ required: true, validator: validatePassword, trigger: 'blur' }],
+        confirmPassword: [{ required: true, validator: validateConfirmPassword, trigger: 'blur' }],
       }
     };
   },
@@ -115,25 +167,36 @@ export default {
           request.put("/user/" + this.userInfo.id, this.userInfo).then(response => {
             this.loading = false;
             if (response.code == '0') {
-              this.$message({
-                type: 'success',
-                message: '信息保存成功!'
-              })
+              this.$message({ type: 'success', message: '信息保存成功!' })
               localStorage.setItem("frontUser", JSON.stringify(this.userInfo))
               this.$emit("update:user", this.userInfo)
             } else {
-              this.$message({
-                type: 'error',
-                message: response.msg
-              })
+              this.$message({ type: 'error', message: response.msg })
             }
-          }).catch(() => {
-            this.loading = false;
-          })
-        } else {
-          return false;
+          }).catch(() => { this.loading = false; })
         }
       });
+    },
+
+    submitPassword() {
+      this.$refs.passwordForm.validate((valid) => {
+        if (valid) {
+          request.put('/user/password/' + this.userInfo.id, this.passwordForm).then(response => {
+            if (response.code == '0') {
+              this.$message({ type: 'success', message: '密码修改成功！请重新登录！' });
+              this.passwordDialogVisible = false;
+              localStorage.removeItem("backUser");
+              this.$router.push({ path: '/login' });
+            } else {
+              this.$message({ type: 'error', message: response.msg });
+            }
+          });
+        }
+      });
+    },
+
+    resetPasswordForm() {
+      this.$refs.passwordForm && this.$refs.passwordForm.resetFields();
     },
 
     triggerUpload() {
@@ -144,7 +207,6 @@ export default {
       const file = e.target.files[0];
       if (!file) return;
 
-      // 验证文件类型和大小
       const isJPGOrPNG = file.type === 'image/jpeg' || file.type === 'image/png';
       const isLt2M = file.size / 1024 / 1024 < 2;
 
@@ -157,21 +219,16 @@ export default {
         return;
       }
 
-      // 创建 FormData
       const formData = new FormData();
       formData.append('file', file);
 
       this.loading = true;
       try {
         const res = await request.post('/file/upload/img', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+          headers: { 'Content-Type': 'multipart/form-data' }
         });
-
         if (res.code === '0') {
           this.userInfo.businessLicense = res.data;
-          // 更新用户信息到本地存储
           const storedUser = JSON.parse(localStorage.getItem('frontUser'));
           if (storedUser) {
             storedUser.businessLicense = res.data;
@@ -182,13 +239,10 @@ export default {
           this.$message.error(res.msg || '上传失败');
         }
       } catch (error) {
-        console.error('上传失败:', error);
         this.$message.error('上传失败');
       } finally {
         this.loading = false;
       }
-
-      // 清空 input 的值，允许重复上传同一个文件
       this.$refs.fileInput.value = '';
     },
 
@@ -199,7 +253,6 @@ export default {
         type: 'warning'
       }).then(() => {
         this.userInfo.businessLicense = '';
-        // 更新用户信息到本地存储
         const storedUser = JSON.parse(localStorage.getItem('frontUser'));
         if (storedUser) {
           storedUser.businessLicense = '';
@@ -225,6 +278,12 @@ export default {
   color: #1f2f3d;
   margin: 0;
   margin-right: 15px;
+}
+
+.pwd-btn {
+  margin-left: 16px;
+  width: auto !important;
+  padding: 7px 15px !important;
 }
 
 .card-container {

@@ -1,24 +1,26 @@
 <template>
   <div class="sales-statistics">
+    <el-tabs v-model="activeTab" class="main-tabs" @tab-click="handleTabChange">
+      <el-tab-pane label="销售数据" name="sales">
     <!-- 页面头部 -->
-    <div class="page-header">
-      <div class="header-left">
-        <h2 class="page-title">销售统计</h2>
-        <p class="page-subtitle">
-          <span v-if="isAdmin && merchantList.length > 0">
-            当前查看:
-            <el-select v-model="selectedMerchantId" placeholder="请选择店铺" size="mini" style="width: 150px; margin-left: 8px;" @change="handleMerchantChange">
-              <el-option label="全部店铺" :value="null" />
-              <el-option v-for="m in merchantList" :key="m.id" :label="m.name || m.username" :value="m.id" />
-            </el-select>
-          </span>
-          <span v-else>数据更新时间: {{ lastUpdateTime }}</span>
-        </p>
-      </div>
-      <div class="header-right">
-        <el-button icon="el-icon-refresh" circle @click="refreshData" :loading="loading"></el-button>
-      </div>
-    </div>
+        <div class="page-header">
+          <div class="header-left">
+            <h2 class="page-title">销售统计</h2>
+            <p class="page-subtitle">
+              <span v-if="isAdmin && merchantList.length > 0">
+                当前查看:
+                <el-select v-model="selectedMerchantId" placeholder="请选择店铺" size="mini" style="width: 150px; margin-left: 8px;" @change="handleMerchantChange">
+                  <el-option label="全部店铺" :value="null" />
+                  <el-option v-for="m in merchantList" :key="m.id" :label="m.name || m.username" :value="m.id" />
+                </el-select>
+              </span>
+              <span v-else>数据更新时间: {{ lastUpdateTime }}</span>
+            </p>
+          </div>
+          <div class="header-right">
+            <el-button icon="el-icon-refresh" circle @click="refreshData" :loading="loading"></el-button>
+          </div>
+        </div>
 
     <!-- 关键指标卡片 -->
     <div class="stat-cards">
@@ -134,13 +136,13 @@
         </div>
       </div>
 
-      <!-- 地区销售 -->
+      <!-- 热销商品 -->
       <div class="chart-panel">
         <div class="chart-panel__header">
-          <h3 class="chart-panel__title">地区销售分布</h3>
+          <h3 class="chart-panel__title">热销商品 TOP5</h3>
         </div>
         <div class="chart-panel__body">
-          <div ref="regionChartRef" class="chart"></div>
+          <div ref="topProductsChartRef" class="chart"></div>
         </div>
       </div>
 
@@ -154,22 +156,18 @@
         </div>
       </div>
     </div>
-
-    <!-- 热销商品 -->
-    <div class="chart-panel chart-panel--full">
-      <div class="chart-panel__header">
-        <h3 class="chart-panel__title">热销商品 TOP5</h3>
-      </div>
-      <div class="chart-panel__body">
-        <div ref="topProductsChartRef" class="chart"></div>
-      </div>
-    </div>
+      </el-tab-pane>
+      <el-tab-pane label="地域分布" name="region" lazy>
+        <region-sales-analysis ref="regionComponent" />
+      </el-tab-pane>
+    </el-tabs>
   </div>
 </template>
 
 <script>
 import { Button, Select, Option } from 'element-ui'
 import CountTo from 'vue-count-to'
+import RegionSalesAnalysis from './RegionSalesAnalysis.vue'
 import * as echarts from 'echarts'
 import {
   getMonthlyOrderStatistics,
@@ -179,7 +177,6 @@ import {
   getCategorySalesStatistics,
   getSalesTrend,
   getSeasonalStatistics,
-  getRegionStatistics,
   getMerchantList
 } from '@/api/statistics'
 
@@ -189,11 +186,13 @@ export default {
     [Button.name]: Button,
     [Select.name]: Select,
     [Option.name]: Option,
-    CountTo
+    CountTo,
+    RegionSalesAnalysis
   },
   data() {
     return {
       loading: false,
+      activeTab: 'sales',
       lastUpdateTime: '',
       activeTrendTab: 30,
       trendTabs: [
@@ -214,18 +213,16 @@ export default {
       categoryData: [],
       trendData: [],
       seasonData: {},
-      regionData: [],
       // 图表实例
       trendChart: null,
       categoryChart: null,
       topProductsChart: null,
       seasonChart: null,
-      regionChart: null,
       monthChart: null,
       // 图表配置
       chartColors: [
-        '#11998e', '#38ef7d', '#43e97b', '#38f9d7',
-        '#20c997', '#12b886', '#0ca678', '#099268'
+        '#7ec8c4', '#a8d8b9', '#b5c7d3', '#d4a5d0',
+        '#f2c78a', '#c4b5e0', '#8fc1a9', '#deb897'
       ]
     }
   },
@@ -240,6 +237,13 @@ export default {
     window.removeEventListener('resize', this.handleResize)
   },
   methods: {
+    handleTabChange(tab) {
+      if (tab.name === 'region') {
+        this.$nextTick(() => {
+          this.$refs.regionComponent && this.$refs.regionComponent.handleResize()
+        })
+      }
+    },
     // 检查用户角色
     checkUserRole() {
       const userStr = localStorage.getItem('backUser')
@@ -274,7 +278,6 @@ export default {
       this.categoryChart = echarts.init(this.$refs.categoryChartRef)
       this.topProductsChart = echarts.init(this.$refs.topProductsChartRef)
       this.seasonChart = echarts.init(this.$refs.seasonChartRef)
-      this.regionChart = echarts.init(this.$refs.regionChartRef)
       this.monthChart = echarts.init(this.$refs.monthChartRef)
     },
     // 销毁图表
@@ -283,7 +286,6 @@ export default {
       this.categoryChart && this.categoryChart.dispose()
       this.topProductsChart && this.topProductsChart.dispose()
       this.seasonChart && this.seasonChart.dispose()
-      this.regionChart && this.regionChart.dispose()
       this.monthChart && this.monthChart.dispose()
     },
     // 响应式
@@ -292,7 +294,6 @@ export default {
       this.categoryChart && this.categoryChart.resize()
       this.topProductsChart && this.topProductsChart.resize()
       this.seasonChart && this.seasonChart.resize()
-      this.regionChart && this.regionChart.resize()
       this.monthChart && this.monthChart.resize()
     },
     // 加载数据
@@ -311,8 +312,7 @@ export default {
           this.fetchTopProducts(),
           this.fetchCategoryData(),
           this.fetchTrendData(),
-          this.fetchSeasonData(),
-          this.fetchRegionData()
+          this.fetchSeasonData()
         ])
         this.updateTime()
       } catch (error) {
@@ -411,14 +411,6 @@ export default {
         this.renderMonthChart()
       }
     },
-    // 获取地区数据
-    async fetchRegionData() {
-      const res = await getRegionStatistics(this.selectedMerchantId)
-      if (res.code === '0' && res.data) {
-        this.regionData = res.data.regionStats || []
-        this.renderRegionChart()
-      }
-    },
     // 渲染销售趋势图
     renderTrendChart() {
       if (!this.trendChart) return
@@ -488,12 +480,12 @@ export default {
             symbol: 'circle',
             symbolSize: 8,
             data: salesAmounts,
-            lineStyle: { color: '#11998e', width: 3 },
-            itemStyle: { color: '#11998e', borderColor: '#fff', borderWidth: 2 },
+            lineStyle: { color: '#7ec8c4', width: 3 },
+            itemStyle: { color: '#7ec8c4', borderColor: '#fff', borderWidth: 2 },
             areaStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: 'rgba(17, 153, 142, 0.3)' },
-                { offset: 1, color: 'rgba(17, 153, 142, 0.02)' }
+                { offset: 0, color: 'rgba(126, 200, 196, 0.3)' },
+                { offset: 1, color: 'rgba(126, 200, 196, 0.02)' }
               ])
             }
           },
@@ -505,8 +497,8 @@ export default {
             symbol: 'circle',
             symbolSize: 8,
             data: orderCounts,
-            lineStyle: { color: '#f6d365', width: 3 },
-            itemStyle: { color: '#f6d365', borderColor: '#fff', borderWidth: 2 }
+            lineStyle: { color: '#f2c78a', width: 3 },
+            itemStyle: { color: '#f2c78a', borderColor: '#fff', borderWidth: 2 }
           }
         ]
       }
@@ -615,8 +607,8 @@ export default {
           barWidth: '50%',
           itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-              { offset: 0, color: '#11998e' },
-              { offset: 1, color: '#38ef7d' }
+              { offset: 0, color: '#7ec8c4' },
+              { offset: 1, color: '#a8d8b9' }
             ]),
             borderRadius: [0, 4, 4, 0]
           },
@@ -676,8 +668,8 @@ export default {
           barWidth: '50%',
           itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: '#43e97b' },
-              { offset: 1, color: '#38f9d7' }
+              { offset: 0, color: '#a8d8b9' },
+              { offset: 1, color: '#b5c7d3' }
             ]),
             borderRadius: [4, 4, 0, 0]
           }
@@ -728,12 +720,12 @@ export default {
           type: 'line',
           smooth: true,
           data: salesAmounts,
-          lineStyle: { color: '#667eea' },
-          itemStyle: { color: '#667eea' },
+          lineStyle: { color: '#c4b5e0' },
+          itemStyle: { color: '#c4b5e0' },
           areaStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: 'rgba(102, 126, 234, 0.3)' },
-              { offset: 1, color: 'rgba(102, 126, 234, 0.02)' }
+              { offset: 0, color: 'rgba(196, 181, 224, 0.3)' },
+              { offset: 1, color: 'rgba(196, 181, 224, 0.02)' }
             ])
           }
         }]
@@ -741,64 +733,6 @@ export default {
 
       this.monthChart.setOption(option)
     },
-    // 渲染地区图表
-    renderRegionChart() {
-      if (!this.regionChart) return
-
-      const data = this.regionData.slice(0, 10)
-      if (data.length === 0) {
-        this.regionChart.clear()
-        return
-      }
-
-      const option = {
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: { type: 'shadow' },
-          formatter: (params) => {
-            const item = params[0]
-            const idx = item.dataIndex
-            const region = data[idx]
-            if (!region) return ''
-            return `${item.name}<br/>销售额: ¥${region.salesAmount?.toLocaleString() || 0}<br/>订单数: ${region.orderCount || 0}<br/>用户数: ${region.userCount || 0}<br/>占比: ${region.percentage || '0%'}`
-          }
-        },
-        grid: { left: '3%', right: '10%', bottom: '3%', top: '3%', containLabel: true },
-        xAxis: {
-          type: 'value',
-          axisLine: { show: false },
-          axisLabel: { color: '#909399' },
-          splitLine: { lineStyle: { color: '#f5f5f5' } }
-        },
-        yAxis: {
-          type: 'category',
-          data: data.map(item => item.region).reverse(),
-          axisLine: { show: false },
-          axisTick: { show: false },
-          axisLabel: { color: '#606266', fontSize: 13 }
-        },
-        series: [{
-          type: 'bar',
-          data: data.map(item => item.salesAmount || 0).reverse(),
-          barWidth: '50%',
-          itemStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-              { offset: 0, color: '#f6d365' },
-              { offset: 1, color: '#fda085' }
-            ]),
-            borderRadius: [0, 4, 4, 0]
-          },
-          label: {
-            show: true,
-            position: 'right',
-            color: '#909399',
-            formatter: (params) => '¥' + params.value.toLocaleString()
-          }
-        }]
-      }
-
-      this.regionChart.setOption(option)
-    }
   }
 }
 </script>
@@ -866,16 +800,16 @@ export default {
     flex-shrink: 0;
 
     &--orders {
-      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      background: linear-gradient(135deg, #7ec8c4 0%, #a8d8b9 100%);
     }
     &--sales {
-      background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+      background: linear-gradient(135deg, #f2c78a 0%, #deb897 100%);
     }
     &--products {
-      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      background: linear-gradient(135deg, #b5c7d3 0%, #d4a5d0 100%);
     }
     &--users {
-      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      background: linear-gradient(135deg, #c4b5e0 0%, #d4b8c8 100%);
     }
   }
 
@@ -979,12 +913,12 @@ export default {
     transition: all 0.2s;
 
     &:hover {
-      color: #11998e;
+      color: #7ec8c4;
     }
 
     &.active {
-      color: #11998e;
-      background: rgba(17, 153, 142, 0.1);
+      color: #7ec8c4;
+      background: rgba(126, 200, 196, 0.1);
       font-weight: 500;
     }
   }
@@ -1001,6 +935,23 @@ export default {
 
 .chart-panel--full .chart-panel__body .chart {
   height: 300px;
+}
+
+:deep(.main-tabs) {
+  .el-tabs__header {
+    margin-bottom: 0;
+    padding: 0 4px;
+  }
+
+  .el-tabs__item {
+    font-size: 16px;
+    height: 48px;
+    line-height: 48px;
+  }
+
+  .el-tabs__content {
+    padding: 0;
+  }
 }
 
 @media (max-width: 1200px) {

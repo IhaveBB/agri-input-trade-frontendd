@@ -200,14 +200,7 @@ export const setRoutes = () => {
             },
           },
           {
-            path: '/region-sales',
-            name: 'RegionSalesAnalysis',
-            component: () => import('../views/RegionSalesAnalysis.vue'),
-            meta: {
-              title: "地域销售分析"
-            },
-          },
-          {
+            path: '/stock-warning',
             path: '/stock-warning',
             name: 'StockWarning',
             component: () => import('../views/StockWarning.vue'),
