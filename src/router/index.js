@@ -201,7 +201,6 @@ export const setRoutes = () => {
           },
           {
             path: '/stock-warning',
-            path: '/stock-warning',
             name: 'StockWarning',
             component: () => import('../views/StockWarning.vue'),
             meta: {
